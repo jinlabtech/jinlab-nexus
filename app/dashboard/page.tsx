@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import DashboardCard from "@/components/DashboardCard";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
+
+import { useAuditLogs } from "@/hooks/useAuditLogs";
 import { supabase } from "@/lib/supabase";
 
 type UserProfile = {
@@ -17,17 +19,32 @@ type UserProfile = {
   role: string | null;
 };
 
+function formatActivityDate(date: string) {
+  return new Intl.DateTimeFormat("en-ZA", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(date));
+}
+
 export default function DashboardPage() {
   const router = useRouter();
 
-  const [profile, setProfile] = useState<UserProfile | null>(
-    null
-  );
+  const [profile, setProfile] =
+    useState<UserProfile | null>(null);
+
+  const [companyId, setCompanyId] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [userCount, setUserCount] = useState(0);
   const [branchCount, setBranchCount] = useState(0);
+
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const {
+    auditLogs,
+    loading: auditLoading,
+    errorMessage: auditError,
+  } = useAuditLogs(companyId, 5);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -74,7 +91,9 @@ export default function DashboardPage() {
         return;
       }
 
-      const companyId = profileData.company_id;
+      const currentCompanyId = profileData.company_id;
+
+      setCompanyId(currentCompanyId);
 
       const [
         companyResult,
@@ -84,7 +103,7 @@ export default function DashboardPage() {
         supabase
           .from("company")
           .select("company_name")
-          .eq("id", companyId)
+          .eq("id", currentCompanyId)
           .single(),
 
         supabase
@@ -93,7 +112,7 @@ export default function DashboardPage() {
             count: "exact",
             head: true,
           })
-          .eq("company_id", companyId),
+          .eq("company_id", currentCompanyId),
 
         supabase
           .from("branch")
@@ -101,7 +120,7 @@ export default function DashboardPage() {
             count: "exact",
             head: true,
           })
-          .eq("company_id", companyId),
+          .eq("company_id", currentCompanyId),
       ]);
 
       if (companyResult.error) {
@@ -145,14 +164,20 @@ export default function DashboardPage() {
           </h1>
 
           <p className="mt-2 text-muted-foreground">
-            Monitor your organisation, users and branches from
-            one central workspace.
+            Monitor your organisation, users, branches and
+            recent system activity.
           </p>
         </section>
 
         {errorMessage && (
           <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             {errorMessage}
+          </div>
+        )}
+
+        {auditError && (
+          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+            Audit activity warning: {auditError}
           </div>
         )}
 
@@ -192,20 +217,56 @@ export default function DashboardPage() {
 
             <section className="mt-8 grid gap-6 lg:grid-cols-2">
               <div className="rounded-xl border bg-card p-6 shadow-sm">
-                <h2 className="text-lg font-semibold">
-                  Recent activity
-                </h2>
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    Recent activity
+                  </h2>
 
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Company activity, user actions and system
-                  updates will appear here.
-                </p>
-
-                <div className="mt-6 rounded-lg border border-dashed p-8 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    No recent activity yet.
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Latest actions recorded for your company.
                   </p>
                 </div>
+
+                {auditLoading ? (
+                  <div className="mt-6 rounded-lg border border-dashed p-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Loading recent activity...
+                    </p>
+                  </div>
+                ) : auditLogs.length === 0 ? (
+                  <div className="mt-6 rounded-lg border border-dashed p-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      No recent activity yet.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-6 divide-y">
+                    {auditLogs.map((log) => (
+                      <div
+                        key={log.id}
+                        className="py-4 first:pt-0 last:pb-0"
+                      >
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <p className="font-medium">
+                              {log.description}
+                            </p>
+
+                            <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+                              {log.module} · {log.action}
+                            </p>
+                          </div>
+
+                          <p className="text-xs text-muted-foreground">
+                            {formatActivityDate(
+                              log.created_at
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="rounded-xl border bg-card p-6 shadow-sm">
