@@ -9,104 +9,102 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 
+import { useCompanies } from "@/hooks/useCompanies";
 import {
   createCompany,
-  getCompanies,
   updateCompany,
-  type Company,
-  type CompanyFormData,
 } from "@/lib/services/companyService";
-
 import { supabase } from "@/lib/supabase";
+
+import type {
+  Company,
+  CompanyFormData,
+} from "@/types/company";
 
 export default function CompaniesPage() {
   const router = useRouter();
 
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const {
+    companies,
+    loading,
+    errorMessage: companiesError,
+    refreshCompanies,
+  } = useCompanies();
+
   const [showForm, setShowForm] = useState(false);
   const [editingCompany, setEditingCompany] =
     useState<Company | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-
   const [companyName, setCompanyName] = useState("JINLAB");
   const [userName, setUserName] =
     useState("JINLAB Admin");
 
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [pageError, setPageError] = useState("");
 
   useEffect(() => {
     async function initialisePage() {
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
 
-      if (!user) {
+      if (userError || !user) {
         router.replace("/login");
         return;
       }
 
-      const { data: profileData } = await supabase
-        .from("user_profile")
-        .select("full_name, company_id")
-        .eq("user_id", user.id)
-        .single();
+      const { data: profileData, error: profileError } =
+        await supabase
+          .from("user_profile")
+          .select("full_name, company_id")
+          .eq("user_id", user.id)
+          .single();
+
+      if (profileError) {
+        setPageError(profileError.message);
+        return;
+      }
 
       if (profileData?.full_name) {
         setUserName(profileData.full_name);
       }
 
       if (profileData?.company_id) {
-        const { data: currentCompanyData } =
-          await supabase
-            .from("company")
-            .select("company_name")
-            .eq("id", profileData.company_id)
-            .single();
+        const {
+          data: currentCompanyData,
+          error: companyError,
+        } = await supabase
+          .from("company")
+          .select("company_name")
+          .eq("id", profileData.company_id)
+          .single();
+
+        if (companyError) {
+          setPageError(companyError.message);
+          return;
+        }
 
         if (currentCompanyData?.company_name) {
-          setCompanyName(
-            currentCompanyData.company_name
-          );
+          setCompanyName(currentCompanyData.company_name);
         }
       }
-
-      await loadCompanies();
     }
 
     initialisePage();
   }, [router]);
 
-  async function loadCompanies() {
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const data = await getCompanies();
-      setCompanies(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Companies could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
   function openAddForm() {
     setMessage("");
-    setErrorMessage("");
+    setPageError("");
     setEditingCompany(null);
     setShowForm(true);
   }
 
   function openEditForm(company: Company) {
     setMessage("");
-    setErrorMessage("");
+    setPageError("");
     setEditingCompany(company);
     setShowForm(true);
 
@@ -124,21 +122,28 @@ export default function CompaniesPage() {
   async function saveCompany(
     companyData: CompanyFormData
   ) {
-    if (editingCompany) {
-      await updateCompany(
-        editingCompany.id,
-        companyData
+    try {
+      if (editingCompany) {
+        await updateCompany(
+          editingCompany.id,
+          companyData
+        );
+
+        setMessage("Company updated successfully.");
+      } else {
+        await createCompany(companyData);
+        setMessage("Company created successfully.");
+      }
+
+      closeForm();
+      await refreshCompanies();
+    } catch (error) {
+      throw new Error(
+        error instanceof Error
+          ? error.message
+          : "The company could not be saved."
       );
-
-      setMessage("Company updated successfully.");
-    } else {
-      await createCompany(companyData);
-
-      setMessage("Company created successfully.");
     }
-
-    closeForm();
-    await loadCompanies();
   }
 
   async function logout() {
@@ -210,6 +215,8 @@ export default function CompaniesPage() {
     </div>,
   ]);
 
+  const visibleError = pageError || companiesError;
+
   return (
     <DashboardLayout>
       <Navbar
@@ -251,9 +258,9 @@ export default function CompaniesPage() {
           </div>
         )}
 
-        {errorMessage && (
+        {visibleError && (
           <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-            {errorMessage}
+            {visibleError}
           </div>
         )}
 

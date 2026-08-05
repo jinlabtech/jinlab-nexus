@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import type {
   Company,
   CompanyFormData,
-} from "@/lib/services/companyService";
+} from "@/types/company";
 
 type CompanyFormProps = {
   company?: Company | null;
@@ -76,10 +76,7 @@ export default function CompanyForm({
 
   return (
     <AppCard>
-      <form
-        onSubmit={handleSubmit}
-        className="grid gap-5"
-      >
+      <form onSubmit={handleSubmit} className="grid gap-5">
         <div>
           <h2 className="text-xl font-semibold">
             {isEditing ? "Edit company" : "Add company"}

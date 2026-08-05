@@ -1,24 +1,16 @@
 import { supabase } from "@/lib/supabase";
 
-export type Company = {
-  id: string;
-  company_name: string;
-  registration_number: string | null;
-  email: string | null;
-  phone: string | null;
-};
-
-export type CompanyFormData = {
-  company_name: string;
-  registration_number: string;
-  email: string;
-  phone: string;
-};
+import type {
+  Company,
+  CompanyFormData,
+} from "@/types/company";
 
 export async function getCompanies(): Promise<Company[]> {
   const { data, error } = await supabase
     .from("company")
-    .select("id, company_name, registration_number, email, phone")
+    .select(
+      "id, company_name, registration_number, email, phone"
+    )
     .order("company_name");
 
   if (error) {
@@ -35,7 +27,8 @@ export async function createCompany(
     .from("company")
     .insert({
       company_name: company.company_name,
-      registration_number: company.registration_number || null,
+      registration_number:
+        company.registration_number || null,
       email: company.email || null,
       phone: company.phone || null,
     });
@@ -53,7 +46,8 @@ export async function updateCompany(
     .from("company")
     .update({
       company_name: company.company_name,
-      registration_number: company.registration_number || null,
+      registration_number:
+        company.registration_number || null,
       email: company.email || null,
       phone: company.phone || null,
     })
