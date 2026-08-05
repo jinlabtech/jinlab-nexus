@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
 import { Button } from "@/components/ui/button";
-import type { CompanyFormData } from "@/lib/services/companyService";
+
+import type {
+  Company,
+  CompanyFormData,
+} from "@/lib/services/companyService";
 
 type CompanyFormProps = {
+  company?: Company | null;
   onSave: (company: CompanyFormData) => Promise<void>;
   onCancel: () => void;
 };
 
 export default function CompanyForm({
+  company,
   onSave,
   onCancel,
 }: CompanyFormProps) {
@@ -24,6 +30,18 @@ export default function CompanyForm({
 
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const isEditing = Boolean(company);
+
+  useEffect(() => {
+    setCompanyName(company?.company_name ?? "");
+    setRegistrationNumber(
+      company?.registration_number ?? ""
+    );
+    setEmail(company?.email ?? "");
+    setPhone(company?.phone ?? "");
+    setErrorMessage("");
+  }, [company]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
@@ -64,11 +82,13 @@ export default function CompanyForm({
       >
         <div>
           <h2 className="text-xl font-semibold">
-            Add company
+            {isEditing ? "Edit company" : "Add company"}
           </h2>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Register a new organisation in JINLAB Nexus.
+            {isEditing
+              ? "Update this organisation's information."
+              : "Register a new organisation in JINLAB Nexus."}
           </p>
         </div>
 
@@ -113,7 +133,11 @@ export default function CompanyForm({
 
         <div className="flex flex-wrap gap-3">
           <Button type="submit" disabled={saving}>
-            {saving ? "Saving..." : "Save Company"}
+            {saving
+              ? "Saving..."
+              : isEditing
+                ? "Save Changes"
+                : "Save Company"}
           </Button>
 
           <Button

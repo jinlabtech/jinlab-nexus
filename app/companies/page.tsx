@@ -8,12 +8,15 @@ import DataTable from "@/components/DataTable";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+
 import {
   createCompany,
   getCompanies,
+  updateCompany,
   type Company,
   type CompanyFormData,
 } from "@/lib/services/companyService";
+
 import { supabase } from "@/lib/supabase";
 
 export default function CompaniesPage() {
@@ -21,6 +24,9 @@ export default function CompaniesPage() {
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingCompany, setEditingCompany] =
+    useState<Company | null>(null);
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const [companyName, setCompanyName] = useState("JINLAB");
@@ -53,14 +59,17 @@ export default function CompaniesPage() {
       }
 
       if (profileData?.company_id) {
-        const { data: companyData } = await supabase
-          .from("company")
-          .select("company_name")
-          .eq("id", profileData.company_id)
-          .single();
+        const { data: currentCompanyData } =
+          await supabase
+            .from("company")
+            .select("company_name")
+            .eq("id", profileData.company_id)
+            .single();
 
-        if (companyData?.company_name) {
-          setCompanyName(companyData.company_name);
+        if (currentCompanyData?.company_name) {
+          setCompanyName(
+            currentCompanyData.company_name
+          );
         }
       }
 
@@ -88,14 +97,47 @@ export default function CompaniesPage() {
     }
   }
 
-  async function saveCompany(
-    company: CompanyFormData
-  ) {
-    await createCompany(company);
+  function openAddForm() {
+    setMessage("");
+    setErrorMessage("");
+    setEditingCompany(null);
+    setShowForm(true);
+  }
 
-    setMessage("Company saved successfully.");
+  function openEditForm(company: Company) {
+    setMessage("");
+    setErrorMessage("");
+    setEditingCompany(company);
+    setShowForm(true);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  function closeForm() {
     setShowForm(false);
+    setEditingCompany(null);
+  }
 
+  async function saveCompany(
+    companyData: CompanyFormData
+  ) {
+    if (editingCompany) {
+      await updateCompany(
+        editingCompany.id,
+        companyData
+      );
+
+      setMessage("Company updated successfully.");
+    } else {
+      await createCompany(companyData);
+
+      setMessage("Company created successfully.");
+    }
+
+    closeForm();
     await loadCompanies();
   }
 
@@ -111,16 +153,16 @@ export default function CompaniesPage() {
       return companies;
     }
 
-    return companies.filter((company) => {
-      return [
+    return companies.filter((company) =>
+      [
         company.company_name,
         company.email,
         company.phone,
         company.registration_number,
       ].some((value) =>
         value?.toLowerCase().includes(search)
-      );
-    });
+      )
+    );
   }, [companies, searchTerm]);
 
   const rows = filteredCompanies.map((company) => [
@@ -145,14 +187,27 @@ export default function CompaniesPage() {
       Active
     </span>,
 
-    <Button
-      key={`${company.id}-view`}
-      type="button"
-      variant="outline"
-      size="sm"
+    <div
+      key={`${company.id}-actions`}
+      className="flex flex-wrap gap-2"
     >
-      View
-    </Button>,
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => openEditForm(company)}
+      >
+        Edit
+      </Button>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+      >
+        View
+      </Button>
+    </div>,
   ]);
 
   return (
@@ -175,18 +230,15 @@ export default function CompaniesPage() {
             </h1>
 
             <p className="mt-2 text-muted-foreground">
-              Manage organisations registered in JINLAB
-              Nexus.
+              Create and manage organisations registered in
+              JINLAB Nexus.
             </p>
           </div>
 
           {!showForm && (
             <Button
               type="button"
-              onClick={() => {
-                setMessage("");
-                setShowForm(true);
-              }}
+              onClick={openAddForm}
             >
               + Add Company
             </Button>
@@ -208,8 +260,9 @@ export default function CompaniesPage() {
         {showForm && (
           <div className="mb-8">
             <CompanyForm
+              company={editingCompany}
               onSave={saveCompany}
-              onCancel={() => setShowForm(false)}
+              onCancel={closeForm}
             />
           </div>
         )}
