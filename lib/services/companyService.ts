@@ -22,8 +22,8 @@ export async function getCompanies(): Promise<Company[]> {
 
 export async function createCompany(
   company: CompanyFormData
-): Promise<void> {
-  const { error } = await supabase
+): Promise<Company> {
+  const { data, error } = await supabase
     .from("company")
     .insert({
       company_name: company.company_name,
@@ -31,18 +31,24 @@ export async function createCompany(
         company.registration_number || null,
       email: company.email || null,
       phone: company.phone || null,
-    });
+    })
+    .select(
+      "id, company_name, registration_number, email, phone"
+    )
+    .single();
 
   if (error) {
     throw new Error(error.message);
   }
+
+  return data;
 }
 
 export async function updateCompany(
   companyId: string,
   company: CompanyFormData
-): Promise<void> {
-  const { error } = await supabase
+): Promise<Company> {
+  const { data, error } = await supabase
     .from("company")
     .update({
       company_name: company.company_name,
@@ -51,9 +57,15 @@ export async function updateCompany(
       email: company.email || null,
       phone: company.phone || null,
     })
-    .eq("id", companyId);
+    .eq("id", companyId)
+    .select(
+      "id, company_name, registration_number, email, phone"
+    )
+    .single();
 
   if (error) {
     throw new Error(error.message);
   }
+
+  return data;
 }

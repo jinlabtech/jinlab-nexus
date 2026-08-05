@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 
 import { useCompanies } from "@/hooks/useCompanies";
+import { createAuditLog } from "@/lib/services/auditLogService";
 import {
   createCompany,
   updateCompany,
@@ -36,6 +37,9 @@ export default function CompaniesPage() {
     useState<Company | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [currentCompanyId, setCurrentCompanyId] =
+    useState("");
   const [companyName, setCompanyName] = useState("JINLAB");
   const [userName, setUserName] =
     useState("JINLAB Admin");
@@ -55,12 +59,14 @@ export default function CompaniesPage() {
         return;
       }
 
-      const { data: profileData, error: profileError } =
-        await supabase
-          .from("user_profile")
-          .select("full_name, company_id")
-          .eq("user_id", user.id)
-          .single();
+      const {
+        data: profileData,
+        error: profileError,
+      } = await supabase
+        .from("user_profile")
+        .select("full_name, company_id")
+        .eq("user_id", user.id)
+        .single();
 
       if (profileError) {
         setPageError(profileError.message);
@@ -72,6 +78,8 @@ export default function CompaniesPage() {
       }
 
       if (profileData?.company_id) {
+        setCurrentCompanyId(profileData.company_id);
+
         const {
           data: currentCompanyData,
           error: companyError,
@@ -87,7 +95,9 @@ export default function CompaniesPage() {
         }
 
         if (currentCompanyData?.company_name) {
-          setCompanyName(currentCompanyData.company_name);
+          setCompanyName(
+            currentCompanyData.company_name
+          );
         }
       }
     }
@@ -119,31 +129,88 @@ export default function CompaniesPage() {
     setEditingCompany(null);
   }
 
+  async function recordAuditLog({
+    action,
+    recordId,
+    description,
+    metadata,
+  }: {
+    action: "create" | "update";
+    recordId: string;
+    description: string;
+    metadata: Record<string, unknown>;
+  }) {
+    if (!currentCompanyId) {
+      setPageError(
+        "The action succeeded, but the audit log could not be created because your account has no company."
+      );
+      return;
+    }
+
+    try {
+      await createAuditLog({
+        company_id: currentCompanyId,
+        action,
+        module: "companies",
+        record_id: recordId,
+        description,
+        metadata,
+      });
+    } catch (error) {
+      setPageError(
+        error instanceof Error
+          ? `The company action succeeded, but audit logging failed: ${error.message}`
+          : "The company action succeeded, but audit logging failed."
+      );
+    }
+  }
+
   async function saveCompany(
     companyData: CompanyFormData
   ) {
-    try {
-      if (editingCompany) {
-        await updateCompany(
-          editingCompany.id,
-          companyData
-        );
-
-        setMessage("Company updated successfully.");
-      } else {
-        await createCompany(companyData);
-        setMessage("Company created successfully.");
-      }
-
-      closeForm();
-      await refreshCompanies();
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? error.message
-          : "The company could not be saved."
+    if (editingCompany) {
+      const updatedCompany = await updateCompany(
+        editingCompany.id,
+        companyData
       );
+
+      await recordAuditLog({
+        action: "update",
+        recordId: updatedCompany.id,
+        description: `Updated company: ${updatedCompany.company_name}`,
+        metadata: {
+          company_name: updatedCompany.company_name,
+          email: updatedCompany.email,
+          phone: updatedCompany.phone,
+          registration_number:
+            updatedCompany.registration_number,
+        },
+      });
+
+      setMessage("Company updated successfully.");
+    } else {
+      const createdCompany = await createCompany(
+        companyData
+      );
+
+      await recordAuditLog({
+        action: "create",
+        recordId: createdCompany.id,
+        description: `Created company: ${createdCompany.company_name}`,
+        metadata: {
+          company_name: createdCompany.company_name,
+          email: createdCompany.email,
+          phone: createdCompany.phone,
+          registration_number:
+            createdCompany.registration_number,
+        },
+      });
+
+      setMessage("Company created successfully.");
     }
+
+    closeForm();
+    await refreshCompanies();
   }
 
   async function logout() {
