@@ -7,12 +7,23 @@ import CompanyForm from "@/components/CompanyForm";
 import DataTable from "@/components/DataTable";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
 import { useCompanies } from "@/hooks/useCompanies";
 import { createAuditLog } from "@/lib/services/auditLogService";
 import {
   createCompany,
+  deleteCompany,
   updateCompany,
 } from "@/lib/services/companyService";
 import { supabase } from "@/lib/supabase";
@@ -35,15 +46,17 @@ export default function CompaniesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingCompany, setEditingCompany] =
     useState<Company | null>(null);
+  const [companyToDelete, setCompanyToDelete] =
+    useState<Company | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-
   const [currentCompanyId, setCurrentCompanyId] =
     useState("");
   const [companyName, setCompanyName] = useState("JINLAB");
   const [userName, setUserName] =
     useState("JINLAB Admin");
 
+  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState("");
   const [pageError, setPageError] = useState("");
 
@@ -129,42 +142,6 @@ export default function CompaniesPage() {
     setEditingCompany(null);
   }
 
-  async function recordAuditLog({
-    action,
-    recordId,
-    description,
-    metadata,
-  }: {
-    action: "create" | "update";
-    recordId: string;
-    description: string;
-    metadata: Record<string, unknown>;
-  }) {
-    if (!currentCompanyId) {
-      setPageError(
-        "The action succeeded, but the audit log could not be created because your account has no company."
-      );
-      return;
-    }
-
-    try {
-      await createAuditLog({
-        company_id: currentCompanyId,
-        action,
-        module: "companies",
-        record_id: recordId,
-        description,
-        metadata,
-      });
-    } catch (error) {
-      setPageError(
-        error instanceof Error
-          ? `The company action succeeded, but audit logging failed: ${error.message}`
-          : "The company action succeeded, but audit logging failed."
-      );
-    }
-  }
-
   async function saveCompany(
     companyData: CompanyFormData
   ) {
@@ -174,18 +151,22 @@ export default function CompaniesPage() {
         companyData
       );
 
-      await recordAuditLog({
-        action: "update",
-        recordId: updatedCompany.id,
-        description: `Updated company: ${updatedCompany.company_name}`,
-        metadata: {
-          company_name: updatedCompany.company_name,
-          email: updatedCompany.email,
-          phone: updatedCompany.phone,
-          registration_number:
-            updatedCompany.registration_number,
-        },
-      });
+      if (currentCompanyId) {
+        await createAuditLog({
+          company_id: currentCompanyId,
+          action: "update",
+          module: "companies",
+          record_id: updatedCompany.id,
+          description: `Updated company: ${updatedCompany.company_name}`,
+          metadata: {
+            company_name: updatedCompany.company_name,
+            email: updatedCompany.email,
+            phone: updatedCompany.phone,
+            registration_number:
+              updatedCompany.registration_number,
+          },
+        });
+      }
 
       setMessage("Company updated successfully.");
     } else {
@@ -193,24 +174,81 @@ export default function CompaniesPage() {
         companyData
       );
 
-      await recordAuditLog({
-        action: "create",
-        recordId: createdCompany.id,
-        description: `Created company: ${createdCompany.company_name}`,
-        metadata: {
-          company_name: createdCompany.company_name,
-          email: createdCompany.email,
-          phone: createdCompany.phone,
-          registration_number:
-            createdCompany.registration_number,
-        },
-      });
+      if (currentCompanyId) {
+        await createAuditLog({
+          company_id: currentCompanyId,
+          action: "create",
+          module: "companies",
+          record_id: createdCompany.id,
+          description: `Created company: ${createdCompany.company_name}`,
+          metadata: {
+            company_name: createdCompany.company_name,
+            email: createdCompany.email,
+            phone: createdCompany.phone,
+            registration_number:
+              createdCompany.registration_number,
+          },
+        });
+      }
 
       setMessage("Company created successfully.");
     }
 
     closeForm();
     await refreshCompanies();
+  }
+
+  async function confirmDeleteCompany() {
+    if (!companyToDelete) {
+      return;
+    }
+
+    if (companyToDelete.id === currentCompanyId) {
+      setPageError(
+        "You cannot delete the company currently linked to your account."
+      );
+      setCompanyToDelete(null);
+      return;
+    }
+
+    setDeleting(true);
+    setMessage("");
+    setPageError("");
+
+    try {
+      const deletedCompany = companyToDelete;
+
+      await deleteCompany(deletedCompany.id);
+
+      if (currentCompanyId) {
+        await createAuditLog({
+          company_id: currentCompanyId,
+          action: "delete",
+          module: "companies",
+          record_id: deletedCompany.id,
+          description: `Deleted company: ${deletedCompany.company_name}`,
+          metadata: {
+            company_name: deletedCompany.company_name,
+            email: deletedCompany.email,
+            phone: deletedCompany.phone,
+            registration_number:
+              deletedCompany.registration_number,
+          },
+        });
+      }
+
+      setCompanyToDelete(null);
+      setMessage("Company deleted successfully.");
+      await refreshCompanies();
+    } catch (error) {
+      setPageError(
+        error instanceof Error
+          ? error.message
+          : "The company could not be deleted."
+      );
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function logout() {
@@ -278,6 +316,16 @@ export default function CompaniesPage() {
         size="sm"
       >
         View
+      </Button>
+
+      <Button
+        type="button"
+        variant="destructive"
+        size="sm"
+        onClick={() => setCompanyToDelete(company)}
+        disabled={company.id === currentCompanyId}
+      >
+        Delete
       </Button>
     </div>,
   ]);
@@ -383,6 +431,45 @@ export default function CompaniesPage() {
           />
         )}
       </main>
+
+      <AlertDialog
+        open={Boolean(companyToDelete)}
+        onOpenChange={(open) => {
+          if (!open && !deleting) {
+            setCompanyToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Delete company?
+            </AlertDialogTitle>
+
+            <AlertDialogDescription>
+              This will permanently delete{" "}
+              <strong>
+                {companyToDelete?.company_name}
+              </strong>
+              . This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>
+              Cancel
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={confirmDeleteCompany}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting..." : "Delete Company"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
