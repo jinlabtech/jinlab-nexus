@@ -5,13 +5,7 @@ import { useState } from "react";
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
 import { Button } from "@/components/ui/button";
-
-type CompanyFormData = {
-  company_name: string;
-  email: string;
-  phone: string;
-  registration_number: string;
-};
+import type { CompanyFormData } from "@/lib/services/companyService";
 
 type CompanyFormProps = {
   onSave: (company: CompanyFormData) => Promise<void>;
@@ -23,12 +17,13 @@ export default function CompanyForm({
   onCancel,
 }: CompanyFormProps) {
   const [companyName, setCompanyName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [registrationNumber, setRegistrationNumber] =
     useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
@@ -36,30 +31,25 @@ export default function CompanyForm({
     event.preventDefault();
 
     if (!companyName.trim()) {
-      setMessage("Company name is required.");
+      setErrorMessage("Company name is required.");
       return;
     }
 
     setSaving(true);
-    setMessage("");
+    setErrorMessage("");
 
     try {
       await onSave({
         company_name: companyName.trim(),
+        registration_number: registrationNumber.trim(),
         email: email.trim(),
         phone: phone.trim(),
-        registration_number: registrationNumber.trim(),
       });
-
-      setCompanyName("");
-      setEmail("");
-      setPhone("");
-      setRegistrationNumber("");
     } catch (error) {
-      setMessage(
+      setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Failed to save company."
+          : "The company could not be saved."
       );
     } finally {
       setSaving(false);
@@ -70,54 +60,59 @@ export default function CompanyForm({
     <AppCard>
       <form
         onSubmit={handleSubmit}
-        className="grid gap-4"
+        className="grid gap-5"
       >
-        <h2 className="text-xl font-semibold">
-          Add Company
-        </h2>
+        <div>
+          <h2 className="text-xl font-semibold">
+            Add company
+          </h2>
 
-        <AppInput
-          label="Company Name"
-          value={companyName}
-          placeholder="Enter company name"
-          required
-          onChange={setCompanyName}
-        />
-
-        <AppInput
-          label="Email"
-          value={email}
-          placeholder="Enter company email"
-          type="email"
-          onChange={setEmail}
-        />
-
-        <AppInput
-          label="Phone"
-          value={phone}
-          placeholder="Enter phone number"
-          type="tel"
-          onChange={setPhone}
-        />
-
-        <AppInput
-          label="Registration Number"
-          value={registrationNumber}
-          placeholder="Enter registration number"
-          onChange={setRegistrationNumber}
-        />
-
-        {message && (
-          <p className="text-sm text-destructive">
-            {message}
+          <p className="mt-1 text-sm text-muted-foreground">
+            Register a new organisation in JINLAB Nexus.
           </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <AppInput
+            label="Company Name"
+            value={companyName}
+            placeholder="Enter company name"
+            required
+            onChange={setCompanyName}
+          />
+
+          <AppInput
+            label="Registration Number"
+            value={registrationNumber}
+            placeholder="Enter registration number"
+            onChange={setRegistrationNumber}
+          />
+
+          <AppInput
+            label="Email"
+            value={email}
+            placeholder="company@example.com"
+            type="email"
+            onChange={setEmail}
+          />
+
+          <AppInput
+            label="Phone"
+            value={phone}
+            placeholder="Enter phone number"
+            type="tel"
+            onChange={setPhone}
+          />
+        </div>
+
+        {errorMessage && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {errorMessage}
+          </div>
         )}
 
-        <div className="flex gap-3">
-          <Button
-            type="submit"
-            disabled={saving}
-          >
+        <div className="flex flex-wrap gap-3">
+          <Button type="submit" disabled={saving}>
             {saving ? "Saving..." : "Save Company"}
           </Button>
 
@@ -125,6 +120,7 @@ export default function CompanyForm({
             type="button"
             variant="outline"
             onClick={onCancel}
+            disabled={saving}
           >
             Cancel
           </Button>
