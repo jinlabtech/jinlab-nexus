@@ -11,6 +11,7 @@ import DataTable from "@/components/DataTable";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import UserForm from "@/components/UserForm";
+import UserInviteForm from "@/components/UserInviteForm";
 import { Button } from "@/components/ui/button";
 
 import { useUsers } from "@/hooks/useUsers";
@@ -19,6 +20,7 @@ import { updateUserProfile } from "@/lib/services/userService";
 import { supabase } from "@/lib/supabase";
 
 import type {
+  InviteUserData,
   UpdateUserProfileData,
   UserProfile,
   UserRole,
@@ -62,6 +64,8 @@ export default function UsersPage() {
     useState("");
   const [currentUserId, setCurrentUserId] =
     useState("");
+  const [currentUserRole, setCurrentUserRole] =
+    useState<UserRole>("employee");
 
   const [companyName, setCompanyName] =
     useState("JINLAB");
@@ -77,6 +81,8 @@ export default function UsersPage() {
 
   const [editingUser, setEditingUser] =
     useState<UserProfile | null>(null);
+  const [showInviteForm, setShowInviteForm] =
+    useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [message, setMessage] = useState("");
@@ -102,7 +108,7 @@ export default function UsersPage() {
       } = await supabase
         .from("user_profile")
         .select(
-          "full_name, company_id"
+          "full_name, company_id, role"
         )
         .eq("user_id", user.id)
         .single();
@@ -114,6 +120,12 @@ export default function UsersPage() {
 
       if (profileData?.full_name) {
         setUserName(profileData.full_name);
+      }
+
+      if (profileData?.role) {
+        setCurrentUserRole(
+          profileData.role as UserRole
+        );
       }
 
       if (!profileData?.company_id) {
@@ -147,9 +159,25 @@ export default function UsersPage() {
     initialisePage();
   }, [router]);
 
+  const canInviteUsers =
+    currentUserRole === "owner" ||
+    currentUserRole === "admin";
+
+  function openInviteForm() {
+    setMessage("");
+    setPageError("");
+    setEditingUser(null);
+    setShowInviteForm(true);
+  }
+
+  function closeInviteForm() {
+    setShowInviteForm(false);
+  }
+
   function openEditForm(user: UserProfile) {
     setMessage("");
     setPageError("");
+    setShowInviteForm(false);
     setEditingUser(user);
 
     window.scrollTo({
@@ -158,8 +186,56 @@ export default function UsersPage() {
     });
   }
 
-  function closeForm() {
+  function closeEditForm() {
     setEditingUser(null);
+  }
+
+  async function inviteUser(
+    invitation: InviteUserData
+  ) {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.access_token) {
+      throw new Error(
+        sessionError?.message ??
+          "Your session could not be verified."
+      );
+    }
+
+    const response = await fetch(
+      "/api/users/invite",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(invitation),
+      }
+    );
+
+    const result = (await response.json()) as {
+      message?: string;
+      error?: string;
+    };
+
+    if (!response.ok) {
+      throw new Error(
+        result.error ??
+          "The invitation could not be sent."
+      );
+    }
+
+    setShowInviteForm(false);
+    setMessage(
+      result.message ??
+        "Invitation sent successfully."
+    );
+
+    await refreshUsers();
   }
 
   async function saveUser(
@@ -171,7 +247,7 @@ export default function UsersPage() {
       );
     }
 
-    const oldRole = editingUser.role;
+    const previousRole = editingUser.role;
 
     const updatedUser = await updateUserProfile(
       editingUser.id,
@@ -188,7 +264,7 @@ export default function UsersPage() {
         description: `Updated user: ${updatedUser.full_name}`,
         metadata: {
           email: updatedUser.email,
-          previous_role: oldRole,
+          previous_role: previousRole,
           new_role: updatedUser.role,
         },
       });
@@ -202,6 +278,7 @@ export default function UsersPage() {
 
     setEditingUser(null);
     setMessage("User updated successfully.");
+
     await refreshUsers();
   }
 
@@ -277,19 +354,32 @@ export default function UsersPage() {
       />
 
       <main className="p-4 sm:p-6 lg:p-8">
-        <section className="mb-8">
-          <p className="text-sm font-medium text-primary">
-            Access management
-          </p>
+        <section className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-primary">
+              Access management
+            </p>
 
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">
-            Users
-          </h1>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight">
+              Users
+            </h1>
 
-          <p className="mt-2 text-muted-foreground">
-            Manage people and access roles belonging to{" "}
-            {companyName}.
-          </p>
+            <p className="mt-2 text-muted-foreground">
+              Manage people and access roles belonging to{" "}
+              {companyName}.
+            </p>
+          </div>
+
+          {canInviteUsers &&
+            !showInviteForm &&
+            !editingUser && (
+              <Button
+                type="button"
+                onClick={openInviteForm}
+              >
+                + Invite User
+              </Button>
+            )}
         </section>
 
         {message && (
@@ -304,12 +394,21 @@ export default function UsersPage() {
           </div>
         )}
 
+        {showInviteForm && (
+          <div className="mb-8">
+            <UserInviteForm
+              onInvite={inviteUser}
+              onCancel={closeInviteForm}
+            />
+          </div>
+        )}
+
         {editingUser && (
           <div className="mb-8">
             <UserForm
               user={editingUser}
               onSave={saveUser}
-              onCancel={closeForm}
+              onCancel={closeEditForm}
             />
           </div>
         )}
@@ -355,17 +454,18 @@ export default function UsersPage() {
           />
         )}
 
-        <div className="mt-6 rounded-xl border border-dashed bg-muted/20 p-5">
-          <p className="font-medium">
-            User invitations are coming next
-          </p>
+        {!canInviteUsers && (
+          <div className="mt-6 rounded-xl border border-dashed bg-muted/20 p-5">
+            <p className="font-medium">
+              Invitation permission required
+            </p>
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            New authentication accounts will be created through
-            a secure server-side invitation workflow, not from
-            browser administrator credentials.
-          </p>
-        </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Only owners and administrators can invite new
+              users.
+            </p>
+          </div>
+        )}
       </main>
     </DashboardLayout>
   );
