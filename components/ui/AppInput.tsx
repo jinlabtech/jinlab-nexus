@@ -2,7 +2,7 @@ type AppInputProps = {
   label: string;
   value: string;
   placeholder?: string;
-  type?: "text" | "email" | "tel";
+  type?: "text" | "email" | "tel" | "password";
   required?: boolean;
   onChange: (value: string) => void;
 };
@@ -16,18 +16,8 @@ export default function AppInput({
   onChange,
 }: AppInputProps) {
   return (
-    <label
-      style={{
-        display: "grid",
-        gap: "6px",
-      }}
-    >
-      <span
-        style={{
-          fontSize: "14px",
-          fontWeight: 600,
-        }}
-      >
+    <label className="grid gap-2">
+      <span className="text-sm font-medium">
         {label}
       </span>
 
@@ -36,14 +26,10 @@ export default function AppInput({
         value={value}
         placeholder={placeholder}
         required={required}
-        onChange={(event) => onChange(event.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px 12px",
-          border: "1px solid #d1d5db",
-          borderRadius: "8px",
-          fontSize: "15px",
-        }}
+        onChange={(event) =>
+          onChange(event.target.value)
+        }
+        className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
       />
     </label>
   );
