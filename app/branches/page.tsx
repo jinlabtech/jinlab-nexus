@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useBranches } from "@/hooks/useBranches";
+import { usePermissions } from "@/hooks/usePermissions";
 import { createAuditLog } from "@/lib/services/auditLogService";
 import {
   createBranch,
@@ -48,7 +49,8 @@ export default function BranchesPage() {
 
   const [currentCompanyId, setCurrentCompanyId] =
     useState("");
-  const [companyName, setCompanyName] = useState("JINLAB");
+  const [companyName, setCompanyName] =
+    useState("JINLAB");
   const [userName, setUserName] =
     useState("JINLAB Admin");
 
@@ -59,16 +61,27 @@ export default function BranchesPage() {
     refreshBranches,
   } = useBranches(currentCompanyId);
 
-  const [showForm, setShowForm] = useState(false);
+  const {
+    can,
+    loading: permissionsLoading,
+    errorMessage: permissionsError,
+  } = usePermissions();
+
+  const [showForm, setShowForm] =
+    useState(false);
   const [editingBranch, setEditingBranch] =
     useState<Branch | null>(null);
   const [branchToDelete, setBranchToDelete] =
     useState<Branch | null>(null);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [deleting, setDeleting] = useState(false);
-  const [message, setMessage] = useState("");
-  const [pageError, setPageError] = useState("");
+  const [searchTerm, setSearchTerm] =
+    useState("");
+  const [deleting, setDeleting] =
+    useState(false);
+  const [message, setMessage] =
+    useState("");
+  const [pageError, setPageError] =
+    useState("");
 
   useEffect(() => {
     async function initialisePage() {
@@ -107,7 +120,9 @@ export default function BranchesPage() {
         return;
       }
 
-      setCurrentCompanyId(profileData.company_id);
+      setCurrentCompanyId(
+        profileData.company_id
+      );
 
       const {
         data: companyData,
@@ -115,7 +130,10 @@ export default function BranchesPage() {
       } = await supabase
         .from("company")
         .select("company_name")
-        .eq("id", profileData.company_id)
+        .eq(
+          "id",
+          profileData.company_id
+        )
         .single();
 
       if (companyError) {
@@ -124,7 +142,9 @@ export default function BranchesPage() {
       }
 
       if (companyData?.company_name) {
-        setCompanyName(companyData.company_name);
+        setCompanyName(
+          companyData.company_name
+        );
       }
     }
 
@@ -132,6 +152,13 @@ export default function BranchesPage() {
   }, [router]);
 
   function openAddForm() {
+    if (!can("branch.create")) {
+      setPageError(
+        "You do not have permission to create branches."
+      );
+      return;
+    }
+
     setMessage("");
     setPageError("");
     setEditingBranch(null);
@@ -139,6 +166,13 @@ export default function BranchesPage() {
   }
 
   function openEditForm(branch: Branch) {
+    if (!can("branch.update")) {
+      setPageError(
+        "You do not have permission to edit branches."
+      );
+      return;
+    }
+
     setMessage("");
     setPageError("");
     setEditingBranch(branch);
@@ -155,40 +189,6 @@ export default function BranchesPage() {
     setEditingBranch(null);
   }
 
-  async function safelyRecordAuditLog({
-    action,
-    branch,
-    description,
-  }: {
-    action: "create" | "update" | "delete";
-    branch: Branch;
-    description: string;
-  }) {
-    if (!currentCompanyId) {
-      return;
-    }
-
-    try {
-      await createAuditLog({
-        company_id: currentCompanyId,
-        action,
-        module: "branches",
-        record_id: branch.id,
-        description,
-        metadata: {
-          branch_name: branch.branch_name,
-          address: branch.address,
-        },
-      });
-    } catch (error) {
-      setPageError(
-        error instanceof Error
-          ? `The branch action succeeded, but audit logging failed: ${error.message}`
-          : "The branch action succeeded, but audit logging failed."
-      );
-    }
-  }
-
   async function saveBranch(
     branchData: BranchFormData
   ) {
@@ -199,40 +199,116 @@ export default function BranchesPage() {
     }
 
     if (editingBranch) {
-      const updatedBranch = await updateBranch(
-        editingBranch.id,
-        currentCompanyId,
-        branchData
+      if (!can("branch.update")) {
+        throw new Error(
+          "You do not have permission to update branches."
+        );
+      }
+
+      const updatedBranch =
+        await updateBranch(
+          editingBranch.id,
+          currentCompanyId,
+          branchData
+        );
+
+      try {
+        await createAuditLog({
+          company_id: currentCompanyId,
+          action: "update",
+          module: "branches",
+          record_id: updatedBranch.id,
+          description: `Updated branch: ${updatedBranch.branch_name}`,
+          metadata: {
+            branch_name:
+              updatedBranch.branch_name,
+            address:
+              updatedBranch.address,
+          },
+        });
+      } catch (error) {
+        setPageError(
+          error instanceof Error
+            ? `Branch updated, but audit logging failed: ${error.message}`
+            : "Branch updated, but audit logging failed."
+        );
+      }
+
+      setMessage(
+        "Branch updated successfully."
       );
-
-      await safelyRecordAuditLog({
-        action: "update",
-        branch: updatedBranch,
-        description: `Updated branch: ${updatedBranch.branch_name}`,
-      });
-
-      setMessage("Branch updated successfully.");
     } else {
-      const createdBranch = await createBranch(
-        currentCompanyId,
-        branchData
+      if (!can("branch.create")) {
+        throw new Error(
+          "You do not have permission to create branches."
+        );
+      }
+
+      const createdBranch =
+        await createBranch(
+          currentCompanyId,
+          branchData
+        );
+
+      try {
+        await createAuditLog({
+          company_id: currentCompanyId,
+          action: "create",
+          module: "branches",
+          record_id: createdBranch.id,
+          description: `Created branch: ${createdBranch.branch_name}`,
+          metadata: {
+            branch_name:
+              createdBranch.branch_name,
+            address:
+              createdBranch.address,
+          },
+        });
+      } catch (error) {
+        setPageError(
+          error instanceof Error
+            ? `Branch created, but audit logging failed: ${error.message}`
+            : "Branch created, but audit logging failed."
+        );
+      }
+
+      setMessage(
+        "Branch created successfully."
       );
-
-      await safelyRecordAuditLog({
-        action: "create",
-        branch: createdBranch,
-        description: `Created branch: ${createdBranch.branch_name}`,
-      });
-
-      setMessage("Branch created successfully.");
     }
 
     closeForm();
     await refreshBranches();
   }
 
+  function requestDeleteBranch(
+    branch: Branch
+  ) {
+    if (!can("branch.delete")) {
+      setPageError(
+        "You do not have permission to delete branches."
+      );
+      return;
+    }
+
+    setMessage("");
+    setPageError("");
+    setBranchToDelete(branch);
+  }
+
   async function confirmDeleteBranch() {
-    if (!branchToDelete || !currentCompanyId) {
+    if (
+      !branchToDelete ||
+      !currentCompanyId
+    ) {
+      return;
+    }
+
+    if (!can("branch.delete")) {
+      setPageError(
+        "You do not have permission to delete branches."
+      );
+      setBranchToDelete(null);
       return;
     }
 
@@ -241,21 +317,42 @@ export default function BranchesPage() {
     setPageError("");
 
     try {
-      const deletedBranch = branchToDelete;
+      const deletedBranch =
+        branchToDelete;
 
       await deleteBranch(
         deletedBranch.id,
         currentCompanyId
       );
 
-      await safelyRecordAuditLog({
-        action: "delete",
-        branch: deletedBranch,
-        description: `Deleted branch: ${deletedBranch.branch_name}`,
-      });
+      try {
+        await createAuditLog({
+          company_id: currentCompanyId,
+          action: "delete",
+          module: "branches",
+          record_id: deletedBranch.id,
+          description: `Deleted branch: ${deletedBranch.branch_name}`,
+          metadata: {
+            branch_name:
+              deletedBranch.branch_name,
+            address:
+              deletedBranch.address,
+          },
+        });
+      } catch (error) {
+        setPageError(
+          error instanceof Error
+            ? `Branch deleted, but audit logging failed: ${error.message}`
+            : "Branch deleted, but audit logging failed."
+        );
+      }
 
       setBranchToDelete(null);
-      setMessage("Branch deleted successfully.");
+
+      setMessage(
+        "Branch deleted successfully."
+      );
+
       await refreshBranches();
     } catch (error) {
       setPageError(
@@ -274,7 +371,8 @@ export default function BranchesPage() {
   }
 
   const filteredBranches = useMemo(() => {
-    const search = searchTerm.trim().toLowerCase();
+    const search =
+      searchTerm.trim().toLowerCase();
 
     if (!search) {
       return branches;
@@ -285,58 +383,103 @@ export default function BranchesPage() {
         branch.branch_name,
         branch.address,
       ].some((value) =>
-        value?.toLowerCase().includes(search)
+        value
+          ?.toLowerCase()
+          .includes(search)
       )
     );
   }, [branches, searchTerm]);
 
-  const rows = filteredBranches.map((branch) => [
-    <div key={`${branch.id}-name`}>
-      <p className="font-semibold">
-        {branch.branch_name}
-      </p>
+  const rows = filteredBranches.map(
+    (branch) => [
+      <div key={`${branch.id}-name`}>
+        <p className="font-semibold">
+          {branch.branch_name}
+        </p>
 
-      <p className="mt-1 text-xs text-muted-foreground">
-        ID: {branch.id.slice(0, 8)}
-      </p>
-    </div>,
+        <p className="mt-1 text-xs text-muted-foreground">
+          ID: {branch.id.slice(0, 8)}
+        </p>
+      </div>,
 
-    branch.address || "-",
+      branch.address || "-",
 
-    <span
-      key={`${branch.id}-status`}
-      className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700"
-    >
-      Active
-    </span>,
-
-    formatCreatedDate(branch.created_at),
-
-    <div
-      key={`${branch.id}-actions`}
-      className="flex flex-wrap gap-2"
-    >
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => openEditForm(branch)}
+      <span
+        key={`${branch.id}-status`}
+        className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700"
       >
-        Edit
-      </Button>
+        Active
+      </span>,
 
-      <Button
-        type="button"
-        variant="destructive"
-        size="sm"
-        onClick={() => setBranchToDelete(branch)}
+      formatCreatedDate(
+        branch.created_at
+      ),
+
+      <div
+        key={`${branch.id}-actions`}
+        className="flex flex-wrap gap-2"
       >
-        Delete
-      </Button>
-    </div>,
-  ]);
+        {can("branch.update") && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              openEditForm(branch)
+            }
+          >
+            Edit
+          </Button>
+        )}
 
-  const visibleError = pageError || branchesError;
+        {can("branch.delete") && (
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={() =>
+              requestDeleteBranch(branch)
+            }
+          >
+            Delete
+          </Button>
+        )}
+      </div>,
+    ]
+  );
+
+  const visibleError =
+    pageError ||
+    branchesError ||
+    permissionsError;
+
+  if (
+    !permissionsLoading &&
+    !can("branch.view")
+  ) {
+    return (
+      <DashboardLayout>
+        <Navbar
+          companyName={companyName}
+          userName={userName}
+          onLogout={logout}
+        />
+
+        <main className="p-4 sm:p-6 lg:p-8">
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6">
+            <h1 className="text-xl font-semibold">
+              Access denied
+            </h1>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              You do not have permission
+              to view the Branches module.
+            </p>
+          </div>
+        </main>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -358,20 +501,25 @@ export default function BranchesPage() {
             </h1>
 
             <p className="mt-2 text-muted-foreground">
-              Create and manage the business locations
-              belonging to {companyName}.
+              Create and manage the
+              business locations
+              belonging to{" "}
+              {companyName}.
             </p>
           </div>
 
-          {!showForm && (
-            <Button
-              type="button"
-              onClick={openAddForm}
-              disabled={!currentCompanyId}
-            >
-              + Add Branch
-            </Button>
-          )}
+          {!showForm &&
+            can("branch.create") && (
+              <Button
+                type="button"
+                onClick={openAddForm}
+                disabled={
+                  !currentCompanyId
+                }
+              >
+                + Add Branch
+              </Button>
+            )}
         </section>
 
         {message && (
@@ -403,8 +551,12 @@ export default function BranchesPage() {
             </p>
 
             <p className="text-sm text-muted-foreground">
-              {filteredBranches.length} result
-              {filteredBranches.length === 1 ? "" : "s"}
+              {filteredBranches.length}{" "}
+              result
+              {filteredBranches.length ===
+              1
+                ? ""
+                : "s"}
             </p>
           </div>
 
@@ -412,14 +564,17 @@ export default function BranchesPage() {
             type="search"
             value={searchTerm}
             onChange={(event) =>
-              setSearchTerm(event.target.value)
+              setSearchTerm(
+                event.target.value
+              )
             }
             placeholder="Search branches..."
             className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring sm:max-w-sm"
           />
         </section>
 
-        {loading ? (
+        {loading ||
+        permissionsLoading ? (
           <div className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground">
             Loading branches...
           </div>
@@ -441,7 +596,10 @@ export default function BranchesPage() {
       <AlertDialog
         open={Boolean(branchToDelete)}
         onOpenChange={(open) => {
-          if (!open && !deleting) {
+          if (
+            !open &&
+            !deleting
+          ) {
             setBranchToDelete(null);
           }
         }}
@@ -453,25 +611,35 @@ export default function BranchesPage() {
             </AlertDialogTitle>
 
             <AlertDialogDescription>
-              This will permanently delete{" "}
+              This will permanently
+              delete{" "}
               <strong>
-                {branchToDelete?.branch_name}
+                {
+                  branchToDelete?.branch_name
+                }
               </strong>
-              . This action cannot be undone.
+              . This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>
+            <AlertDialogCancel
+              disabled={deleting}
+            >
               Cancel
             </AlertDialogCancel>
 
             <AlertDialogAction
-              onClick={confirmDeleteBranch}
+              onClick={
+                confirmDeleteBranch
+              }
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? "Deleting..." : "Delete Branch"}
+              {deleting
+                ? "Deleting..."
+                : "Delete Branch"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

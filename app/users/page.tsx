@@ -14,7 +14,9 @@ import UserForm from "@/components/UserForm";
 import UserInviteForm from "@/components/UserInviteForm";
 import { Button } from "@/components/ui/button";
 
+import { usePermissions } from "@/hooks/usePermissions";
 import { useUsers } from "@/hooks/useUsers";
+
 import { createAuditLog } from "@/lib/services/auditLogService";
 import { updateUserProfile } from "@/lib/services/userService";
 import { supabase } from "@/lib/supabase";
@@ -62,13 +64,13 @@ export default function UsersPage() {
 
   const [currentCompanyId, setCurrentCompanyId] =
     useState("");
+
   const [currentUserId, setCurrentUserId] =
     useState("");
-  const [currentUserRole, setCurrentUserRole] =
-    useState<UserRole>("employee");
 
   const [companyName, setCompanyName] =
     useState("JINLAB");
+
   const [userName, setUserName] =
     useState("JINLAB Admin");
 
@@ -79,14 +81,26 @@ export default function UsersPage() {
     refreshUsers,
   } = useUsers(currentCompanyId);
 
+  const {
+    can,
+    loading: permissionsLoading,
+    errorMessage: permissionsError,
+  } = usePermissions();
+
   const [editingUser, setEditingUser] =
     useState<UserProfile | null>(null);
+
   const [showInviteForm, setShowInviteForm] =
     useState(false);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [message, setMessage] = useState("");
-  const [pageError, setPageError] = useState("");
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [message, setMessage] =
+    useState("");
+
+  const [pageError, setPageError] =
+    useState("");
 
   useEffect(() => {
     async function initialisePage() {
@@ -108,23 +122,21 @@ export default function UsersPage() {
       } = await supabase
         .from("user_profile")
         .select(
-          "full_name, company_id, role"
+          "full_name, company_id"
         )
         .eq("user_id", user.id)
         .single();
 
       if (profileError) {
-        setPageError(profileError.message);
+        setPageError(
+          profileError.message
+        );
         return;
       }
 
       if (profileData?.full_name) {
-        setUserName(profileData.full_name);
-      }
-
-      if (profileData?.role) {
-        setCurrentUserRole(
-          profileData.role as UserRole
+        setUserName(
+          profileData.full_name
         );
       }
 
@@ -135,7 +147,9 @@ export default function UsersPage() {
         return;
       }
 
-      setCurrentCompanyId(profileData.company_id);
+      setCurrentCompanyId(
+        profileData.company_id
+      );
 
       const {
         data: companyData,
@@ -143,27 +157,37 @@ export default function UsersPage() {
       } = await supabase
         .from("company")
         .select("company_name")
-        .eq("id", profileData.company_id)
+        .eq(
+          "id",
+          profileData.company_id
+        )
         .single();
 
       if (companyError) {
-        setPageError(companyError.message);
+        setPageError(
+          companyError.message
+        );
         return;
       }
 
       if (companyData?.company_name) {
-        setCompanyName(companyData.company_name);
+        setCompanyName(
+          companyData.company_name
+        );
       }
     }
 
     initialisePage();
   }, [router]);
 
-  const canInviteUsers =
-    currentUserRole === "owner" ||
-    currentUserRole === "admin";
-
   function openInviteForm() {
+    if (!can("user.invite")) {
+      setPageError(
+        "You do not have permission to invite users."
+      );
+      return;
+    }
+
     setMessage("");
     setPageError("");
     setEditingUser(null);
@@ -174,7 +198,16 @@ export default function UsersPage() {
     setShowInviteForm(false);
   }
 
-  function openEditForm(user: UserProfile) {
+  function openEditForm(
+    user: UserProfile
+  ) {
+    if (!can("user.update")) {
+      setPageError(
+        "You do not have permission to edit users."
+      );
+      return;
+    }
+
     setMessage("");
     setPageError("");
     setShowInviteForm(false);
@@ -193,12 +226,21 @@ export default function UsersPage() {
   async function inviteUser(
     invitation: InviteUserData
   ) {
+    if (!can("user.invite")) {
+      throw new Error(
+        "You do not have permission to invite users."
+      );
+    }
+
     const {
       data: { session },
       error: sessionError,
     } = await supabase.auth.getSession();
 
-    if (sessionError || !session?.access_token) {
+    if (
+      sessionError ||
+      !session?.access_token
+    ) {
       throw new Error(
         sessionError?.message ??
           "Your session could not be verified."
@@ -209,18 +251,26 @@ export default function UsersPage() {
       "/api/users/invite",
       {
         method: "POST",
+
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type":
+            "application/json",
+
+          Authorization:
+            `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify(invitation),
+
+        body: JSON.stringify(
+          invitation
+        ),
       }
     );
 
-    const result = (await response.json()) as {
-      message?: string;
-      error?: string;
-    };
+    const result =
+      (await response.json()) as {
+        message?: string;
+        error?: string;
+      };
 
     if (!response.ok) {
       throw new Error(
@@ -230,6 +280,7 @@ export default function UsersPage() {
     }
 
     setShowInviteForm(false);
+
     setMessage(
       result.message ??
         "Invitation sent successfully."
@@ -241,31 +292,55 @@ export default function UsersPage() {
   async function saveUser(
     profileData: UpdateUserProfileData
   ) {
-    if (!editingUser || !currentCompanyId) {
+    if (!can("user.update")) {
+      throw new Error(
+        "You do not have permission to update users."
+      );
+    }
+
+    if (
+      !editingUser ||
+      !currentCompanyId
+    ) {
       throw new Error(
         "The selected user or company could not be identified."
       );
     }
 
-    const previousRole = editingUser.role;
+    const previousRole =
+      editingUser.role;
 
-    const updatedUser = await updateUserProfile(
-      editingUser.id,
-      currentCompanyId,
-      profileData
-    );
+    const updatedUser =
+      await updateUserProfile(
+        editingUser.id,
+        currentCompanyId,
+        profileData
+      );
 
     try {
       await createAuditLog({
-        company_id: currentCompanyId,
+        company_id:
+          currentCompanyId,
+
         action: "update",
+
         module: "users",
-        record_id: updatedUser.id,
-        description: `Updated user: ${updatedUser.full_name}`,
+
+        record_id:
+          updatedUser.id,
+
+        description:
+          `Updated user: ${updatedUser.full_name}`,
+
         metadata: {
-          email: updatedUser.email,
-          previous_role: previousRole,
-          new_role: updatedUser.role,
+          email:
+            updatedUser.email,
+
+          previous_role:
+            previousRole,
+
+          new_role:
+            updatedUser.role,
         },
       });
     } catch (error) {
@@ -277,78 +352,147 @@ export default function UsersPage() {
     }
 
     setEditingUser(null);
-    setMessage("User updated successfully.");
+
+    setMessage(
+      "User updated successfully."
+    );
 
     await refreshUsers();
   }
 
   async function logout() {
     await supabase.auth.signOut();
+
     router.replace("/login");
   }
 
-  const filteredUsers = useMemo(() => {
-    const search = searchTerm.trim().toLowerCase();
+  const filteredUsers =
+    useMemo(() => {
+      const search =
+        searchTerm
+          .trim()
+          .toLowerCase();
 
-    if (!search) {
-      return users;
-    }
+      if (!search) {
+        return users;
+      }
 
-    return users.filter((user) =>
-      [
-        user.full_name,
-        user.email,
-        user.role,
-      ].some((value) =>
-        value?.toLowerCase().includes(search)
-      )
+      return users.filter(
+        (user) =>
+          [
+            user.full_name,
+            user.email,
+            user.role,
+          ].some((value) =>
+            value
+              ?.toLowerCase()
+              .includes(search)
+          )
+      );
+    }, [
+      users,
+      searchTerm,
+    ]);
+
+  const rows =
+    filteredUsers.map(
+      (user) => [
+        <div
+          key={`${user.id}-identity`}
+        >
+          <p className="font-semibold">
+            {user.full_name}
+          </p>
+
+          <p className="mt-1 text-xs text-muted-foreground">
+            {user.user_id ===
+            currentUserId
+              ? "Current user"
+              : `ID: ${user.user_id.slice(
+                  0,
+                  8
+                )}`}
+          </p>
+        </div>,
+
+        user.email || "-",
+
+        <span
+          key={`${user.id}-role`}
+          className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${roleBadgeClass(
+            user.role
+          )}`}
+        >
+          {user.role
+            .charAt(0)
+            .toUpperCase() +
+            user.role.slice(1)}
+        </span>,
+
+        formatCreatedDate(
+          user.created_at
+        ),
+
+        <div
+          key={`${user.id}-actions`}
+          className="flex flex-wrap gap-2"
+        >
+          {can("user.update") && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                openEditForm(user)
+              }
+            >
+              Edit
+            </Button>
+          )}
+        </div>,
+      ]
     );
-  }, [users, searchTerm]);
 
-  const rows = filteredUsers.map((user) => [
-    <div key={`${user.id}-identity`}>
-      <p className="font-semibold">
-        {user.full_name}
-      </p>
+  const visibleError =
+    pageError ||
+    usersError ||
+    permissionsError;
 
-      <p className="mt-1 text-xs text-muted-foreground">
-        {user.user_id === currentUserId
-          ? "Current user"
-          : `ID: ${user.user_id.slice(0, 8)}`}
-      </p>
-    </div>,
+  if (
+    !permissionsLoading &&
+    !can("user.view")
+  ) {
+    return (
+      <DashboardLayout>
+        <Navbar
+          companyName={companyName}
+          userName={userName}
+          onLogout={logout}
+        />
 
-    user.email || "-",
+        <main className="p-4 sm:p-6 lg:p-8">
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6">
+            <h1 className="text-xl font-semibold">
+              Access denied
+            </h1>
 
-    <span
-      key={`${user.id}-role`}
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${roleBadgeClass(
-        user.role
-      )}`}
-    >
-      {user.role.charAt(0).toUpperCase() +
-        user.role.slice(1)}
-    </span>,
-
-    formatCreatedDate(user.created_at),
-
-    <Button
-      key={`${user.id}-edit`}
-      type="button"
-      variant="outline"
-      size="sm"
-      onClick={() => openEditForm(user)}
-    >
-      Edit
-    </Button>,
-  ]);
-
-  const visibleError = pageError || usersError;
+            <p className="mt-2 text-sm text-muted-foreground">
+              You do not have
+              permission to view the
+              Users module.
+            </p>
+          </div>
+        </main>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <Navbar
-        companyName={companyName}
+        companyName={
+          companyName
+        }
         userName={userName}
         onLogout={logout}
       />
@@ -365,17 +509,20 @@ export default function UsersPage() {
             </h1>
 
             <p className="mt-2 text-muted-foreground">
-              Manage people and access roles belonging to{" "}
-              {companyName}.
+              Manage people and
+              permissions belonging
+              to {companyName}.
             </p>
           </div>
 
-          {canInviteUsers &&
+          {can("user.invite") &&
             !showInviteForm &&
             !editingUser && (
               <Button
                 type="button"
-                onClick={openInviteForm}
+                onClick={
+                  openInviteForm
+                }
               >
                 + Invite User
               </Button>
@@ -394,24 +541,46 @@ export default function UsersPage() {
           </div>
         )}
 
-        {showInviteForm && (
-          <div className="mb-8">
-            <UserInviteForm
-              onInvite={inviteUser}
-              onCancel={closeInviteForm}
-            />
+        {permissionsLoading && (
+          <div className="mb-6 rounded-xl border bg-card p-5 text-sm text-muted-foreground">
+            Loading permissions...
           </div>
         )}
 
-        {editingUser && (
-          <div className="mb-8">
-            <UserForm
-              user={editingUser}
-              onSave={saveUser}
-              onCancel={closeEditForm}
-            />
-          </div>
-        )}
+        {showInviteForm &&
+          can(
+            "user.invite"
+          ) && (
+            <div className="mb-8">
+              <UserInviteForm
+                onInvite={
+                  inviteUser
+                }
+                onCancel={
+                  closeInviteForm
+                }
+              />
+            </div>
+          )}
+
+        {editingUser &&
+          can(
+            "user.update"
+          ) && (
+            <div className="mb-8">
+              <UserForm
+                user={
+                  editingUser
+                }
+                onSave={
+                  saveUser
+                }
+                onCancel={
+                  closeEditForm
+                }
+              />
+            </div>
+          )}
 
         <section className="mb-5 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -420,8 +589,14 @@ export default function UsersPage() {
             </p>
 
             <p className="text-sm text-muted-foreground">
-              {filteredUsers.length} result
-              {filteredUsers.length === 1 ? "" : "s"}
+              {
+                filteredUsers.length
+              }{" "}
+              result
+              {filteredUsers.length ===
+              1
+                ? ""
+                : "s"}
             </p>
           </div>
 
@@ -429,14 +604,17 @@ export default function UsersPage() {
             type="search"
             value={searchTerm}
             onChange={(event) =>
-              setSearchTerm(event.target.value)
+              setSearchTerm(
+                event.target.value
+              )
             }
             placeholder="Search users..."
             className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring sm:max-w-sm"
           />
         </section>
 
-        {loading ? (
+        {loading ||
+        permissionsLoading ? (
           <div className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground">
             Loading users...
           </div>
@@ -452,19 +630,6 @@ export default function UsersPage() {
             rows={rows}
             emptyMessage="No users match your search."
           />
-        )}
-
-        {!canInviteUsers && (
-          <div className="mt-6 rounded-xl border border-dashed bg-muted/20 p-5">
-            <p className="font-medium">
-              Invitation permission required
-            </p>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Only owners and administrators can invite new
-              users.
-            </p>
-          </div>
         )}
       </main>
     </DashboardLayout>
