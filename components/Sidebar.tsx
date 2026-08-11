@@ -34,6 +34,11 @@ const navigationItems: NavigationItem[] = [
   permission: "inventory.view",
 },
   {
+    name: "Purchasing",
+    href: "/purchasing",
+    permission: "purchasing.view",
+  },
+  {
     name: "Users",
     href: "/users",
     permission: "user.view",

@@ -26,6 +26,14 @@ export type PermissionName =
   | "supplier.update"
   | "supplier.delete"
 
+  | "purchasing.view"
+  | "purchasing.create"
+  | "purchasing.update"
+  | "purchasing.delete"
+  | "purchasing.submit"
+  | "purchasing.approve"
+  | "purchasing.receive"
+
   | "audit.view"
 
   | "reports.view"
