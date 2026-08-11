@@ -2,8 +2,15 @@ type AppInputProps = {
   label: string;
   value: string;
   placeholder?: string;
-  type?: "text" | "email" | "tel" | "password";
+  type?:
+    | "text"
+    | "email"
+    | "tel"
+    | "password"
+    | "number";
   required?: boolean;
+  min?: number;
+  step?: string;
   onChange: (value: string) => void;
 };
 
@@ -13,6 +20,8 @@ export default function AppInput({
   placeholder,
   type = "text",
   required = false,
+  min,
+  step,
   onChange,
 }: AppInputProps) {
   return (
@@ -26,6 +35,8 @@ export default function AppInput({
         value={value}
         placeholder={placeholder}
         required={required}
+        min={min}
+        step={step}
         onChange={(event) =>
           onChange(event.target.value)
         }

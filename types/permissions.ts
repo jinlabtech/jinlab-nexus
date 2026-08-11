@@ -15,6 +15,17 @@ export type PermissionName =
   | "user.invite"
   | "user.update"
 
+  | "inventory.view"
+  | "inventory.create"
+  | "inventory.update"
+  | "inventory.delete"
+  | "inventory.stock.adjust"
+
+  | "supplier.view"
+  | "supplier.create"
+  | "supplier.update"
+  | "supplier.delete"
+
   | "audit.view"
 
   | "reports.view"
