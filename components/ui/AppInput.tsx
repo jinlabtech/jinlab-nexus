@@ -10,6 +10,7 @@ type AppInputProps = {
     | "number";
   required?: boolean;
   min?: number;
+  max?: number;
   step?: string;
   onChange: (value: string) => void;
 };
@@ -21,6 +22,7 @@ export default function AppInput({
   type = "text",
   required = false,
   min,
+  max,
   step,
   onChange,
 }: AppInputProps) {
@@ -36,6 +38,7 @@ export default function AppInput({
         placeholder={placeholder}
         required={required}
         min={min}
+        max={max}
         step={step}
         onChange={(event) =>
           onChange(event.target.value)

@@ -1,0 +1,9 @@
+NotFound: FileSystem.readFile (/Users/khumalo/.supabase/profile)
+Using access token for profile: supabase
+Supabase CLI 2.111.0
+Using profile: supabase (supabase.co)
+Using access token for profile: supabase
+Initialising login role...
+2026/08/19 00:03:24 HTTP POST: https://api.supabase.com/v1/projects/guqzhdcqwqtfkfetagfb/cli/login-role
+Connecting to remote database...
+Remote database is up to date.

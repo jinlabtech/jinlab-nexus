@@ -39,6 +39,26 @@ const navigationItems: NavigationItem[] = [
     permission: "purchasing.view",
   },
   {
+    name: "Customers",
+    href: "/customers",
+    permission: "customer.view",
+  },
+  {
+    name: "Quotations",
+    href: "/quotations",
+    permission: "quotation.view",
+  },
+  {
+    name: "Sales",
+    href: "/sales",
+    permission: "sales.view",
+  },
+  {
+    name: "Invoices",
+    href: "/invoices",
+    permission: "invoice.view",
+  },
+  {
     name: "Users",
     href: "/users",
     permission: "user.view",
