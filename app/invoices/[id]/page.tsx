@@ -15,12 +15,23 @@ import {
 
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
+import InvoicePaymentForm from "@/components/InvoicePaymentForm";
 import { Button } from "@/components/ui/button";
 
 import {
   getInvoice,
   updateInvoiceStatus,
 } from "@/lib/services/invoiceService";
+
+import {
+  getInvoicePayments,
+  recordInvoicePayment,
+} from "@/lib/services/paymentService";
+
+import type {
+  InvoicePayment,
+  PaymentFormData,
+} from "@/lib/services/paymentService";
 
 import { supabase } from "@/lib/supabase";
 
@@ -142,6 +153,16 @@ export default function InvoiceDetailPage() {
     setMessage,
   ] = useState("");
 
+  const [
+    showPaymentForm,
+    setShowPaymentForm,
+  ] = useState(false);
+
+  const [
+    payments,
+    setPayments,
+  ] = useState<InvoicePayment[]>([]);
+
   const loadInvoice =
     useCallback(
       async (
@@ -159,6 +180,16 @@ export default function InvoiceDetailPage() {
 
         setItems(
           result.items
+        );
+
+        const paymentData =
+          await getInvoicePayments(
+            invoiceId,
+            targetCompanyId
+          );
+
+        setPayments(
+          paymentData
         );
 
         const [
@@ -444,6 +475,41 @@ export default function InvoiceDetailPage() {
     }
   }
 
+  async function savePayment(
+    data: PaymentFormData
+  ) {
+    if (
+      !companyId ||
+      !invoice
+    ) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      setErrorMessage("");
+      setMessage("");
+
+      await recordInvoicePayment(
+        invoice.id,
+        companyId,
+        invoice.branch_id,
+        invoice.customer_id,
+        data
+      );
+
+      setShowPaymentForm(false);
+
+      setMessage(
+        "Payment recorded successfully."
+      );
+
+      await refresh();
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
   async function logout() {
     await supabase.auth.signOut();
 
@@ -602,8 +668,17 @@ export default function InvoiceDetailPage() {
             ) && (
               <Button
                 type="button"
-                disabled
-                title="Payment recording will be added in the next sprint."
+                onClick={() =>
+                  setShowPaymentForm(
+                    true
+                  )
+                }
+                disabled={
+                  actionLoading ||
+                  Number(
+                    invoice.balance_due
+                  ) <= 0
+                }
               >
                 Record Payment
               </Button>
@@ -714,6 +789,32 @@ export default function InvoiceDetailPage() {
           </div>
         </section>
 
+        {showPaymentForm &&
+          Number(
+            invoice.balance_due
+          ) > 0 && (
+            <div className="mb-6">
+              <InvoicePaymentForm
+                balanceDue={
+                  Number(
+                    invoice.balance_due
+                  )
+                }
+                saving={
+                  actionLoading
+                }
+                onSave={
+                  savePayment
+                }
+                onCancel={() =>
+                  setShowPaymentForm(
+                    false
+                  )
+                }
+              />
+            </div>
+          )}
+
         <section className="overflow-hidden rounded-xl border bg-card">
           <div className="border-b p-5">
             <h2 className="text-lg font-semibold">
@@ -818,6 +919,88 @@ export default function InvoiceDetailPage() {
                           {formatCurrency(
                             Number(
                               item.line_total
+                            )
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="mt-6 overflow-hidden rounded-xl border bg-card">
+          <div className="border-b p-5">
+            <h2 className="text-lg font-semibold">
+              Payment History
+            </h2>
+
+            <p className="text-sm text-muted-foreground">
+              {payments.length} payment
+              {payments.length === 1
+                ? ""
+                : "s"}
+            </p>
+          </div>
+
+          {payments.length === 0 ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No payments recorded yet.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b bg-muted/30">
+                  <tr>
+                    <th className="p-4 text-left">
+                      Date
+                    </th>
+                    <th className="p-4 text-left">
+                      Method
+                    </th>
+                    <th className="p-4 text-left">
+                      Reference
+                    </th>
+                    <th className="p-4 text-right">
+                      Amount
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {payments.map(
+                    (payment) => (
+                      <tr
+                        key={
+                          payment.id
+                        }
+                        className="border-b last:border-0"
+                      >
+                        <td className="p-4">
+                          {
+                            payment.payment_date
+                          }
+                        </td>
+
+                        <td className="p-4 capitalize">
+                          {
+                            payment.payment_method
+                          }
+                        </td>
+
+                        <td className="p-4">
+                          {
+                            payment.reference ||
+                            "-"
+                          }
+                        </td>
+
+                        <td className="p-4 text-right font-semibold">
+                          {formatCurrency(
+                            Number(
+                              payment.amount
                             )
                           )}
                         </td>
