@@ -75,6 +75,22 @@ function formatDateTime(
 }
 
 
+function formatCurrency(
+  value: number
+) {
+  return new Intl.NumberFormat(
+    "en-ZA",
+    {
+      style: "currency",
+      currency: "ZAR",
+      minimumFractionDigits: 2,
+    }
+  ).format(
+    Number(value ?? 0)
+  );
+}
+
+
 export default function SalesOrderCreditControlPanel({
   salesOrderId,
 }: Props) {
@@ -255,14 +271,14 @@ export default function SalesOrderCreditControlPanel({
 
 
       setSuccessMessage(
-        "Credit hold override approved and recorded."
+        "Credit override approved and recorded."
       );
 
     } catch (error) {
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Credit hold override could not be approved."
+          : "Credit override could not be approved."
       );
     } finally {
       setApproving(false);
@@ -306,10 +322,8 @@ export default function SalesOrderCreditControlPanel({
 
 
   const blocked =
-    control.credit_hold &&
-    control.payment_basis ===
-      "credit" &&
-    !control.override;
+    control.credit_control_blocked;
+
 
 
   return (
@@ -346,9 +360,18 @@ export default function SalesOrderCreditControlPanel({
           )}
 
 
+          {control.credit_limit_exceeded && (
+            <span className="rounded-full border border-destructive/40 bg-destructive/10 px-3 py-1 text-xs font-bold text-destructive">
+              LIMIT EXCEEDED
+            </span>
+          )}
+
+
           {control.override && (
             <span className="rounded-full border px-3 py-1 text-xs font-medium">
-              OVERRIDE APPROVED
+              {control.override.valid
+                ? "OVERRIDE APPROVED"
+                : "REAPPROVAL REQUIRED"}
             </span>
           )}
 
@@ -461,7 +484,9 @@ export default function SalesOrderCreditControlPanel({
           <p className="mt-1 font-semibold">
             {control.credit_hold
               ? "Credit Hold"
-              : "Credit Available"}
+              : control.credit_limit_exceeded
+                ? "Credit Limit Exceeded"
+                : "Credit Available"}
           </p>
 
 
@@ -478,7 +503,8 @@ export default function SalesOrderCreditControlPanel({
           )}
 
 
-          {!control.credit_hold && (
+          {!control.credit_hold &&
+            !control.credit_limit_exceeded && (
             <p className="mt-3 text-sm text-muted-foreground">
               No active credit restriction is
               recorded for this customer.
@@ -490,6 +516,114 @@ export default function SalesOrderCreditControlPanel({
       </div>
 
 
+      {control.payment_basis === "credit" && (
+        <div className="mt-5 rounded-lg border p-4">
+
+          <div>
+            <p className="font-semibold">
+              Credit Exposure
+            </p>
+
+            <p className="mt-1 text-sm text-muted-foreground">
+              Nexus combines unpaid invoices and
+              open credit commitments before
+              approving additional credit.
+            </p>
+          </div>
+
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+
+            <div className="rounded-lg border p-3">
+              <p className="text-xs text-muted-foreground">
+                Credit Limit
+              </p>
+
+              <p className="mt-1 font-semibold">
+                {control.limit_configured
+                  ? formatCurrency(
+                      control.credit_limit
+                    )
+                  : "Not configured"}
+              </p>
+            </div>
+
+
+            <div className="rounded-lg border p-3">
+              <p className="text-xs text-muted-foreground">
+                Receivables
+              </p>
+
+              <p className="mt-1 font-semibold">
+                {formatCurrency(
+                  control.receivables
+                )}
+              </p>
+            </div>
+
+
+            <div className="rounded-lg border p-3">
+              <p className="text-xs text-muted-foreground">
+                Open Credit Orders
+              </p>
+
+              <p className="mt-1 font-semibold">
+                {formatCurrency(
+                  control.open_credit_orders
+                )}
+              </p>
+            </div>
+
+
+            <div className="rounded-lg border p-3">
+              <p className="text-xs text-muted-foreground">
+                This Order
+              </p>
+
+              <p className="mt-1 font-semibold">
+                {formatCurrency(
+                  control.current_order_amount
+                )}
+              </p>
+            </div>
+
+
+            <div className="rounded-lg border p-3">
+              <p className="text-xs text-muted-foreground">
+                Projected Exposure
+              </p>
+
+              <p className="mt-1 font-semibold">
+                {formatCurrency(
+                  control.projected_exposure
+                )}
+              </p>
+            </div>
+
+          </div>
+
+
+          {control.limit_configured && (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-muted/30 p-3">
+
+              <span className="text-sm">
+                Available after this order
+              </span>
+
+              <span className="font-semibold">
+                {formatCurrency(
+                  control.available_credit_after_order ??
+                  0
+                )}
+              </span>
+
+            </div>
+          )}
+
+        </div>
+      )}
+
+
       {blocked && (
         <div className="mt-5 rounded-lg border border-destructive/40 bg-destructive/10 p-4">
 
@@ -498,10 +632,16 @@ export default function SalesOrderCreditControlPanel({
           </p>
 
           <p className="mt-2 text-sm leading-6">
-            This customer is on credit hold.
-            Nexus will not allow this credit
-            sales order to be confirmed without
-            an authorised override.
+            {control.credit_hold &&
+            control.credit_limit_exceeded
+              ? "This customer is on credit hold and the order also exceeds the configured credit limit."
+              : control.credit_hold
+                ? "This customer is on credit hold. Nexus will not allow additional credit without authorised approval."
+                : `This order would increase projected credit exposure to ${formatCurrency(
+                    control.projected_exposure
+                  )}, above the configured limit of ${formatCurrency(
+                    control.credit_limit
+                  )}.`}
           </p>
 
 
@@ -523,7 +663,7 @@ export default function SalesOrderCreditControlPanel({
                       event.target.value
                     )
                 }
-                placeholder="Explain why this credit sale is being authorised despite the customer hold."
+                placeholder="Explain why this credit exposure is being authorised."
                 className="mt-2 w-full rounded-md border bg-background px-3 py-2 text-sm"
               />
 
@@ -563,7 +703,9 @@ export default function SalesOrderCreditControlPanel({
 
             <div>
               <p className="font-semibold">
-                Credit Override Approved
+                {control.override.valid
+                  ? "Credit Override Approved"
+                  : "Credit Override Needs Reapproval"}
               </p>
 
               <p className="mt-1 text-sm text-muted-foreground">
@@ -576,9 +718,11 @@ export default function SalesOrderCreditControlPanel({
 
 
             <span className="rounded-full border px-3 py-1 text-xs font-medium">
-              {control.override.used_at
-                ? "USED"
-                : "READY"}
+              {!control.override.valid
+                ? "INVALID"
+                : control.override.used_at
+                  ? "USED"
+                  : "READY"}
             </span>
 
           </div>
@@ -593,6 +737,15 @@ export default function SalesOrderCreditControlPanel({
               {control.override.reason}
             </p>
           </div>
+
+
+          {!control.override.valid && (
+            <p className="mt-3 text-xs font-medium text-destructive">
+              The order or customer credit exposure
+              changed after approval. A fresh owner/admin
+              approval is required.
+            </p>
+          )}
 
 
           {control.override.used_at && (

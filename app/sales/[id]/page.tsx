@@ -442,11 +442,23 @@ export default function SalesOrderDetailPage() {
             .payment_basis ===
             "credit" &&
           creditControl
-            .credit_hold &&
-          !creditControl.override
+            .credit_control_blocked
         ) {
           setErrorMessage(
-            "CREDIT HOLD: This customer cannot receive additional credit. An authorised override is required before this order can be confirmed."
+            creditControl.credit_hold &&
+            creditControl.credit_limit_exceeded
+              ? "CREDIT CONTROL: Customer is on credit hold and this order also exceeds the credit limit. Owner/admin approval is required."
+              : creditControl.credit_hold
+                ? "CREDIT HOLD: This customer cannot receive additional credit without owner/admin approval."
+                : `CREDIT LIMIT: Projected exposure ${formatCurrency(
+                    Number(
+                      creditControl.projected_exposure
+                    )
+                  )} exceeds the configured limit ${formatCurrency(
+                    Number(
+                      creditControl.credit_limit
+                    )
+                  )}. Owner/admin approval is required.`
           );
 
           return;

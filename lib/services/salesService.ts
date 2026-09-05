@@ -483,6 +483,27 @@ export type SalesOrderCreditControl = {
   credit_hold_reason:
     string | null;
 
+  credit_limit: number;
+  limit_configured: boolean;
+
+  receivables: number;
+  open_credit_orders: number;
+
+  current_exposure: number;
+  current_order_amount: number;
+
+  projected_exposure: number;
+
+  available_credit_before_order:
+    number | null;
+
+  available_credit_after_order:
+    number | null;
+
+  credit_limit_exceeded: boolean;
+
+  credit_control_blocked: boolean;
+
   override:
     {
       id: string;
@@ -493,6 +514,24 @@ export type SalesOrderCreditControl = {
 
       used_at:
         string | null;
+
+      scope:
+        | "credit_hold"
+        | "credit_limit"
+        | "both"
+        | null;
+
+      approved_total_amount:
+        number | null;
+
+      approved_exposure:
+        number | null;
+
+      approved_credit_limit:
+        number | null;
+
+      signature_valid: boolean;
+      valid: boolean;
     } | null;
 };
 
