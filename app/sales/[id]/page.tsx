@@ -506,8 +506,6 @@ export default function SalesOrderDetailPage() {
 
     if (
       order.payment_basis ===
-        "immediate" ||
-      order.payment_basis ===
         "prepaid"
     ) {
       try {
@@ -522,7 +520,7 @@ export default function SalesOrderDetailPage() {
             .fully_paid
         ) {
           setErrorMessage(
-            `PAYMENT REQUIRED: ${order.payment_basis === "immediate" ? "Pay Now" : "Prepaid"} order still has ${formatCurrency(
+            `PAYMENT REQUIRED: Prepaid order still has ${formatCurrency(
               Number(
                 paymentSummary.balance_due
               )

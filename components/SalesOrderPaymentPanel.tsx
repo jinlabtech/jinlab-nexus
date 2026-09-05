@@ -226,6 +226,7 @@ export default function SalesOrderPaymentPanel({
     try {
       setLoading(true);
       setErrorMessage("");
+      setSummary(null);
 
       const result =
         await getSalesOrderPaymentSummary(
@@ -418,8 +419,8 @@ export default function SalesOrderPaymentPanel({
           </h2>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Record actual money received against
-            this sales order before invoicing.
+            Prepaid orders can receive an advance here.
+            Pay Now and Credit payments are recorded after invoicing.
           </p>
         </div>
 
@@ -518,13 +519,13 @@ export default function SalesOrderPaymentPanel({
 
 
       {canRecord &&
-        summary.payment_basis &&
+        summary.payment_basis === "prepaid" &&
         !summary.fully_paid && (
 
         <div className="mt-6 rounded-lg border p-5">
 
           <h3 className="font-semibold">
-            Record Payment
+            Record Advance Payment
           </h3>
 
 
