@@ -21,6 +21,10 @@ import type {
   Customer,
 } from "@/types/customer";
 
+import type {
+  SalesPaymentBasis,
+} from "@/types/sales";
+
 type BranchOption = {
   id: string;
   branch_name: string;
@@ -29,6 +33,10 @@ type BranchOption = {
 type FormValues = {
   customer_id: string;
   branch_id: string;
+
+  payment_basis:
+    SalesPaymentBasis;
+
   expected_delivery: string | null;
   notes: string | null;
 };

@@ -60,10 +60,36 @@ export type PermissionName =
   | "invoice.issue"
   | "invoice.payment"
 
+  | "accounting.view"
+  | "accounting.debtors.manage"
+  | "sales.credit_hold.override"
+  | "sales.payment.record"
+  | "accounting.accounts.manage"
+  | "accounting.journal.create"
+  | "accounting.journal.approve"
+  | "accounting.journal.post"
+  | "accounting.period.manage"
+  | "accounting.financial_year.manage"
+
   | "audit.view"
 
   | "reports.view"
   | "reports.export"
 
   | "settings.view"
-  | "settings.manage";
+  | "settings.manage"
+  | "settings.company.manage"
+  | "settings.branding.manage"
+  | "settings.roles.manage"
+  | "settings.branches.manage"
+  | "settings.finance.view"
+  | "settings.finance.manage"
+  | "settings.accounting.manage"
+  | "settings.security.manage"
+  | "settings.notifications.manage"
+  | "settings.integrations.manage"
+  | "settings.audit.view"
+  | "settings.subscription.manage"
+  | "data.export"
+  | "data.backup"
+  | "data.export.audit";

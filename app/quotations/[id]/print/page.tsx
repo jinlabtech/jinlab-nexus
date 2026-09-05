@@ -10,23 +10,40 @@ import {
   useRouter,
 } from "next/navigation";
 
-import QuotationPrintDocument from "@/components/QuotationPrintDocument";
-import { Button } from "@/components/ui/button";
-
-import { getQuotation } from "@/lib/services/quotationService";
 import { supabase } from "@/lib/supabase";
 
-import type { Customer } from "@/types/customer";
+import {
+  getQuotation,
+} from "@/lib/services/quotationService";
+
+import {
+  getDocumentLogoUrl,
+} from "@/lib/services/settingsService";
+
 import type {
   Quotation,
   QuotationItem,
 } from "@/types/quotation";
 
+import JinlabSignatureQuotation from "@/components/quotation-templates/JinlabSignatureQuotation";
+
+import { Button } from "@/components/ui/button";
+
 type CompanyInfo = {
   company_name: string;
-  registration_number: string | null;
-  email: string | null;
-  phone: string | null;
+  registration_number?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  logo_url?: string | null;
+  document_display_name?: string | null;
+};
+
+type CustomerInfo = {
+  customer_name: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
 };
 
 type BranchInfo = {
@@ -34,8 +51,8 @@ type BranchInfo = {
 };
 
 export default function QuotationPrintPage() {
-  const router = useRouter();
   const params = useParams();
+  const router = useRouter();
 
   const quotationId =
     String(params.id);
@@ -44,34 +61,46 @@ export default function QuotationPrintPage() {
     quotation,
     setQuotation,
   ] =
-    useState<Quotation | null>(null);
+    useState<Quotation | null>(
+      null
+    );
 
   const [
     items,
     setItems,
   ] =
-    useState<QuotationItem[]>([]);
-
-  const [
-    customer,
-    setCustomer,
-  ] =
-    useState<Customer | null>(null);
+    useState<QuotationItem[]>(
+      []
+    );
 
   const [
     company,
     setCompany,
   ] =
-    useState<CompanyInfo | null>(null);
+    useState<CompanyInfo | null>(
+      null
+    );
+
+  const [
+    customer,
+    setCustomer,
+  ] =
+    useState<CustomerInfo | null>(
+      null
+    );
 
   const [
     branch,
     setBranch,
   ] =
-    useState<BranchInfo | null>(null);
+    useState<BranchInfo | null>(
+      null
+    );
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
   const [
     errorMessage,
@@ -79,24 +108,18 @@ export default function QuotationPrintPage() {
   ] = useState("");
 
   useEffect(() => {
-    async function loadDocument() {
-      setLoading(true);
-      setErrorMessage("");
-
+    async function load() {
       try {
+        setLoading(true);
+        setErrorMessage("");
+
         const {
           data: { user },
-          error: userError,
         } =
           await supabase.auth.getUser();
 
-        if (
-          userError ||
-          !user
-        ) {
-          router.replace(
-            "/login"
-          );
+        if (!user) {
+          router.push("/login");
           return;
         }
 
@@ -106,7 +129,10 @@ export default function QuotationPrintPage() {
         } = await supabase
           .from("user_profile")
           .select("company_id")
-          .eq("user_id", user.id)
+          .eq(
+            "user_id",
+            user.id
+          )
           .single();
 
         if (
@@ -114,15 +140,17 @@ export default function QuotationPrintPage() {
           !profile?.company_id
         ) {
           throw new Error(
-            profileError?.message ??
-              "Company could not be identified."
+            "Company profile could not be loaded."
           );
         }
+
+        const companyId =
+          profile.company_id;
 
         const result =
           await getQuotation(
             quotationId,
-            profile.company_id
+            companyId
           );
 
         setQuotation(
@@ -134,88 +162,125 @@ export default function QuotationPrintPage() {
         );
 
         const [
-          customerResult,
           companyResult,
+          customerResult,
           branchResult,
+          documentSettingsResult,
         ] =
           await Promise.all([
+            supabase
+              .from("company")
+              .select("*")
+              .eq(
+                "id",
+                companyId
+              )
+              .single(),
+
             supabase
               .from("customer")
               .select("*")
               .eq(
                 "id",
-                result.quotation.customer_id
+                result.quotation
+                  .customer_id
               )
               .eq(
                 "company_id",
-                profile.company_id
-              )
-              .single(),
-
-            supabase
-              .from("company")
-              .select(
-                "company_name, registration_number, email, phone"
-              )
-              .eq(
-                "id",
-                profile.company_id
+                companyId
               )
               .single(),
 
             supabase
               .from("branch")
-              .select(
-                "branch_name"
-              )
+              .select("*")
               .eq(
                 "id",
-                result.quotation.branch_id
+                result.quotation
+                  .branch_id
+              )
+              .eq(
+                "company_id",
+                companyId
               )
               .single(),
+
+            supabase
+              .from(
+                "company_document_settings"
+              )
+              .select(
+                "logo_path, document_display_name"
+              )
+              .eq(
+                "company_id",
+                companyId
+              )
+              .maybeSingle(),
           ]);
 
-        if (customerResult.error) {
-          throw new Error(
-            customerResult.error.message
-          );
-        }
-
-        if (companyResult.error) {
+        if (
+          companyResult.error
+        ) {
           throw new Error(
             companyResult.error.message
           );
         }
 
-        if (branchResult.error) {
+        if (
+          customerResult.error
+        ) {
           throw new Error(
-            branchResult.error.message
+            customerResult.error.message
           );
         }
 
+        const logoUrl =
+          await getDocumentLogoUrl(
+            documentSettingsResult
+              .data?.logo_path ??
+              null
+          );
+
+        setCompany({
+          ...(companyResult.data as CompanyInfo),
+
+          logo_url:
+            logoUrl,
+
+          document_display_name:
+            documentSettingsResult
+              .data
+              ?.document_display_name ??
+            companyResult.data
+              .company_name,
+        });
+
         setCustomer(
-          customerResult.data
+          customerResult.data as CustomerInfo
         );
 
-        setCompany(
-          companyResult.data
-        );
-
-        setBranch(
-          branchResult.data
-        );
+        if (
+          !branchResult.error
+        ) {
+          setBranch(
+            branchResult.data as BranchInfo
+          );
+        }
       } catch (error) {
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "Quotation document could not be loaded."
+            : "Quotation could not be loaded."
         );
       } finally {
         setLoading(false);
       }
     }
 
-    loadDocument();
+    if (quotationId) {
+      load();
+    }
   }, [
     quotationId,
     router,
@@ -223,8 +288,10 @@ export default function QuotationPrintPage() {
 
   if (loading) {
     return (
-      <main className="p-10 text-center">
-        Loading quotation...
+      <main className="flex min-h-screen items-center justify-center bg-gray-100">
+        <p className="text-sm text-gray-600">
+          Preparing quotation...
+        </p>
       </main>
     );
   }
@@ -232,78 +299,87 @@ export default function QuotationPrintPage() {
   if (
     errorMessage ||
     !quotation ||
-    !customer ||
-    !company
+    !company ||
+    !customer
   ) {
     return (
-      <main className="p-10">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-red-700">
-          {errorMessage ||
-            "Quotation could not be loaded."}
+      <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
+        <div className="max-w-lg rounded-xl border bg-white p-6 text-center">
+          <h1 className="text-xl font-bold">
+            Quotation unavailable
+          </h1>
+
+          <p className="mt-3 text-sm text-red-600">
+            {errorMessage ||
+              "Quotation information is incomplete."}
+          </p>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-5"
+            onClick={() =>
+              router.back()
+            }
+          >
+            Go Back
+          </Button>
         </div>
       </main>
     );
   }
 
   return (
-    <>
-      <style jsx global>{`
-        @page {
-          size: A4;
-          margin: 12mm;
-        }
+    <main className="min-h-screen bg-neutral-100 print:bg-white">
+      <div className="sticky top-0 z-50 border-b bg-white/95 px-6 py-3 backdrop-blur print:hidden">
+        <div className="mx-auto flex max-w-[210mm] flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold">
+              {
+                quotation.quotation_number
+              }
+            </p>
 
-        @media print {
-          body {
-            background: white !important;
-          }
+            <p className="text-xs text-muted-foreground">
+              JINLAB Nexus Quotation Preview
+            </p>
+          </div>
 
-          .no-print {
-            display: none !important;
-          }
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                router.push(
+                  `/quotations/${quotation.id}`
+                )
+              }
+            >
+              Back to Quotation
+            </Button>
 
-          .quotation-page {
-            box-shadow: none !important;
-            border: none !important;
-            margin: 0 !important;
-            width: 100% !important;
-            max-width: none !important;
-          }
-        }
-      `}</style>
-
-      <div className="no-print sticky top-0 z-50 flex items-center justify-between border-b bg-background p-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() =>
-            router.push(
-              `/quotations/${quotation.id}`
-            )
-          }
-        >
-          ← Back to Quotation
-        </Button>
-
-        <Button
-          type="button"
-          onClick={() =>
-            window.print()
-          }
-        >
-          Print / Save PDF
-        </Button>
+            <Button
+              type="button"
+              onClick={() =>
+                window.print()
+              }
+              className="bg-black text-white hover:bg-black/85"
+            >
+              Print / Save PDF
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <main className="min-h-screen bg-muted/30 p-4 sm:p-8 print:bg-white print:p-0">
-        <QuotationPrintDocument
+      <div className="py-8 print:py-0">
+        <JinlabSignatureQuotation
           quotation={quotation}
           items={items}
-          customer={customer}
           company={company}
+          customer={customer}
           branch={branch}
         />
-      </main>
-    </>
+      </div>
+    </main>
   );
 }

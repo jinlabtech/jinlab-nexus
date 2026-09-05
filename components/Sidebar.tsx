@@ -59,9 +59,19 @@ const navigationItems: NavigationItem[] = [
     permission: "invoice.view",
   },
   {
+    name: "Accounting",
+    href: "/accounting",
+    permission: "accounting.view",
+  },
+  {
     name: "Users",
     href: "/users",
     permission: "user.view",
+  },
+  {
+    name: "Settings",
+    href: "/settings",
+    permission: "settings.view",
   },
 ];
 

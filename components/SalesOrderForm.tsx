@@ -10,6 +10,10 @@ import { Button } from "@/components/ui/button";
 
 import type { Customer } from "@/types/customer";
 
+import type {
+  SalesPaymentBasis,
+} from "@/types/sales";
+
 type BranchOption = {
   id: string;
   branch_name: string;
@@ -18,6 +22,10 @@ type BranchOption = {
 type SalesOrderFormValues = {
   customer_id: string;
   branch_id: string;
+
+  payment_basis:
+    SalesPaymentBasis;
+
   expected_delivery: string | null;
   notes: string | null;
 };
@@ -46,6 +54,15 @@ export default function SalesOrderForm({
     branchId,
     setBranchId,
   ] = useState("");
+
+  const [
+    paymentBasis,
+    setPaymentBasis,
+  ] =
+    useState<
+      SalesPaymentBasis | ""
+    >("");
+
 
   const [
     expectedDelivery,
@@ -96,12 +113,25 @@ export default function SalesOrderForm({
       return;
     }
 
+
+    if (!paymentBasis) {
+      setErrorMessage(
+        "Select how the customer will pay."
+      );
+      return;
+    }
+
+
     try {
       await onSubmit({
         customer_id:
           customerId,
         branch_id:
           branchId,
+
+        payment_basis:
+          paymentBasis,
+
         expected_delivery:
           expectedDelivery ||
           null,
@@ -200,6 +230,52 @@ export default function SalesOrderForm({
           )}
         </select>
       </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-medium">
+          Payment Terms
+        </label>
+
+        <select
+          value={
+            paymentBasis
+          }
+          onChange={(event) =>
+            setPaymentBasis(
+              event.target
+                .value as
+                SalesPaymentBasis | ""
+            )
+          }
+          className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+          disabled={submitting}
+        >
+          <option value="">
+            Select payment terms
+          </option>
+
+          <option value="credit">
+            Credit — customer pays later
+          </option>
+
+          <option value="immediate">
+            Pay Now — full payment required
+          </option>
+
+          <option value="prepaid">
+            Prepaid — payment before fulfilment
+          </option>
+        </select>
+
+        <p className="mt-2 text-xs leading-5 text-muted-foreground">
+          Credit allows the customer to pay later.
+          Pay Now requires full payment immediately.
+          Prepaid requires payment before fulfilment.
+          The actual payment method — such as Cash,
+          EFT or Card — is recorded separately.
+        </p>
+      </div>
+
 
       <div>
         <label className="mb-2 block text-sm font-medium">

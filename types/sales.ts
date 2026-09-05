@@ -5,6 +5,12 @@ export type SalesOrderStatus =
   | "invoiced"
   | "cancelled";
 
+
+export type SalesPaymentBasis =
+  | "credit"
+  | "immediate"
+  | "prepaid";
+
 export type SalesTaxMode =
   | "none"
   | "vat";
@@ -22,6 +28,9 @@ export type SalesOrder = {
 
   sales_order_number: string;
   status: SalesOrderStatus;
+
+  payment_basis:
+    SalesPaymentBasis | null;
 
   order_date: string;
   expected_delivery: string | null;
@@ -67,6 +76,9 @@ export type SalesOrderItem = {
 export type SalesOrderFormData = {
   customer_id: string;
   branch_id: string;
+
+  payment_basis:
+    SalesPaymentBasis | null;
 
   expected_delivery: string | null;
   notes: string | null;

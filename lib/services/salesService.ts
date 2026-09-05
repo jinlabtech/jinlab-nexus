@@ -7,10 +7,11 @@ import type {
   SalesOrderItemFormData,
   SalesOrderStatus,
   SalesOrderWithItems,
+  SalesPaymentBasis,
 } from "@/types/sales";
 
 const salesOrderColumns =
-  "id, company_id, branch_id, customer_id, quotation_id, sales_order_number, status, order_date, expected_delivery, notes, subtotal, discount_amount, tax_amount, total_amount, created_by, created_at, updated_at";
+  "id, company_id, branch_id, customer_id, quotation_id, sales_order_number, status, payment_basis, order_date, expected_delivery, notes, subtotal, discount_amount, tax_amount, total_amount, created_by, created_at, updated_at";
 
 const salesOrderItemColumns =
   "id, sales_order_id, inventory_item_id, description, quantity, unit_price, discount_mode, discount_value, tax_mode, tax_rate, line_subtotal, line_discount, line_tax, line_total, created_at";
@@ -125,6 +126,11 @@ export async function createSalesOrder(
         quotation_id:
           formData.quotation_id ??
           null,
+
+        payment_basis:
+          formData.payment_basis ??
+          null,
+
         sales_order_number:
           generatedNumber,
         expected_delivery:
@@ -390,6 +396,9 @@ export async function convertQuotationToSalesOrder(
         branch_id:
           quotation.branch_id,
 
+        payment_basis:
+          null,
+
         expected_delivery:
           null,
 
@@ -446,4 +455,279 @@ export async function convertQuotationToSalesOrder(
   }
 
   return salesOrder;
+}
+
+
+// ============================================================
+// SALES CREDIT CONTROL
+// ============================================================
+
+export type SalesOrderCreditControl = {
+  ok: boolean;
+
+  sales_order_id: string;
+
+  customer_id: string;
+  customer_name: string;
+
+  sales_order_status:
+    SalesOrderStatus;
+
+  payment_basis:
+    SalesPaymentBasis | null;
+
+  collection_status: string;
+
+  credit_hold: boolean;
+
+  credit_hold_reason:
+    string | null;
+
+  override:
+    {
+      id: string;
+      reason: string;
+
+      approved_by: string;
+      approved_at: string;
+
+      used_at:
+        string | null;
+    } | null;
+};
+
+
+export async function getSalesOrderCreditControl(
+  salesOrderId: string
+): Promise<SalesOrderCreditControl> {
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_sales_order_credit_control",
+      {
+        p_sales_order_id:
+          salesOrderId,
+      }
+    );
+
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+
+  return data as
+    SalesOrderCreditControl;
+}
+
+
+export async function setSalesOrderPaymentBasis(
+  salesOrderId: string,
+  paymentBasis:
+    SalesPaymentBasis
+): Promise<SalesOrder> {
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "set_sales_order_payment_basis",
+      {
+        p_sales_order_id:
+          salesOrderId,
+
+        p_payment_basis:
+          paymentBasis,
+      }
+    );
+
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+
+  return data as SalesOrder;
+}
+
+
+export async function approveSalesCreditHoldOverride(
+  salesOrderId: string,
+  reason: string
+) {
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "approve_sales_credit_hold_override",
+      {
+        p_sales_order_id:
+          salesOrderId,
+
+        p_reason:
+          reason,
+      }
+    );
+
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+
+  return data;
+}
+
+
+// ============================================================
+// SALES ORDER PAYMENTS
+// ============================================================
+
+export type SalesOrderPaymentMethod =
+  | "cash"
+  | "eft"
+  | "card"
+  | "other";
+
+
+export type SalesOrderPaymentRecord = {
+  id: string;
+
+  payment_date: string;
+
+  payment_method:
+    SalesOrderPaymentMethod;
+
+  reference: string | null;
+
+  amount: number;
+
+  notes: string | null;
+
+  received_by: string | null;
+
+  created_at: string;
+};
+
+
+export type SalesOrderPaymentSummary = {
+  ok: boolean;
+
+  sales_order_id: string;
+
+  payment_basis:
+    SalesPaymentBasis | null;
+
+  order_total: number;
+
+  amount_paid: number;
+
+  balance_due: number;
+
+  fully_paid: boolean;
+
+  payment_count: number;
+
+  payments:
+    SalesOrderPaymentRecord[];
+};
+
+
+export async function getSalesOrderPaymentSummary(
+  salesOrderId: string
+): Promise<SalesOrderPaymentSummary> {
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_sales_order_payment_summary",
+      {
+        p_sales_order_id:
+          salesOrderId,
+      }
+    );
+
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+
+  return data as
+    SalesOrderPaymentSummary;
+}
+
+
+export async function recordSalesOrderPayment(
+  salesOrderId: string,
+  input: {
+    paymentDate: string;
+
+    paymentMethod:
+      SalesOrderPaymentMethod;
+
+    reference?:
+      string | null;
+
+    amount: number;
+
+    notes?:
+      string | null;
+  }
+): Promise<string> {
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "record_sales_order_payment",
+      {
+        p_sales_order_id:
+          salesOrderId,
+
+        p_payment_date:
+          input.paymentDate,
+
+        p_payment_method:
+          input.paymentMethod,
+
+        p_reference:
+          input.reference ??
+          null,
+
+        p_amount:
+          input.amount,
+
+        p_notes:
+          input.notes ??
+          null,
+      }
+    );
+
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+
+  return data as string;
 }

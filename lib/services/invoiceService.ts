@@ -300,3 +300,159 @@ export async function updateInvoiceStatus(
 
   return data as Invoice;
 }
+
+export type UpdateInvoiceDetailsInput = {
+  invoice_date?: string;
+  due_date?: string | null;
+  customer_reference?: string | null;
+  notes?: string | null;
+  terms?: string | null;
+};
+
+export async function updateInvoiceDetails(
+  invoiceId: string,
+  companyId: string,
+  input: UpdateInvoiceDetailsInput
+): Promise<Invoice> {
+  const {
+    data: existing,
+    error: existingError,
+  } = await supabase
+    .from("invoice")
+    .select("id, status")
+    .eq("id", invoiceId)
+    .eq("company_id", companyId)
+    .single();
+
+  if (existingError) {
+    throw new Error(existingError.message);
+  }
+
+  if (!existing) {
+    throw new Error(
+      "Invoice could not be found."
+    );
+  }
+
+  if (existing.status !== "draft") {
+    throw new Error(
+      "Only draft invoices can be edited."
+    );
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase
+    .from("invoice")
+    .update({
+      ...input,
+      updated_at:
+        new Date().toISOString(),
+    })
+    .eq("id", invoiceId)
+    .eq("company_id", companyId)
+    .eq("status", "draft")
+    .select(invoiceColumns)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as Invoice;
+}
+
+export type InvoiceChangeLog = {
+  id: string;
+  company_id: string;
+  invoice_id: string;
+  invoice_item_id: string | null;
+  change_type: string;
+  field_name: string;
+  old_value: string | null;
+  new_value: string | null;
+  reason: string | null;
+  changed_by: string | null;
+  created_at: string;
+};
+
+export type UpdateInvoiceItemFinancialsInput = {
+  unit_price: number;
+  discount_mode:
+    | "percentage"
+    | "fixed";
+  discount_value: number;
+  reason?: string;
+};
+
+export async function updateInvoiceItemFinancials(
+  invoiceItemId: string,
+  input: UpdateInvoiceItemFinancialsInput
+): Promise<void> {
+  const { error } =
+    await supabase.rpc(
+      "update_invoice_item_financials",
+      {
+        p_invoice_item_id:
+          invoiceItemId,
+
+        p_unit_price:
+          input.unit_price,
+
+        p_discount_mode:
+          input.discount_mode,
+
+        p_discount_value:
+          input.discount_value,
+
+        p_reason:
+          input.reason?.trim() ||
+          null,
+      }
+    );
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+}
+
+export async function getInvoiceChangeLog(
+  invoiceId: string,
+  companyId: string
+): Promise<InvoiceChangeLog[]> {
+  const {
+    data,
+    error,
+  } = await supabase
+    .from("invoice_change_log")
+    .select(
+      "id, company_id, invoice_id, invoice_item_id, change_type, field_name, old_value, new_value, reason, changed_by, created_at"
+    )
+    .eq(
+      "invoice_id",
+      invoiceId
+    )
+    .eq(
+      "company_id",
+      companyId
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false,
+      }
+    );
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+  return (
+    data ?? []
+  ) as InvoiceChangeLog[];
+}

@@ -14,15 +14,23 @@ import {
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import SalesOrderItemForm from "@/components/SalesOrderItemForm";
+import SalesOrderCreditControlPanel from "@/components/SalesOrderCreditControlPanel";
+import SalesOrderPaymentPanel from "@/components/SalesOrderPaymentPanel";
 import { Button } from "@/components/ui/button";
 
 import {
   addSalesOrderItem,
   deleteSalesOrderItem,
   getSalesOrder,
+  getSalesOrderCreditControl,
+  getSalesOrderPaymentSummary,
   updateSalesOrderItem,
   updateSalesOrderStatus,
 } from "@/lib/services/salesService";
+
+import {
+  convertSalesOrderToInvoice,
+} from "@/lib/services/invoiceService";
 
 import { supabase } from "@/lib/supabase";
 
@@ -406,6 +414,56 @@ export default function SalesOrderDetailPage() {
       return;
     }
 
+    if (
+      status ===
+      "confirmed"
+    ) {
+      try {
+        const creditControl =
+          await getSalesOrderCreditControl(
+            order.id
+          );
+
+
+        if (
+          !creditControl
+            .payment_basis
+        ) {
+          setErrorMessage(
+            "Select and save a payment basis before confirming this sales order."
+          );
+
+          return;
+        }
+
+
+        if (
+          creditControl
+            .payment_basis ===
+            "credit" &&
+          creditControl
+            .credit_hold &&
+          !creditControl.override
+        ) {
+          setErrorMessage(
+            "CREDIT HOLD: This customer cannot receive additional credit. An authorised override is required before this order can be confirmed."
+          );
+
+          return;
+        }
+
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Credit control could not be verified."
+        );
+
+        return;
+      }
+    }
+
+
     try {
       setActionLoading(true);
       setErrorMessage("");
@@ -422,6 +480,88 @@ export default function SalesOrderDetailPage() {
         error instanceof Error
           ? error.message
           : "Sales order status could not be updated."
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  async function createInvoice() {
+    if (
+      !companyId ||
+      !order
+    ) {
+      return;
+    }
+
+    if (
+      order.status !== "confirmed" &&
+      order.status !== "delivered"
+    ) {
+      setErrorMessage(
+        "Only confirmed or delivered sales orders can be invoiced."
+      );
+      return;
+    }
+
+    if (
+      order.payment_basis ===
+        "immediate" ||
+      order.payment_basis ===
+        "prepaid"
+    ) {
+      try {
+        const paymentSummary =
+          await getSalesOrderPaymentSummary(
+            order.id
+          );
+
+
+        if (
+          !paymentSummary
+            .fully_paid
+        ) {
+          setErrorMessage(
+            `PAYMENT REQUIRED: ${order.payment_basis === "immediate" ? "Pay Now" : "Prepaid"} order still has ${formatCurrency(
+              Number(
+                paymentSummary.balance_due
+              )
+            )} outstanding. Record full actual payment before creating the invoice.`
+          );
+
+          return;
+        }
+
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Payment status could not be verified."
+        );
+
+        return;
+      }
+    }
+
+
+    try {
+      setActionLoading(true);
+      setErrorMessage("");
+
+      const invoice =
+        await convertSalesOrderToInvoice(
+          order.id,
+          companyId
+        );
+
+      router.push(
+        `/invoices/${invoice.id}`
+      );
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Invoice could not be created."
       );
     } finally {
       setActionLoading(false);
@@ -574,14 +714,22 @@ export default function SalesOrderDetailPage() {
               </>
             )}
 
-            {order.status ===
-              "confirmed" && (
+            {(order.status ===
+              "confirmed" ||
+              order.status ===
+                "delivered") && (
               <Button
                 type="button"
-                disabled
-                title="Invoice conversion will be added in the next sprint."
+                onClick={
+                  createInvoice
+                }
+                disabled={
+                  actionLoading
+                }
               >
-                Create Invoice
+                {actionLoading
+                  ? "Creating Invoice..."
+                  : "Create Invoice"}
               </Button>
             )}
           </div>
@@ -640,6 +788,21 @@ export default function SalesOrderDetailPage() {
             </p>
           </div>
         </section>
+
+
+        <SalesOrderCreditControlPanel
+          salesOrderId={
+            order.id
+          }
+        />
+
+
+        <SalesOrderPaymentPanel
+          salesOrderId={
+            order.id
+          }
+        />
+
 
         {showItemForm && editable && (
           <div className="mb-8">
