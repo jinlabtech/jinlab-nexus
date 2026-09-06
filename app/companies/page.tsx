@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useMemo,
@@ -616,21 +618,29 @@ export default function CompaniesPage() {
           </div>
         ) : null}
 
-        {showForm && (
-          <div className="mb-8">
-            <CompanyForm
-              company={
-                editingCompany
-              }
-              onSave={
-                saveCompany
-              }
-              onCancel={
-                closeForm
-              }
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showForm}
+          title={
+            editingCompany
+              ? "Edit Company"
+              : "Add Company"
+          }
+          subtitle="Maintain organisation information."
+          onClose={closeForm}
+          maxWidth="max-w-4xl"
+        >
+          <CompanyForm
+            company={
+              editingCompany
+            }
+            onSave={
+              saveCompany
+            }
+            onCancel={
+              closeForm
+            }
+          />
+        </ActionModal>
 
         <section className="mb-5 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>

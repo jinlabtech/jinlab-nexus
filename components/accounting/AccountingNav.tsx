@@ -9,8 +9,28 @@ const items = [
     href: "/accounting",
   },
   {
+    name: "KPIs & Budget",
+    href: "/accounting/performance",
+  },
+  {
     name: "Customers / Debtors",
     href: "/accounting/debtors",
+  },
+  {
+    name: "Expenses & Bills",
+    href: "/accounting/expenses",
+  },
+  {
+    name: "What We Owe",
+    href: "/accounting/payables",
+  },
+  {
+    name: "Inventory Costing",
+    href: "/accounting/inventory-costing",
+  },
+  {
+    name: "Bank & Clearing",
+    href: "/accounting/bank-reconciliation",
   },
   {
     name: "Chart of Accounts",
@@ -55,7 +75,7 @@ export default function AccountingNav() {
               href={item.href}
               className={
                 active
-                  ? "rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
+                  ? "rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
                   : "rounded-md border bg-background px-4 py-2 text-sm font-medium hover:bg-muted"
               }
             >

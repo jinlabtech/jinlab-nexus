@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useMemo,
@@ -989,24 +991,32 @@ export default function PurchaseOrderDetailPage() {
           </div>
         )}
 
-        {showItemForm && (
-          <div className="mb-8">
-            <PurchaseOrderItemForm
-              inventoryItems={
-                inventoryItems
-              }
-              item={
-                editingItem
-              }
-              onSave={
-                saveOrderItem
-              }
-              onCancel={
-                closeItemForm
-              }
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showItemForm}
+          title={
+            editingItem
+              ? "Edit Purchase Item"
+              : "Add Product"
+          }
+          subtitle="Add a product to this purchase order."
+          onClose={closeItemForm}
+          maxWidth="max-w-3xl"
+        >
+          <PurchaseOrderItemForm
+            inventoryItems={
+              inventoryItems
+            }
+            item={
+              editingItem
+            }
+            onSave={
+              saveOrderItem
+            }
+            onCancel={
+              closeItemForm
+            }
+          />
+        </ActionModal>
 
         {showReceiveForm &&
           order && (

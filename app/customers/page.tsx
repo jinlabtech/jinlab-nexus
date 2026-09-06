@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useMemo,
@@ -506,21 +508,29 @@ export default function CustomersPage() {
           </div>
         )}
 
-        {showForm && (
-          <div className="mb-8">
-            <CustomerForm
-              customer={
-                editingCustomer
-              }
-              onSave={
-                saveCustomer
-              }
-              onCancel={
-                closeForm
-              }
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showForm}
+          title={
+            editingCustomer
+              ? "Edit Customer"
+              : "Add Customer"
+          }
+          subtitle="Maintain customer and account information."
+          onClose={closeForm}
+          maxWidth="max-w-4xl"
+        >
+          <CustomerForm
+            customer={
+              editingCustomer
+            }
+            onSave={
+              saveCustomer
+            }
+            onCancel={
+              closeForm
+            }
+          />
+        </ActionModal>
 
         <section className="mb-5 flex flex-col gap-4 rounded-xl border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

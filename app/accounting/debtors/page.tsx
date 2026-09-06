@@ -15,6 +15,8 @@ import Navbar from "@/components/Navbar";
 import DataTable from "@/components/DataTable";
 import AccountingNav from "@/components/accounting/AccountingNav";
 import DebtorReconciliationDetails from "@/components/accounting/DebtorReconciliationDetails";
+import DebtorRiskOverview from "@/components/accounting/DebtorRiskOverview";
+import DebtorCollectionQueue from "@/components/accounting/DebtorCollectionQueue";
 
 import {
   Button,
@@ -538,6 +540,19 @@ export default function DebtorsPage() {
 
         <AccountingNav />
 
+
+        <DebtorRiskOverview
+          asOfDate={asOfDate}
+        />
+
+        <DebtorCollectionQueue
+          asOfDate={asOfDate}
+          canManage={
+            can(
+              "accounting.debtors.manage"
+            )
+          }
+        />
 
         {errorMessage && (
           <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">

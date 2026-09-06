@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useMemo,
@@ -534,15 +536,22 @@ export default function BranchesPage() {
           </div>
         )}
 
-        {showForm && (
-          <div className="mb-8">
-            <BranchForm
-              branch={editingBranch}
-              onSave={saveBranch}
-              onCancel={closeForm}
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showForm}
+          title={
+            editingBranch
+              ? "Edit Branch"
+              : "Add Branch"
+          }
+          subtitle="Maintain business location details."
+          onClose={closeForm}
+        >
+          <BranchForm
+            branch={editingBranch}
+            onSave={saveBranch}
+            onCancel={closeForm}
+          />
+        </ActionModal>
 
         <section className="mb-5 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>

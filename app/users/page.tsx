@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useMemo,
@@ -547,40 +549,48 @@ export default function UsersPage() {
           </div>
         )}
 
-        {showInviteForm &&
-          can(
-            "user.invite"
-          ) && (
-            <div className="mb-8">
-              <UserInviteForm
-                onInvite={
-                  inviteUser
-                }
-                onCancel={
-                  closeInviteForm
-                }
-              />
-            </div>
-          )}
+        <ActionModal
+          open={
+            showInviteForm &&
+            can("user.invite")
+          }
+          title="Invite User"
+          subtitle="Invite a person into this company workspace."
+          onClose={closeInviteForm}
+        >
+          <UserInviteForm
+            onInvite={
+              inviteUser
+            }
+            onCancel={
+              closeInviteForm
+            }
+          />
+        </ActionModal>
 
-        {editingUser &&
-          can(
-            "user.update"
-          ) && (
-            <div className="mb-8">
-              <UserForm
-                user={
-                  editingUser
-                }
-                onSave={
-                  saveUser
-                }
-                onCancel={
-                  closeEditForm
-                }
-              />
-            </div>
+        <ActionModal
+          open={
+            Boolean(editingUser) &&
+            can("user.update")
+          }
+          title="Edit User"
+          subtitle="Update user identity, access and role."
+          onClose={closeEditForm}
+        >
+          {editingUser && (
+            <UserForm
+              user={
+                editingUser
+              }
+              onSave={
+                saveUser
+              }
+              onCancel={
+                closeEditForm
+              }
+            />
           )}
+        </ActionModal>
 
         <section className="mb-5 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>

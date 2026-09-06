@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useState,
@@ -484,21 +486,29 @@ export default function SuppliersPage() {
           </div>
         )}
 
-        {showForm && (
-          <div className="mb-8">
-            <SupplierForm
-              supplier={
-                editingSupplier
-              }
-              onSave={
-                saveSupplier
-              }
-              onCancel={
-                closeForm
-              }
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showForm}
+          title={
+            editingSupplier
+              ? "Edit Supplier"
+              : "Add Supplier"
+          }
+          subtitle="Maintain supplier contact and procurement information."
+          onClose={closeForm}
+          maxWidth="max-w-3xl"
+        >
+          <SupplierForm
+            supplier={
+              editingSupplier
+            }
+            onSave={
+              saveSupplier
+            }
+            onCancel={
+              closeForm
+            }
+          />
+        </ActionModal>
 
         {loading ||
         permissionsLoading ? (

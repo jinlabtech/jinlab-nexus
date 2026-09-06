@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useState,
@@ -473,21 +475,28 @@ export default function InventoryCategoriesPage() {
           </div>
         )}
 
-        {showForm && (
-          <div className="mb-8">
-            <InventoryCategoryForm
-              category={
-                editingCategory
-              }
-              onSave={
-                saveCategory
-              }
-              onCancel={
-                closeForm
-              }
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showForm}
+          title={
+            editingCategory
+              ? "Edit Category"
+              : "Add Category"
+          }
+          subtitle="Organise inventory into clear product groups."
+          onClose={closeForm}
+        >
+          <InventoryCategoryForm
+            category={
+              editingCategory
+            }
+            onSave={
+              saveCategory
+            }
+            onCancel={
+              closeForm
+            }
+          />
+        </ActionModal>
 
         {loading ||
         permissionsLoading ? (

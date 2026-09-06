@@ -1737,3 +1737,358 @@ export async function addCustomerCollectionActivity(
 
   return data as string;
 }
+
+
+// ============================================================
+// DEBTOR RISK WORKSPACE
+// ============================================================
+
+export type DebtorRiskLevel =
+  | "current"
+  | "due_today"
+  | "watch"
+  | "elevated"
+  | "high"
+  | "critical";
+
+export type DebtorRiskCustomer = {
+  customer_id: string;
+  customer_name: string;
+
+  outstanding: number;
+  overdue: number;
+  due_today: number;
+
+  ageing_bucket: string;
+  risk_level: DebtorRiskLevel;
+
+  oldest_due_date: string | null;
+  max_days_overdue: number;
+
+  open_invoice_count: number;
+  overdue_invoice_count: number;
+
+  recommended_action: string;
+};
+
+export type DebtorRiskSummaryResult = {
+  ok: boolean;
+  as_of_date: string;
+
+  summary: {
+    total_outstanding: number;
+    total_overdue: number;
+    due_today: number;
+    current: number;
+
+    days_1_30: number;
+    days_31_60: number;
+    days_61_90: number;
+    days_90_plus: number;
+
+    critical_customers: number;
+    high_customers: number;
+    elevated_customers: number;
+    watch_customers: number;
+  };
+
+  customers: DebtorRiskCustomer[];
+};
+
+export async function getDebtorRiskSummary(
+  asOfDate?: string
+): Promise<DebtorRiskSummaryResult> {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_debtor_risk_summary",
+    {
+      p_as_of_date:
+        asOfDate ?? null,
+    }
+  );
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+  return data as
+    DebtorRiskSummaryResult;
+}
+
+
+// ============================================================
+// PAYMENT PROMISE WORKSPACE
+// ============================================================
+
+export type DebtorPaymentPromiseStatus =
+  | "active"
+  | "kept"
+  | "partial"
+  | "broken"
+  | "cancelled";
+
+
+export type DebtorPaymentPromise = {
+  id: string;
+
+  promised_amount: number;
+  promised_payment_date: string;
+  promise_start_date: string;
+
+  status:
+    DebtorPaymentPromiseStatus;
+
+  paid_during_promise: number;
+  shortfall: number;
+
+  fulfilled_at: string | null;
+  broken_at: string | null;
+  cancelled_at: string | null;
+
+  notes: string | null;
+
+  created_at: string;
+};
+
+
+export type CustomerPaymentPromisesResult = {
+  ok: boolean;
+
+  customer_id: string;
+
+  promises:
+    DebtorPaymentPromise[];
+};
+
+
+export type CreatePaymentPromiseResult = {
+  ok: boolean;
+
+  promise_id: string;
+  customer_id: string;
+
+  promised_amount: number;
+  promised_payment_date: string;
+
+  outstanding_at_creation: number;
+
+  status:
+    DebtorPaymentPromiseStatus;
+};
+
+
+export async function getCustomerPaymentPromises(
+  customerId: string
+): Promise<CustomerPaymentPromisesResult> {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_customer_payment_promises",
+    {
+      p_customer_id:
+        customerId,
+    }
+  );
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+  return data as
+    CustomerPaymentPromisesResult;
+}
+
+
+export async function createDebtorPaymentPromise(
+  input: {
+    customerId: string;
+    amount: number;
+    paymentDate: string;
+    notes?: string;
+  }
+): Promise<CreatePaymentPromiseResult> {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "create_debtor_payment_promise",
+    {
+      p_customer_id:
+        input.customerId,
+
+      p_promised_amount:
+        input.amount,
+
+      p_promised_payment_date:
+        input.paymentDate,
+
+      p_notes:
+        input.notes?.trim() ||
+        null,
+    }
+  );
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+  return data as
+    CreatePaymentPromiseResult;
+}
+
+
+// ============================================================
+// DEBTOR COLLECTION ACTION QUEUE
+// ============================================================
+
+export type DebtorCollectionQueueStatus =
+  | "pending"
+  | "approved"
+  | "dismissed"
+  | "completed";
+
+export type DebtorCollectionPriority =
+  | "low"
+  | "normal"
+  | "high"
+  | "urgent";
+
+export type DebtorCollectionActionType =
+  | "reminder"
+  | "follow_up"
+  | "escalation"
+  | "credit_review"
+  | "legal_review"
+  | "manual_review"
+  | "promise_monitor"
+  | "broken_promise";
+
+export type DebtorCollectionQueueItem = {
+  id: string;
+
+  customer_id: string;
+  customer_name: string;
+
+  status:
+    DebtorCollectionQueueStatus;
+
+  priority:
+    DebtorCollectionPriority;
+
+  risk_level: string;
+  ageing_bucket: string;
+
+  action_type:
+    DebtorCollectionActionType;
+
+  recommended_channel:
+    string;
+
+  outstanding: number;
+  overdue: number;
+  max_days_overdue: number;
+
+  due_on: string | null;
+
+  reason: string;
+
+  draft_subject: string | null;
+  draft_message: string | null;
+
+  decision_note: string | null;
+
+  created_at: string;
+  updated_at: string;
+};
+
+export type DebtorCollectionQueueResult = {
+  ok: boolean;
+
+  as_of_date: string;
+
+  summary: {
+    pending: number;
+    approved: number;
+    urgent: number;
+    high: number;
+  };
+
+  items:
+    DebtorCollectionQueueItem[];
+};
+
+export async function getDebtorCollectionQueue(
+  asOfDate?: string
+): Promise<DebtorCollectionQueueResult> {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_debtor_collection_queue",
+    {
+      p_as_of_date:
+        asOfDate ?? null,
+
+      p_status:
+        "all",
+    }
+  );
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+  return data as
+    DebtorCollectionQueueResult;
+}
+
+export async function decideDebtorCollectionQueueItem(
+  queueId: string,
+  decision:
+    | "approved"
+    | "dismissed"
+    | "completed",
+  note?: string
+) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "decide_debtor_collection_queue_item",
+    {
+      p_queue_id:
+        queueId,
+
+      p_decision:
+        decision,
+
+      p_note:
+        note?.trim() ||
+        null,
+    }
+  );
+
+  if (error) {
+    throw new Error(
+      error.message
+    );
+  }
+
+  return data as {
+    ok: boolean;
+    queue_id: string;
+    status:
+      DebtorCollectionQueueStatus;
+  };
+}

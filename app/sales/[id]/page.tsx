@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useCallback,
   useEffect,
@@ -814,21 +816,36 @@ export default function SalesOrderDetailPage() {
         />
 
 
-        {showItemForm && editable && (
-          <div className="mb-8">
-            <SalesOrderItemForm
-              inventoryItems={
-                inventoryItems
-              }
-              item={editingItem}
-              onSave={saveItem}
-              onCancel={() => {
-                setEditingItem(null);
-                setShowItemForm(false);
-              }}
-            />
-          </div>
-        )}
+        <ActionModal
+          open={
+            showItemForm &&
+            editable
+          }
+          title={
+            editingItem
+              ? "Edit Item"
+              : "Add Item"
+          }
+          subtitle="Add a product or service to this sales order."
+          onClose={() => {
+            setEditingItem(null);
+            setShowItemForm(false);
+          }}
+          maxWidth="max-w-3xl"
+        >
+          <SalesOrderItemForm
+            inventoryItems={
+              inventoryItems
+            }
+            item={editingItem}
+            onSave={saveItem}
+            onCancel={() => {
+              setEditingItem(null);
+              setShowItemForm(false);
+            }}
+          />
+        </ActionModal>
+
 
         <section className="overflow-hidden rounded-xl border bg-card">
           <div className="flex items-center justify-between border-b p-5">

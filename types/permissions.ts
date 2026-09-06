@@ -47,6 +47,14 @@ export type PermissionName =
   | "quotation.accept"
 
   | "sales.view"
+  | "pos.view"
+  | "pos.sell"
+  | "pos.discount"
+  | "pos.manage"
+  | "pos.session.open"
+  | "pos.session.close"
+  | "pos.cashup.view"
+  | "pos.cashup.manage"
   | "sales.create"
   | "sales.update"
   | "sales.delete"
@@ -70,6 +78,11 @@ export type PermissionName =
   | "accounting.journal.post"
   | "accounting.period.manage"
   | "accounting.financial_year.manage"
+  | "accounting.budget.manage"
+  | "accounting.expense.manage"
+  | "accounting.payables.manage"
+  | "accounting.inventory_costing.manage"
+  | "accounting.bank_reconcile"
 
   | "audit.view"
 

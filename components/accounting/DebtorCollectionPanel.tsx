@@ -500,8 +500,8 @@ export default function DebtorCollectionPanel({
         </h2>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage follow-ups, payment promises,
-          disputes and customer credit restrictions.
+          Manage follow-ups, disputes,
+          collection activity and customer credit restrictions.
           These controls do not change the accounting ledger.
         </p>
       </div>
@@ -584,8 +584,11 @@ export default function DebtorCollectionPanel({
                   Follow-up Required
                 </option>
 
-                <option value="promise_to_pay">
-                  Promise to Pay
+                <option
+                  value="promise_to_pay"
+                  disabled
+                >
+                  Promise to Pay — use Payment Promises
                 </option>
 
                 <option value="disputed">
@@ -626,61 +629,15 @@ export default function DebtorCollectionPanel({
             </label>
 
 
-            <label className="text-sm">
-              <span className="mb-1 block font-medium">
-                Promised Payment Date
-              </span>
+            <div className="sm:col-span-2 rounded-lg border bg-muted/20 p-4">
+              <p className="text-sm font-medium">
+                Payment Promise
+              </p>
 
-              <input
-                type="date"
-                value={
-                  promisedPaymentDate
-                }
-                disabled={
-                  !canManage
-                }
-                onChange={
-                  (
-                    event
-                  ) =>
-                    setPromisedPaymentDate(
-                      event.target
-                        .value
-                    )
-                }
-                className="w-full rounded-md border bg-background px-3 py-2"
-              />
-            </label>
-
-
-            <label className="text-sm">
-              <span className="mb-1 block font-medium">
-                Promised Amount
-              </span>
-
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                value={
-                  promisedAmount
-                }
-                disabled={
-                  !canManage
-                }
-                onChange={
-                  (
-                    event
-                  ) =>
-                    setPromisedAmount(
-                      event.target
-                        .value
-                    )
-                }
-                className="w-full rounded-md border bg-background px-3 py-2"
-              />
-            </label>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Payment commitments are managed in the Payment Promises section above so that every promise has a tracked outcome and history.
+              </p>
+            </div>
 
           </div>
 
@@ -715,9 +672,9 @@ export default function DebtorCollectionPanel({
                 </p>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Prevent further credit sales once
-                  enforcement is connected to Sales
-                  Orders and Invoices.
+                  Restrict new credit Sales Orders
+                  and credit invoices unless an authorised
+                  override is recorded.
                 </p>
               </div>
 

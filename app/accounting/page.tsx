@@ -13,6 +13,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import DataTable from "@/components/DataTable";
 import AccountingNav from "@/components/accounting/AccountingNav";
+import BusinessPerformanceSummary from "@/components/accounting/BusinessPerformanceSummary";
 import AccountingExceptionAlert from "@/components/accounting/AccountingExceptionAlert";
 
 import {
@@ -471,6 +472,8 @@ export default function AccountingPage() {
 
 
         <AccountingNav />
+
+        <BusinessPerformanceSummary />
 
         <AccountingExceptionAlert />
 

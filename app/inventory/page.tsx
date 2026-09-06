@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import Link from "next/link";
 
 import {
@@ -1170,32 +1172,40 @@ export default function InventoryPage() {
           </div>
         )}
 
-        {showItemForm && (
-          <div className="mb-8">
-            <InventoryItemForm
-              item={
-                editingItem
-              }
-              categories={
-                categories
-              }
-              suppliers={
-                suppliers
-              }
-              branches={
-                branches
-              }
-              onSave={
-                editingItem
-                  ? saveEditedItem
-                  : saveNewItem
-              }
-              onCancel={
-                closeAddItem
-              }
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showItemForm}
+          title={
+            editingItem
+              ? "Edit Inventory Item"
+              : "Add Inventory Item"
+          }
+          subtitle="Create or update an inventory item without leaving this page."
+          onClose={closeAddItem}
+          maxWidth="max-w-4xl"
+        >
+          <InventoryItemForm
+            item={
+              editingItem
+            }
+            categories={
+              categories
+            }
+            suppliers={
+              suppliers
+            }
+            branches={
+              branches
+            }
+            onSave={
+              editingItem
+                ? saveEditedItem
+                : saveNewItem
+            }
+            onCancel={
+              closeAddItem
+            }
+          />
+        </ActionModal>
 
         {stockItem && (
           <div className="mb-8">

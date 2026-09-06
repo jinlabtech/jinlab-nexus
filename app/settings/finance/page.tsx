@@ -307,6 +307,81 @@ export default function FinanceSettingsPage() {
           </p>
         </div>
 
+        {can("accounting.view") && (
+          <section className="mb-8 rounded-2xl border bg-card">
+            <div className="border-b p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Connected Finance Workspaces
+              </p>
+
+              <h2 className="mt-1 text-lg font-semibold">
+                Accounting Operations
+              </h2>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Financial configuration lives here. Daily accounting work stays inside the connected Accounting workspaces.
+              </p>
+            </div>
+
+            <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-3">
+              {[
+                {
+                  name: "Accounting",
+                  description: "Business performance and financial records",
+                  href: "/accounting",
+                },
+                {
+                  name: "Expenses & Bills",
+                  description: "Rent, salaries and operating expenses",
+                  href: "/accounting/expenses",
+                },
+                {
+                  name: "What We Owe",
+                  description: "Supplier bills and liabilities",
+                  href: "/accounting/payables",
+                },
+                {
+                  name: "Bank & Clearing",
+                  description: "Card settlements and bank reconciliation",
+                  href: "/accounting/bank-reconciliation",
+                },
+                {
+                  name: "Inventory Costing",
+                  description: "Stock valuation and Cost of Sales",
+                  href: "/accounting/inventory-costing",
+                },
+                {
+                  name: "Performance & Budget",
+                  description: "Profit analysis, forecasting and budgets",
+                  href: "/accounting/performance",
+                },
+              ].map((item) => (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() =>
+                    router.push(item.href)
+                  }
+                  className="rounded-xl border bg-background p-4 text-left transition hover:-translate-y-0.5 hover:bg-muted/30 hover:shadow-sm"
+                >
+                  <p className="font-semibold">
+                    {item.name}
+                  </p>
+
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {item.description}
+                  </p>
+
+                  <p className="mt-3 text-xs font-semibold">
+                    Open →
+                  </p>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+
         {errorMessage && (
           <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             {errorMessage}

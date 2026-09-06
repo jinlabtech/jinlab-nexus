@@ -433,25 +433,51 @@ export default function CustomerForm({
             onChange={setCountry}
           />
 
-          <AppInput
-            label="Credit Limit"
-            value={creditLimit}
-            type="number"
-            min={0}
-            step="0.01"
-            onChange={setCreditLimit}
-          />
+        </div>
 
-          <AppInput
-            label="Payment Terms (Days)"
-            value={paymentTermsDays}
-            type="number"
-            min={0}
-            step="1"
-            onChange={
-              setPaymentTermsDays
-            }
-          />
+        <div className="rounded-xl border bg-muted/20 p-5">
+          <div>
+            <p className="text-sm font-medium text-primary">
+              Account Control
+            </p>
+
+            <h3 className="mt-1 text-lg font-semibold">
+              Account & Credit
+            </h3>
+
+            <p className="mt-1 text-sm text-muted-foreground">
+              Set how much credit this customer may use
+              and when invoices are expected to be paid.
+            </p>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <AppInput
+              label="Credit Limit (R)"
+              value={creditLimit}
+              type="number"
+              min={0}
+              step="0.01"
+              onChange={setCreditLimit}
+            />
+
+            <AppInput
+              label="Payment Terms (Days)"
+              value={paymentTermsDays}
+              type="number"
+              min={0}
+              step="1"
+              onChange={
+                setPaymentTermsDays
+              }
+            />
+          </div>
+
+          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+            A credit limit of R0 means no limit has been
+            configured yet. Payment terms of 0 days mean
+            payment is due immediately.
+          </p>
         </div>
 
         <label className="grid gap-2">

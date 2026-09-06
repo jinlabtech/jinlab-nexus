@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import DashboardCard from "@/components/DashboardCard";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
+import BusinessPerformanceSummary from "@/components/accounting/BusinessPerformanceSummary";
 
 import { useAuditLogs } from "@/hooks/useAuditLogs";
 import { supabase } from "@/lib/supabase";
@@ -168,6 +169,8 @@ export default function DashboardPage() {
             recent system activity.
           </p>
         </section>
+
+        <BusinessPerformanceSummary />
 
         {errorMessage && (
           <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">

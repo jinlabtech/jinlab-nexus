@@ -15,6 +15,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import AccountingNav from "@/components/accounting/AccountingNav";
 import DebtorCollectionPanel from "@/components/accounting/DebtorCollectionPanel";
+import DebtorPaymentPromises from "@/components/accounting/DebtorPaymentPromises";
 import DataTable from "@/components/DataTable";
 
 import {
@@ -262,6 +263,13 @@ export default function CustomerDebtorPage() {
     setErrorMessage,
   ] =
     useState("");
+
+
+  const [
+    collectionRefreshKey,
+    setCollectionRefreshKey,
+  ] =
+    useState(0);
 
 
   async function loadData(
@@ -1215,7 +1223,37 @@ export default function CustomerDebtorPage() {
         </section>
 
 
+        <DebtorPaymentPromises
+          customerId={
+            customerId
+          }
+          canManage={
+            can(
+              "accounting.debtors.manage"
+            )
+          }
+          outstanding={
+            Math.max(
+              closingBalance,
+              0
+            )
+          }
+          currency={
+            currency
+          }
+          onChanged={() =>
+            setCollectionRefreshKey(
+              (
+                value
+              ) =>
+                value + 1
+            )
+          }
+        />
+
+
         <DebtorCollectionPanel
+          key={`${customerId}-${collectionRefreshKey}`}
           customerId={
             customerId
           }

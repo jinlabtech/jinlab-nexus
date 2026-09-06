@@ -1,5 +1,7 @@
 "use client";
 
+import ActionModal from "@/components/ui/ActionModal";
+
 import {
   useEffect,
   useMemo,
@@ -1990,24 +1992,32 @@ export default function QuotationDetailPage() {
           </div>
         )}
 
-        {showItemForm && (
-          <div className="mb-8">
-            <QuotationItemForm
-              inventoryItems={
-                inventoryItems
-              }
-              item={
-                editingItem
-              }
-              onSave={
-                saveQuotationItem
-              }
-              onCancel={
-                closeItemForm
-              }
-            />
-          </div>
-        )}
+        <ActionModal
+          open={showItemForm}
+          title={
+            editingItem
+              ? "Edit Item"
+              : "Add Item"
+          }
+          subtitle="Add a product or service to this quotation."
+          onClose={closeItemForm}
+          maxWidth="max-w-3xl"
+        >
+          <QuotationItemForm
+            inventoryItems={
+              inventoryItems
+            }
+            item={
+              editingItem
+            }
+            onSave={
+              saveQuotationItem
+            }
+            onCancel={
+              closeItemForm
+            }
+          />
+        </ActionModal>
 
         {quotation && (
           <section className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
