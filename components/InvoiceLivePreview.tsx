@@ -99,6 +99,19 @@ export default function InvoiceLivePreview({
   const financialEditable =
     invoice.status !== "cancelled";
 
+  const isJinlabCompany =
+    companyName.trim().toUpperCase() === "JINLAB";
+
+  const effectiveLogoUrl =
+    companyLogoUrl ||
+    (isJinlabCompany
+      ? "/branding/jinlab-mark.jpg"
+      : null);
+
+  const usingJinlabFallbackLogo =
+    !companyLogoUrl &&
+    isJinlabCompany;
+
   const [
     editingItemId,
     setEditingItemId,
@@ -297,12 +310,26 @@ export default function InvoiceLivePreview({
       <div className="p-6 text-neutral-950 sm:p-8">
         <div className="flex items-start justify-between gap-6 border-b pb-6">
           <div>
-            {companyLogoUrl ? (
-              <div className="mb-3 flex min-h-16 items-center">
+            {effectiveLogoUrl ? (
+              <div
+                className={
+                  usingJinlabFallbackLogo
+                    ? "mb-3 flex h-16 w-16 items-center justify-center overflow-hidden bg-white"
+                    : "mb-3 flex min-h-16 items-center"
+                }
+              >
+                {/* The JINLAB source mark has intentional white canvas around it.
+                    Scale only the displayed fallback inside this clipped UI frame;
+                    the original image file remains unchanged. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={companyLogoUrl}
+                  src={effectiveLogoUrl}
                   alt={`${companyName} logo`}
-                  className="max-h-16 max-w-[180px] object-contain"
+                  className={
+                    usingJinlabFallbackLogo
+                      ? "h-full w-full scale-[1.65] object-cover object-center"
+                      : "max-h-16 max-w-[180px] object-contain object-left"
+                  }
                 />
               </div>
             ) : (

@@ -11,6 +11,7 @@ import {
   CircleDollarSign,
   Layers3,
   Plug,
+  Palette,
   ShieldCheck,
   ShoppingCart,
   Users,
@@ -77,6 +78,14 @@ const sections: SettingsSection[] = [
           "Logo, invoice appearance, quotation appearance and document defaults.",
         href: "/settings/branding",
         permission: "settings.branding.manage",
+      },
+      {
+        name: "Appearance & Theme",
+        description:
+          "Choose the company-wide Nexus colour theme and appearance mode.",
+        href: "/settings/appearance",
+        permission: "settings.appearance.manage",
+        status: "JINLAB Blue",
       },
     ],
   },
@@ -454,7 +463,7 @@ export default function SettingsPage() {
                         }
                         className={
                           selected
-                            ? "flex min-w-fit items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-left text-sm font-semibold text-emerald-800 lg:w-full"
+                            ? "flex min-w-fit items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-left text-sm font-semibold text-primary lg:w-full"
                             : "flex min-w-fit items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-muted-foreground transition hover:bg-muted lg:w-full"
                         }
                       >
@@ -492,7 +501,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center gap-3">
 
-                    <div className="rounded-xl bg-emerald-50 p-3 text-emerald-700">
+                    <div className="rounded-xl bg-primary/10 p-3 text-primary">
                       {
                         activeSection.icon
                       }
@@ -538,7 +547,7 @@ export default function SettingsPage() {
                               card.href
                             )
                           }
-                          className="group rounded-2xl border bg-card p-5 text-left transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-sm"
+                          className="group rounded-2xl border bg-card p-5 text-left transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm"
                         >
 
                           <div className="flex items-start justify-between gap-3">
@@ -572,7 +581,7 @@ export default function SettingsPage() {
 
                           <div className="mt-5 border-t pt-3">
 
-                            <span className="text-xs font-semibold text-emerald-700">
+                            <span className="text-xs font-semibold text-primary">
                               Open →
                             </span>
 

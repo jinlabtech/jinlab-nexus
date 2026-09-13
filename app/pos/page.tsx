@@ -25,6 +25,12 @@ import {
 
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import TillSessionPanel from "@/components/pos/TillSessionPanel";
+import SplitTenderPanel, {
+  type PosTenderDraft,
+} from "@/components/pos/SplitTenderPanel";
+import SuspendedSalesPanel, {
+  type RecalledSuspendedSale,
+} from "@/components/pos/SuspendedSalesPanel";
 import Navbar from "@/components/Navbar";
 
 import {
@@ -123,6 +129,10 @@ type PosWorkspace = {
 type CartItem = PosProduct & {
   cart_quantity: number;
   discount_percent: number;
+
+  override_unit_price?:
+    number |
+    null;
 };
 
 
@@ -201,6 +211,18 @@ export default function PosPage() {
     );
 
 
+  const canRequestDiscountApproval =
+    can(
+      "pos.discount.request"
+    );
+
+
+  const canApproveDiscount =
+    can(
+      "pos.discount.approve"
+    );
+
+
   const [
     companyName,
     setCompanyName,
@@ -251,6 +273,26 @@ export default function PosPage() {
 
 
   const [
+    activeSuspendedSaleId,
+    setActiveSuspendedSaleId,
+  ] =
+    useState<
+      string |
+      null
+    >(null);
+
+
+  const [
+    activeSuspendedSaleNumber,
+    setActiveSuspendedSaleNumber,
+  ] =
+    useState<
+      string |
+      null
+    >(null);
+
+
+  const [
     paymentMethod,
     setPaymentMethod,
   ] =
@@ -262,6 +304,22 @@ export default function PosPage() {
     >(
       "cash"
     );
+
+
+  const [
+    splitPaymentActive,
+    setSplitPaymentActive,
+  ] =
+    useState(false);
+
+
+  const [
+    splitTenders,
+    setSplitTenders,
+  ] =
+    useState<
+      PosTenderDraft[]
+    >([]);
 
 
   const [
@@ -295,6 +353,36 @@ export default function PosPage() {
   const [
     checkingOut,
     setCheckingOut,
+  ] =
+    useState(false);
+
+
+  const [
+    activeApprovalId,
+    setActiveApprovalId,
+  ] =
+    useState<
+      string |
+      null
+    >(null);
+
+
+  const [
+    activeApprovalStatus,
+    setActiveApprovalStatus,
+  ] =
+    useState<
+      "" |
+      "pending" |
+      "approved" |
+      "rejected" |
+      "expired"
+    >("");
+
+
+  const [
+    requestingApproval,
+    setRequestingApproval,
   ] =
     useState(false);
 
@@ -508,6 +596,26 @@ export default function PosPage() {
   }
 
 
+  // Cart changes invalidate an approval because approvals
+  // are bound to the exact item/quantity/discount snapshot.
+  useEffect(
+    () => {
+
+      setActiveApprovalId(
+        null
+      );
+
+      setActiveApprovalStatus(
+        ""
+      );
+
+    },
+    [
+      cart,
+    ]
+  );
+
+
   useEffect(
     () => {
 
@@ -559,6 +667,14 @@ export default function PosPage() {
 
     setCart([]);
     setSuccess(null);
+
+    setActiveSuspendedSaleId(
+      null
+    );
+
+    setActiveSuspendedSaleNumber(
+      null
+    );
 
     setSelectedBranchId(
       branchId
@@ -808,12 +924,53 @@ export default function PosPage() {
   }
 
 
+  function setOverridePrice(
+    productId: string,
+    value:
+      number |
+      null
+  ) {
+
+    setCart(
+      (
+        current
+      ) =>
+        current.map(
+          (
+            item
+          ) =>
+            item.id ===
+              productId
+              ? {
+                  ...item,
+
+                  override_unit_price:
+                    value !== null &&
+                    value > 0
+                      ? value
+                      : null,
+
+                  discount_percent:
+                    value !== null &&
+                    value > 0
+                      ? 0
+                      : item.discount_percent,
+                }
+              : item
+        )
+    );
+  }
+
+
   function lineTotal(
     item: CartItem
   ) {
 
     const base =
-      item.selling_price *
+      (
+        item.override_unit_price ??
+        item.selling_price
+      ) *
       item.cart_quantity;
 
 
@@ -866,6 +1023,161 @@ export default function PosPage() {
         cart,
         workspace,
       ]
+    );
+
+
+  const needsApproval =
+    useMemo(
+      () =>
+        cart.some(
+          (
+            item
+          ) =>
+            (
+              item.override_unit_price !==
+                null &&
+              item.override_unit_price !==
+                undefined
+            ) ||
+            item.discount_percent >
+              Number(
+                workspace?.profile
+                  ?.max_cashier_discount_pct ??
+                0
+              )
+        ),
+      [
+        cart,
+        workspace,
+      ]
+    );
+
+
+  const splitAppliedTotal =
+    splitTenders.reduce(
+      (
+        total,
+        tender
+      ) =>
+        total +
+        Number(
+          tender.amount ||
+          0
+        ),
+      0
+    );
+
+
+  const splitTenderedTotal =
+    splitTenders.reduce(
+      (
+        total,
+        tender
+      ) =>
+        total +
+        (
+          tender.payment_method ===
+            "cash"
+            ? Number(
+                tender.amount_tendered ||
+                tender.amount ||
+                0
+              )
+            : Number(
+                tender.amount ||
+                0
+              )
+        ),
+      0
+    );
+
+
+  const splitChangeDue =
+    splitTenders.reduce(
+      (
+        total,
+        tender
+      ) => {
+
+        if (
+          tender.payment_method !==
+          "cash"
+        ) {
+          return total;
+        }
+
+
+        return (
+          total +
+          Math.max(
+            Number(
+              tender.amount_tendered ||
+              tender.amount ||
+              0
+            ) -
+              Number(
+                tender.amount ||
+                0
+              ),
+            0
+          )
+        );
+      },
+      0
+    );
+
+
+  const splitTenderValid =
+    !splitPaymentActive ||
+    (
+      splitTenders.length >=
+        2 &&
+
+      splitTenders.every(
+        (
+          tender
+        ) => {
+
+          const amount =
+            Number(
+              tender.amount ||
+              0
+            );
+
+
+          if (
+            amount <=
+            0
+          ) {
+            return false;
+          }
+
+
+          if (
+            tender.payment_method ===
+            "cash"
+          ) {
+
+            return (
+              Number(
+                tender.amount_tendered ||
+                tender.amount ||
+                0
+              ) >=
+              amount
+            );
+          }
+
+
+          return true;
+        }
+      ) &&
+
+      Math.abs(
+        splitAppliedTotal -
+        cartTotal
+      ) <
+        0.009
     );
 
 
@@ -932,6 +1244,372 @@ export default function PosPage() {
   }
 
 
+  function loadRecalledSale(
+    recalled:
+      RecalledSuspendedSale
+  ) {
+
+    if (!workspace) {
+      return;
+    }
+
+
+    const nextCart =
+      recalled.items.map(
+        (
+          recalledItem
+        ) => {
+
+          const product =
+            workspace.products.find(
+              (
+                item
+              ) =>
+                item.id ===
+                recalledItem.inventory_item_id
+            );
+
+
+          if (!product) {
+
+            throw new Error(
+              `${recalledItem.name} is not currently available in this branch POS catalogue.`
+            );
+          }
+
+
+          return {
+            ...product,
+
+            cart_quantity:
+              Number(
+                recalledItem.quantity
+              ),
+
+            discount_percent:
+              recalledItem.discount_mode ===
+                "percentage"
+                ? Number(
+                    recalledItem.discount_value
+                  )
+                : 0,
+          };
+        }
+      );
+
+
+    setCart(
+      nextCart
+    );
+
+
+    setSelectedCustomerId(
+      recalled.customer_id ??
+      ""
+    );
+
+
+    setPaymentMethod(
+      "cash"
+    );
+
+    setAmountTendered(
+      ""
+    );
+
+    setPaymentReference(
+      ""
+    );
+
+
+    setActiveSuspendedSaleId(
+      recalled.id
+    );
+
+    setActiveSuspendedSaleNumber(
+      recalled.hold_number
+    );
+
+
+    setSuccess(
+      null
+    );
+
+    setErrorMessage(
+      ""
+    );
+  }
+
+
+  function approvalCartItems() {
+
+    return cart.map(
+      (
+        item
+      ) => ({
+        inventory_item_id:
+          item.id,
+
+        quantity:
+          item.cart_quantity,
+
+        discount_mode:
+          "percentage",
+
+        discount_value:
+          item.discount_percent,
+
+        requested_unit_price:
+          item.override_unit_price ??
+          null,
+      })
+    );
+  }
+
+
+  async function requestDiscountApproval() {
+
+    if (
+      !selectedBranchId ||
+      cart.length ===
+        0
+    ) {
+      return;
+    }
+
+
+    const reason =
+      window.prompt(
+        "Why is this discount or price override needed?",
+        ""
+      );
+
+
+    if (
+      reason ===
+      null
+    ) {
+      return;
+    }
+
+
+    if (
+      reason.trim()
+        .length <
+      3
+    ) {
+
+      setErrorMessage(
+        "Enter a clear reason for the approval request."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      setRequestingApproval(
+        true
+      );
+
+      setErrorMessage(
+        ""
+      );
+
+
+      const {
+        data,
+        error,
+      } =
+        await supabase.rpc(
+          "request_pos_approval",
+          {
+            p_branch_id:
+              selectedBranchId,
+
+            p_items:
+              approvalCartItems(),
+
+            p_reason:
+              reason.trim(),
+          }
+        );
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      if (
+        !data?.approval_required
+      ) {
+
+        setActiveApprovalId(
+          null
+        );
+
+        setActiveApprovalStatus(
+          ""
+        );
+
+        setErrorMessage(
+          data?.message ??
+          "Approval is not required."
+        );
+
+        return;
+      }
+
+
+      setActiveApprovalId(
+        data.approval_id
+      );
+
+      setActiveApprovalStatus(
+        "pending"
+      );
+
+    } catch (
+      error
+    ) {
+
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Approval request could not be created."
+      );
+
+    } finally {
+
+      setRequestingApproval(
+        false
+      );
+    }
+  }
+
+
+  async function refreshDiscountApproval() {
+
+    if (
+      !activeApprovalId ||
+      !selectedBranchId
+    ) {
+      return;
+    }
+
+
+    try {
+
+      setErrorMessage(
+        ""
+      );
+
+
+      const {
+        data,
+        error,
+      } =
+        await supabase.rpc(
+          "get_pos_approval_workspace",
+          {
+            p_branch_id:
+              selectedBranchId,
+          }
+        );
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      const requests =
+        data?.my_requests ??
+        [];
+
+
+      const request =
+        requests.find(
+          (
+            row:
+              {
+                id: string;
+                status: string;
+              }
+          ) =>
+            row.id ===
+            activeApprovalId
+        );
+
+
+      if (!request) {
+
+        setErrorMessage(
+          "Approval request could not be found."
+        );
+
+        return;
+      }
+
+
+      if (
+        request.status ===
+        "approved"
+      ) {
+
+        setActiveApprovalStatus(
+          "approved"
+        );
+
+        return;
+      }
+
+
+      if (
+        request.status ===
+          "rejected" ||
+        request.status ===
+          "expired"
+      ) {
+
+        setActiveApprovalStatus(
+          request.status
+        );
+
+        setActiveApprovalId(
+          null
+        );
+
+        setErrorMessage(
+          request.status ===
+            "rejected"
+            ? "The POS approval request was rejected."
+            : "The POS approval request expired."
+        );
+
+        return;
+      }
+
+
+      setActiveApprovalStatus(
+        "pending"
+      );
+
+    } catch (
+      error
+    ) {
+
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Approval status could not be refreshed."
+      );
+    }
+  }
+
+
   async function checkout() {
 
     if (
@@ -971,6 +1649,34 @@ export default function PosPage() {
 
 
     if (
+      needsApproval &&
+      activeApprovalStatus !==
+        "approved"
+    ) {
+
+      setErrorMessage(
+        "Approval is required before completing this sale."
+      );
+
+      return;
+    }
+
+
+    if (
+      splitPaymentActive &&
+      !splitTenderValid
+    ) {
+
+      setErrorMessage(
+        "Split payment must equal the sale total."
+      );
+
+      return;
+    }
+
+
+    if (
+      !splitPaymentActive &&
       paymentMethod ===
         "cash" &&
       tendered <
@@ -993,7 +1699,10 @@ export default function PosPage() {
           `Total: ${money(
             cartTotal
           )}`,
-          `Payment: ${paymentMethod.toUpperCase()}`,
+          splitPaymentActive
+            ? "Payment: SPLIT"
+            : `Payment: ${paymentMethod.toUpperCase()}`,
+          !splitPaymentActive &&
           paymentMethod ===
           "cash"
             ? `Cash: ${money(
@@ -1057,6 +1766,14 @@ export default function PosPage() {
 
                   discount_value:
                     item.discount_percent,
+
+                  requested_unit_price:
+                    item.override_unit_price ??
+                    null,
+
+                  approval_id:
+                    activeApprovalId ||
+                    null,
                 })
               ),
 
@@ -1071,6 +1788,43 @@ export default function PosPage() {
 
             p_reference:
               paymentReference.trim() ||
+              null,
+
+
+            p_tenders:
+              splitPaymentActive
+                ? splitTenders.map(
+                    (
+                      tender
+                    ) => ({
+                      payment_method:
+                        tender.payment_method,
+
+                      amount:
+                        Number(
+                          tender.amount
+                        ),
+
+                      amount_tendered:
+                        tender.payment_method ===
+                          "cash"
+                          ? Number(
+                              tender.amount_tendered ||
+                              tender.amount
+                            )
+                          : Number(
+                              tender.amount
+                            ),
+
+                      reference:
+                        tender.reference.trim() ||
+                        null,
+                    })
+                  )
+                : null,
+
+            p_suspended_sale_id:
+              activeSuspendedSaleId ||
               null,
           }
         );
@@ -1094,7 +1848,31 @@ export default function PosPage() {
 
       setAmountTendered("");
       setPaymentReference("");
+
+      setSplitPaymentActive(
+        false
+      );
+
+      setSplitTenders(
+        []
+      );
       setSelectedCustomerId("");
+
+      setActiveApprovalId(
+        null
+      );
+
+      setActiveApprovalStatus(
+        ""
+      );
+
+      setActiveSuspendedSaleId(
+        null
+      );
+
+      setActiveSuspendedSaleNumber(
+        null
+      );
 
 
       await loadWorkspace(
@@ -1311,7 +2089,7 @@ export default function PosPage() {
 
         {
           success && (
-            <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">
+            <div className="mb-5 rounded-2xl border border-primary/20 bg-primary/10 p-5 text-primary">
 
               <div className="flex flex-wrap items-center justify-between gap-4">
 
@@ -1356,18 +2134,99 @@ export default function PosPage() {
                   variant="outline"
                   onClick={() =>
                     router.push(
-                      `/invoices/${success.invoice_id}`
+                      `/pos/receipt/${success.pos_sale_id}`
                     )
                   }
                 >
                   <ReceiptText className="mr-2 h-4 w-4" />
 
-                  Open Receipt / Invoice
+                  Open POS Receipt
                 </Button>
 
               </div>
 
             </div>
+          )
+        }
+
+
+        {
+          activeSuspendedSaleNumber && (
+            <div className="mb-5 rounded-xl border border-primary/20 bg-primary/10 p-4 text-sm text-primary">
+
+              <strong>
+                Recalled sale: {
+                  activeSuspendedSaleNumber
+                }
+              </strong>
+
+              {" "}
+
+              Current stock and selling prices were revalidated.
+              Completing checkout will close this held basket.
+
+            </div>
+          )
+        }
+
+
+        {
+          selectedBranchId &&
+          workspace?.profile?.capabilities?.suspend_sale !== false && (
+            <SuspendedSalesPanel
+              branchId={
+                selectedBranchId
+              }
+              customerId={
+                selectedCustomerId ||
+                null
+              }
+              cartItems={
+                cart.map(
+                  (
+                    item
+                  ) => ({
+                    id:
+                      item.id,
+
+                    cart_quantity:
+                      item.cart_quantity,
+
+                    discount_percent:
+                      item.discount_percent,
+                  })
+                )
+              }
+              enabled={true}
+              activeSuspendedSaleId={
+                activeSuspendedSaleId
+              }
+              onSuspended={() => {
+
+                setCart(
+                  []
+                );
+
+                setSelectedCustomerId(
+                  ""
+                );
+
+                setAmountTendered(
+                  ""
+                );
+
+                setPaymentReference(
+                  ""
+                );
+
+                setSuccess(
+                  null
+                );
+              }}
+              onRecall={
+                loadRecalledSale
+              }
+            />
           )
         }
 
@@ -1477,12 +2336,12 @@ export default function PosPage() {
                           product
                         )
                       }
-                      className="group rounded-2xl border bg-card p-5 text-left transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md"
+                      className="group rounded-2xl border bg-card p-5 text-left transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
                     >
 
                       <div className="flex items-start justify-between gap-3">
 
-                        <div className="rounded-xl bg-emerald-50 p-2.5 text-emerald-700">
+                        <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
                           <ShoppingCart className="h-5 w-5" />
                         </div>
 
@@ -1746,6 +2605,50 @@ export default function PosPage() {
                             )
                           }
 
+
+                          {
+                            canRequestDiscountApproval &&
+                            workspace?.profile?.capabilities?.price_override === true && (
+                              <label className="mt-3 flex items-center justify-between gap-3 text-xs">
+
+                                <span className="text-muted-foreground">
+                                  Override Price
+                                </span>
+
+                                <input
+                                  type="number"
+                                  min="0.01"
+                                  step="0.01"
+                                  value={
+                                    item.override_unit_price ??
+                                    ""
+                                  }
+                                  onChange={
+                                    (
+                                      event
+                                    ) => {
+
+                                      const value =
+                                        event.target.value ===
+                                        ""
+                                          ? null
+                                          : Number(
+                                              event.target.value
+                                            );
+
+                                      setOverridePrice(
+                                        item.id,
+                                        value
+                                      );
+                                    }
+                                  }
+                                  className="w-24 rounded-md border bg-background px-2 py-1.5 text-right"
+                                />
+
+                              </label>
+                            )
+                          }
+
                         </div>
                       )
                     )
@@ -1826,7 +2729,32 @@ export default function PosPage() {
               </label>
 
 
-              <div className="grid grid-cols-4 gap-2">
+              <SplitTenderPanel
+                total={
+                  cartTotal
+                }
+                active={
+                  splitPaymentActive
+                }
+                enabled={
+                  workspace?.profile?.capabilities?.split_tender ===
+                  true
+                }
+                tenders={
+                  splitTenders
+                }
+                onActiveChange={
+                  setSplitPaymentActive
+                }
+                onTendersChange={
+                  setSplitTenders
+                }
+              />
+
+
+              {
+                !splitPaymentActive && (
+                  <div className="grid grid-cols-4 gap-2">
 
                 {
                   (
@@ -1853,7 +2781,7 @@ export default function PosPage() {
                         className={
                           paymentMethod ===
                           method
-                            ? "rounded-lg bg-emerald-600 px-2 py-2.5 text-xs font-semibold uppercase text-white"
+                            ? "rounded-lg bg-primary px-2 py-2.5 text-xs font-semibold uppercase text-white"
                             : "rounded-lg border px-2 py-2.5 text-xs font-semibold uppercase hover:bg-muted"
                         }
                       >
@@ -1865,10 +2793,13 @@ export default function PosPage() {
                   )
                 }
 
-              </div>
+                  </div>
+                )
+              }
 
 
               {
+                !splitPaymentActive &&
                 paymentMethod ===
                   "cash" && (
                   <label className="block space-y-2 text-sm">
@@ -1914,6 +2845,7 @@ export default function PosPage() {
 
 
               {
+                !splitPaymentActive &&
                 paymentMethod !==
                   "cash" && (
                   <label className="block space-y-2 text-sm">
@@ -1971,11 +2903,14 @@ export default function PosPage() {
 
 
                 {
-                  paymentMethod ===
-                    "cash" &&
+                  (
+                    splitPaymentActive ||
+                    paymentMethod ===
+                      "cash"
+                  ) &&
                   changeDue >
                     0 && (
-                    <div className="flex justify-between text-sm font-semibold text-emerald-700">
+                    <div className="flex justify-between text-sm font-semibold text-primary">
 
                       <span>
                         Change
@@ -2013,19 +2948,106 @@ export default function PosPage() {
               </div>
 
 
+              {
+                needsApproval && (
+                  <div className="rounded-xl border border-primary/20 bg-primary/10 p-4">
+
+                    <p className="font-semibold text-primary">
+                      Approval Required
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      This cart exceeds the company self-service discount limit
+                      or contains a price override.
+                    </p>
+
+                    {
+                      activeApprovalStatus ===
+                        "approved" ? (
+
+                        <div className="mt-3 rounded-lg border border-primary/20 bg-background p-3 text-sm font-semibold text-primary">
+                          Approved for this exact cart.
+                        </div>
+
+                      ) : activeApprovalStatus ===
+                          "pending" ? (
+
+                        <div className="mt-3 flex gap-2">
+
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() =>
+                              void refreshDiscountApproval()
+                            }
+                          >
+                            Check Approval
+                          </Button>
+
+                          {
+                            canApproveDiscount && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() =>
+                                  router.push(
+                                    "/pos/approvals"
+                                  )
+                                }
+                              >
+                                Open Approvals
+                              </Button>
+                            )
+                          }
+
+                        </div>
+
+                      ) : (
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="mt-3 w-full"
+                          disabled={
+                            !canRequestDiscountApproval ||
+                            requestingApproval
+                          }
+                          onClick={() =>
+                            void requestDiscountApproval()
+                          }
+                        >
+                          {
+                            requestingApproval
+                              ? "Requesting..."
+                              : "Request Approval"
+                          }
+                        </Button>
+                      )
+                    }
+
+                  </div>
+                )
+              }
+
+
               <Button
                 type="button"
                 disabled={
                   !canSell ||
                   workspace?.profile?.enabled === false ||
                   checkingOut ||
+                  (
+                    splitPaymentActive &&
+                    !splitTenderValid
+                  ) ||
                   cart.length ===
                     0
                 }
                 onClick={() =>
                   void checkout()
                 }
-                className="h-12 w-full bg-emerald-600 text-base font-bold text-white hover:bg-emerald-700"
+                className="h-12 w-full bg-primary text-base font-bold text-white hover:bg-primary"
               >
 
                 {

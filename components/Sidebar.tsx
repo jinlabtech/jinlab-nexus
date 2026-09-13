@@ -19,6 +19,7 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  Wrench,
   Settings as SettingsIcon,
 } from "lucide-react";
 
@@ -94,6 +95,51 @@ const navigationGroups: NavigationGroup[] = [
         href: "/pos",
         permission: "pos.view",
       },
+      {
+        name: "Returns & Exchanges",
+        href: "/pos/returns",
+        permission: "pos.return.view",
+      },
+      {
+        name: "POS Approvals",
+        href: "/pos/approvals",
+        permission: "pos.discount.approve",
+      },
+      {
+        name: "Pricing & Promotions",
+        href: "/pos/pricing",
+        permission: "pos.pricing.view",
+      },
+      {
+        name: "Receipts",
+        href: "/pos/receipts",
+        permission: "pos.view",
+      },
+      {
+        name: "Cash-up & Reconciliation",
+        href: "/pos/cashup",
+        permission: "pos.cashup.view",
+      },
+      {
+        name: "POS Analytics",
+        href: "/pos/analytics",
+        permission: "pos.analytics.view",
+      },
+    ],
+  },
+
+  {
+    key: "repairs",
+    name: "Repairs & Job Cards",
+    icon: (
+      <Wrench className="h-4 w-4" />
+    ),
+    items: [
+      {
+        name: "Job Cards & Scanner",
+        href: "/repairs/scanner",
+        permission: "repair.view" as PermissionName,
+      },
     ],
   },
 
@@ -107,6 +153,16 @@ const navigationGroups: NavigationGroup[] = [
       {
         name: "Inventory",
         href: "/inventory",
+        permission: "inventory.view",
+      },
+      {
+        name: "Barcodes & Labels",
+        href: "/inventory/barcodes",
+        permission: "inventory.view",
+      },
+      {
+        name: "Mobile Scanner",
+        href: "/inventory/scan",
         permission: "inventory.view",
       },
       {
@@ -128,6 +184,81 @@ const navigationGroups: NavigationGroup[] = [
         name: "Accounting",
         href: "/accounting",
         permission: "accounting.view",
+      },
+      {
+        name: "Payroll",
+        href: "/payroll",
+        permission: "payroll.view" as PermissionName,
+      },
+      {
+        name: "Payroll Runs",
+        href: "/payroll/runs",
+        permission: "payroll.run" as PermissionName,
+      },
+    ],
+  },
+
+  {
+    key: "hr",
+    name: "People & HR",
+    icon: (
+      <Building2 className="h-4 w-4" />
+    ),
+    items: [
+      {
+        name: "Human Resources",
+        href: "/hr",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "HR Intelligence",
+        href: "/hr/intelligence",
+        permission: "hr.view" as PermissionName,
+      },
+      {
+        name: "HR Notifications",
+        href: "/hr/notifications",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "HR Reports",
+        href: "/hr/reports",
+        permission: "hr.view" as PermissionName,
+      },
+      {
+        name: "My Schedule",
+        href: "/hr/my-schedule",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "Digital Time Book",
+        href: "/hr/timebook",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "Attendance Devices",
+        href: "/hr/devices",
+        permission: "hr.attendance.manage" as PermissionName,
+      },
+      {
+        name: "HR Management",
+        href: "/hr/manage",
+        permission: "hr.view" as PermissionName,
+      },
+      {
+        name: "User Linking",
+        href: "/hr/link-users",
+        permission: "hr.employee.manage" as PermissionName,
+      },
+      {
+        name: "HR Records",
+        href: "/hr/records",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "Secure Documents",
+        href: "/hr/documents",
+        permission: "hr.documents.manage" as PermissionName,
       },
     ],
   },
@@ -352,7 +483,7 @@ export default function Sidebar() {
                         pathname,
                         dashboardItem.href
                       )
-                        ? "flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+                        ? "flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-semibold text-primary"
                         : "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     }
                   >
@@ -474,7 +605,7 @@ export default function Sidebar() {
                                         }
                                         className={
                                           active
-                                            ? "block rounded-lg bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-800"
+                                            ? "block rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary"
                                             : "block rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                         }
                                       >
@@ -527,7 +658,7 @@ export default function Sidebar() {
                           pathname,
                           settingsItem.href
                         )
-                          ? "flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+                          ? "flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-semibold text-primary"
                           : "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                       }
                     >

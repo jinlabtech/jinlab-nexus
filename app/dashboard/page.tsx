@@ -1,14 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import DashboardCard from "@/components/DashboardCard";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
-import BusinessPerformanceSummary from "@/components/accounting/BusinessPerformanceSummary";
-
-import { useAuditLogs } from "@/hooks/useAuditLogs";
 import { supabase } from "@/lib/supabase";
 
 type UserProfile = {
@@ -20,125 +16,238 @@ type UserProfile = {
   role: string | null;
 };
 
-function formatActivityDate(date: string) {
-  return new Intl.DateTimeFormat("en-ZA", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(date));
-}
+type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  attachments?: string[];
+};
+
+const QUICK_QUESTIONS = [
+  "What needs my attention today?",
+  "How is JINLAB doing?",
+  "Which repairs need attention?",
+  "What should I focus on next?",
+];
 
 export default function DashboardPage() {
   const router = useRouter();
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const [profile, setProfile] =
-    useState<UserProfile | null>(null);
-
-  const [companyId, setCompanyId] = useState("");
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [companyName, setCompanyName] = useState("");
-  const [userCount, setUserCount] = useState(0);
-  const [branchCount, setBranchCount] = useState(0);
-
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
 
-  const {
-    auditLogs,
-    loading: auditLoading,
-    errorMessage: auditError,
-  } = useAuditLogs(companyId, 5);
+  const [question, setQuestion] = useState("");
+  const [thinking, setThinking] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [attachments, setAttachments] = useState<File[]>([]);
 
   useEffect(() => {
     async function loadDashboard() {
-      setLoading(true);
-      setErrorMessage("");
-
       const {
         data: { user },
-        error: userError,
+        error,
       } = await supabase.auth.getUser();
 
-      if (userError || !user) {
+      if (error || !user) {
         router.replace("/login");
         return;
       }
 
-      const {
-        data: profileData,
-        error: profileError,
-      } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from("user_profile")
-        .select(
-          "id, user_id, company_id, full_name, email, role"
-        )
+        .select("id, user_id, company_id, full_name, email, role")
         .eq("user_id", user.id)
         .single();
 
       if (profileError || !profileData) {
-        setErrorMessage(
-          profileError?.message ??
-            "Your user profile could not be loaded."
-        );
+        setErrorMessage("Your Nexus profile could not be loaded.");
         setLoading(false);
         return;
       }
 
       setProfile(profileData);
 
-      if (!profileData.company_id) {
-        setErrorMessage(
-          "Your account is not linked to a company."
-        );
-        setLoading(false);
-        return;
-      }
-
-      const currentCompanyId = profileData.company_id;
-
-      setCompanyId(currentCompanyId);
-
-      const [
-        companyResult,
-        userCountResult,
-        branchCountResult,
-      ] = await Promise.all([
-        supabase
+      if (profileData.company_id) {
+        const { data: company } = await supabase
           .from("company")
           .select("company_name")
-          .eq("id", currentCompanyId)
-          .single(),
+          .eq("id", profileData.company_id)
+          .single();
 
-        supabase
-          .from("user_profile")
-          .select("*", {
-            count: "exact",
-            head: true,
-          })
-          .eq("company_id", currentCompanyId),
-
-        supabase
-          .from("branch")
-          .select("*", {
-            count: "exact",
-            head: true,
-          })
-          .eq("company_id", currentCompanyId),
-      ]);
-
-      if (companyResult.error) {
-        setErrorMessage(companyResult.error.message);
-      } else {
-        setCompanyName(
-          companyResult.data?.company_name ?? ""
-        );
+        setCompanyName(company?.company_name ?? "");
       }
 
-      setUserCount(userCountResult.count ?? 0);
-      setBranchCount(branchCountResult.count ?? 0);
       setLoading(false);
     }
 
-    loadDashboard();
+    void loadDashboard();
   }, [router]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }, [messages, thinking]);
+
+  function fileToDataUrl(file: File) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () =>
+        resolve(String(reader.result || ""));
+
+      reader.onerror = () =>
+        reject(new Error(`Nexus could not read ${file.name}.`));
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function askNexus(customQuestion?: string) {
+    const filesForRequest = [...attachments];
+
+    const finalQuestion =
+      customQuestion?.trim() ||
+      question.trim() ||
+      (filesForRequest.length
+        ? "Read and analyse the attached document. Tell me what matters most and wait for my follow-up questions."
+        : "");
+
+    if (!finalQuestion || thinking) return;
+
+    const previousMessages = messages;
+
+    const userMessage: ChatMessage = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: finalQuestion,
+      attachments: filesForRequest.map((file) => file.name),
+    };
+
+    const assistantId = crypto.randomUUID();
+
+    setThinking(true);
+    setErrorMessage("");
+    setQuestion("");
+    setAttachments([]);
+
+    setMessages((current) => [
+      ...current,
+      userMessage,
+      {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+      },
+    ]);
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        throw new Error("Your Nexus session has expired.");
+      }
+
+      const encodedAttachments = await Promise.all(
+        filesForRequest.map(async (file) => ({
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          dataUrl: await fileToDataUrl(file),
+        }))
+      );
+
+      const response = await fetch("/api/nexus-ai/cto", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          question: finalQuestion,
+          history: previousMessages.map((message) => ({
+            role: message.role,
+            content: message.content,
+          })),
+          attachments: encodedAttachments,
+        }),
+      });
+
+      if (!response.ok) {
+        let message = "Nexus CTO could not analyse JINLAB.";
+
+        try {
+          const payload = await response.json();
+          message = payload?.error || message;
+        } catch {}
+
+        throw new Error(message);
+      }
+
+      if (!response.body) {
+        throw new Error("Nexus CTO response stream is unavailable.");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let firstChunk = true;
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        const chunk = decoder.decode(value, {
+          stream: true,
+        });
+
+        if (!chunk) continue;
+
+        if (firstChunk) {
+          firstChunk = false;
+          setThinking(false);
+        }
+
+        setMessages((current) =>
+          current.map((message) =>
+            message.id === assistantId
+              ? {
+                  ...message,
+                  content: message.content + chunk,
+                }
+              : message
+          )
+        );
+      }
+
+      setThinking(false);
+    } catch (error) {
+      setThinking(false);
+
+      setMessages((current) =>
+        current.filter(
+          (message) =>
+            !(
+              message.id === assistantId &&
+              !message.content
+            )
+        )
+      );
+
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Nexus CTO encountered an unexpected error."
+      );
+    }
+  }
 
   async function logout() {
     await supabase.auth.signOut();
@@ -153,160 +262,241 @@ export default function DashboardPage() {
         onLogout={logout}
       />
 
-      <main className="p-4 sm:p-6 lg:p-8">
-        <section className="mb-8">
-          <p className="text-sm font-medium text-primary">
-            JINLAB Nexus
-          </p>
-
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">
-            Welcome back,{" "}
-            {profile?.full_name || "JINLAB Admin"}
-          </h1>
-
-          <p className="mt-2 text-muted-foreground">
-            Monitor your organisation, users, branches and
-            recent system activity.
-          </p>
-        </section>
-
-        <BusinessPerformanceSummary />
-
-        {errorMessage && (
-          <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-            {errorMessage}
-          </div>
-        )}
-
-        {auditError && (
-          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-            Audit activity warning: {auditError}
-          </div>
-        )}
-
+      <main className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-5xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         {loading ? (
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
-            <p className="text-muted-foreground">
-              Loading dashboard information...
+          <div className="flex flex-1 items-center justify-center">
+            <div className="h-10 w-10 animate-pulse rounded-2xl bg-blue-600" />
+          </div>
+        ) : profile?.role !== "owner" ? (
+          <div className="flex flex-1 items-center justify-center">
+            <p className="text-sm text-muted-foreground">
+              Nexus CTO is currently available to the company owner.
             </p>
           </div>
         ) : (
           <>
-            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <DashboardCard
-                title="Company"
-                value={companyName}
-                description="Current organisation"
-              />
-
-              <DashboardCard
-                title="Users"
-                value={String(userCount)}
-                description="Users linked to this company"
-              />
-
-              <DashboardCard
-                title="Branches"
-                value={String(branchCount)}
-                description="Registered company locations"
-              />
-
-              <DashboardCard
-                title="Your Role"
-                value={profile?.role ?? "-"}
-                description="Current access level"
-              />
-            </section>
-
-            <section className="mt-8 grid gap-6 lg:grid-cols-2">
-              <div className="rounded-xl border bg-card p-6 shadow-sm">
-                <div>
-                  <h2 className="text-lg font-semibold">
-                    Recent activity
-                  </h2>
-
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Latest actions recorded for your company.
-                  </p>
+            {messages.length === 0 && (
+              <section className="flex flex-1 flex-col items-center justify-center pb-16 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-lg font-bold text-white shadow-sm">
+                  AI
                 </div>
 
-                {auditLoading ? (
-                  <div className="mt-6 rounded-lg border border-dashed p-8 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      Loading recent activity...
-                    </p>
-                  </div>
-                ) : auditLogs.length === 0 ? (
-                  <div className="mt-6 rounded-lg border border-dashed p-8 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      No recent activity yet.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="mt-6 divide-y">
-                    {auditLogs.map((log) => (
-                      <div
-                        key={log.id}
-                        className="py-4 first:pt-0 last:pb-0"
-                      >
-                        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                          <div>
-                            <p className="font-medium">
-                              {log.description}
-                            </p>
+                <h1 className="mt-5 text-3xl font-bold tracking-tight">
+                  Nexus CTO
+                </h1>
 
-                            <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
-                              {log.module} · {log.action}
-                            </p>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+                  Ask about JINLAB. Nexus will analyse the business and give you
+                  the most useful answer without overwhelming you.
+                </p>
+
+                <div className="mt-6 flex flex-wrap justify-center gap-2">
+                  {QUICK_QUESTIONS.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => void askNexus(item)}
+                      className="rounded-full border bg-background px-4 py-2 text-sm transition hover:border-blue-300 hover:bg-blue-50"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {messages.length > 0 && (
+              <section className="flex-1 space-y-6 pb-8">
+                {messages
+                  .filter(
+                    (message) =>
+                      message.role === "user" ||
+                      message.content.trim()
+                  )
+                  .map((message) => (
+                  <div
+                    key={message.id}
+                    className={
+                      message.role === "user"
+                        ? "flex justify-end"
+                        : "flex justify-start"
+                    }
+                  >
+                    {message.role === "user" ? (
+                      <div className="max-w-[80%] rounded-2xl rounded-br-md bg-blue-600 px-4 py-3 text-sm leading-6 text-white">
+                        {message.attachments?.length ? (
+                          <div className="mb-2 flex flex-wrap gap-1.5">
+                            {message.attachments.map((name) => (
+                              <span
+                                key={name}
+                                className="rounded-md bg-white/15 px-2 py-1 text-xs"
+                              >
+                                {name}
+                              </span>
+                            ))}
                           </div>
+                        ) : null}
 
-                          <p className="text-xs text-muted-foreground">
-                            {formatActivityDate(
-                              log.created_at
-                            )}
-                          </p>
+                        {message.content}
+                      </div>
+                    ) : (
+                      <div className="max-w-3xl">
+                        <div className="mb-2 flex items-center gap-2">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-[10px] font-bold text-white">
+                            AI
+                          </div>
+                          <span className="text-sm font-semibold">
+                            Nexus CTO
+                          </span>
+                        </div>
+
+                        <div className="whitespace-pre-wrap text-[15px] leading-7">
+                          {message.content}
                         </div>
                       </div>
+                    )}
+                  </div>
+                ))}
+
+                {thinking && (
+                  <div className="flex justify-start">
+                    <div className="max-w-md rounded-2xl border bg-card px-5 py-4 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600">
+                          <div className="absolute h-3 w-3 animate-ping rounded-full bg-white/70" />
+                          <div className="relative h-2 w-2 rounded-full bg-white" />
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold">
+                            Nexus is thinking
+                          </p>
+
+                          <div className="mt-2 flex gap-1">
+                            <span className="h-1.5 w-8 animate-pulse rounded-full bg-blue-600" />
+                            <span className="h-1.5 w-5 animate-pulse rounded-full bg-blue-400" />
+                            <span className="h-1.5 w-3 animate-pulse rounded-full bg-blue-300" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={bottomRef} />
+              </section>
+            )}
+
+            {errorMessage && (
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                {errorMessage}
+              </div>
+            )}
+
+            <section className="sticky bottom-0 mt-auto bg-background/95 pb-4 pt-3 backdrop-blur">
+              <div className="rounded-2xl border bg-card p-3 shadow-lg">
+                <textarea
+                  value={question}
+                  onChange={(event) => setQuestion(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === "Enter" &&
+                      !event.shiftKey &&
+                      !thinking
+                    ) {
+                      event.preventDefault();
+                      void askNexus();
+                    }
+                  }}
+                  rows={2}
+                  placeholder={
+                    messages.length
+                      ? "Ask a follow-up"
+                      : "Ask Nexus CTO about JINLAB"
+                  }
+                  className="w-full resize-none border-0 bg-transparent px-2 py-2 text-[15px] leading-6 outline-none placeholder:text-muted-foreground"
+                />
+
+                {attachments.length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    {attachments.map((file, index) => (
+                      <button
+                        key={`${file.name}-${index}`}
+                        type="button"
+                        onClick={() =>
+                          setAttachments((current) =>
+                            current.filter((_, i) => i !== index)
+                          )
+                        }
+                        className="rounded-lg border bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700"
+                        title="Remove attachment"
+                      >
+                        {file.name} ×
+                      </button>
                     ))}
                   </div>
                 )}
-              </div>
 
-              <div className="rounded-xl border bg-card p-6 shadow-sm">
-                <h2 className="text-lg font-semibold">
-                  Account information
-                </h2>
+                <div className="flex items-center justify-between gap-3">
+                  <label className="cursor-pointer rounded-lg px-2 py-2 text-xs font-semibold text-blue-600 transition hover:bg-blue-50">
+                    Attach document
+                    <input
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,.rtf,.odt,.ppt,.pptx,.txt,.md,.json,.html,.xml,.csv,.xls,.xlsx"
+                      className="hidden"
+                      onChange={(event) => {
+                        const selected = Array.from(
+                          event.target.files ?? []
+                        );
 
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Full name
-                    </p>
+                        const next = [
+                          ...attachments,
+                          ...selected,
+                        ].slice(0, 4);
 
-                    <p className="mt-1 font-medium">
-                      {profile?.full_name ?? "-"}
-                    </p>
-                  </div>
+                        const total = next.reduce(
+                          (sum, file) => sum + file.size,
+                          0
+                        );
 
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Email address
-                    </p>
+                        if (total > 2_800_000) {
+                          setErrorMessage(
+                            "Documents are too large. Keep attachments below 2.8 MB total for now."
+                          );
+                        } else {
+                          setErrorMessage("");
+                          setAttachments(next);
+                        }
 
-                    <p className="mt-1 break-all font-medium">
-                      {profile?.email ?? "-"}
-                    </p>
-                  </div>
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
+                  {messages.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMessages([]);
+                        setQuestion("");
+                        setErrorMessage("");
+                      }}
+                      className="px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                    >
+                      New conversation
+                    </button>
+                  ) : (
+                    <span />
+                  )}
 
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Company
-                    </p>
-
-                    <p className="mt-1 font-medium">
-                      {companyName || "-"}
-                    </p>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void askNexus()}
+                    disabled={thinking || (!question.trim() && attachments.length === 0)}
+                    className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Ask Nexus
+                  </button>
                 </div>
               </div>
             </section>

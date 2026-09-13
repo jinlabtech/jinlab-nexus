@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import Sidebar from "@/components/Sidebar";
+import NexusHelper from "@/components/NexusHelper";
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -18,6 +19,7 @@ export default function DashboardLayout({
       <div className="min-w-0 flex-1">
         {children}
       </div>
+      <NexusHelper />
     </div>
   );
 }

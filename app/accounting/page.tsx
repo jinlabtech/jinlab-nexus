@@ -15,6 +15,7 @@ import DataTable from "@/components/DataTable";
 import AccountingNav from "@/components/accounting/AccountingNav";
 import BusinessPerformanceSummary from "@/components/accounting/BusinessPerformanceSummary";
 import AccountingExceptionAlert from "@/components/accounting/AccountingExceptionAlert";
+import HistoricalMigrationNotice from "@/components/accounting/HistoricalMigrationNotice";
 
 import {
   Button,
@@ -298,11 +299,20 @@ export default function AccountingPage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
-    void loadAccounting();
+    const timer = window.setTimeout(() => {
+      void loadAccounting();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+
+    // loadAccounting is intentionally triggered when the resolved
+    // accounting permission state changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     permissionsLoading,
     canView,
@@ -321,7 +331,7 @@ export default function AccountingPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>
@@ -476,6 +486,8 @@ export default function AccountingPage() {
         <BusinessPerformanceSummary />
 
         <AccountingExceptionAlert />
+
+        <HistoricalMigrationNotice />
 
         {errorMessage && (
           <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
