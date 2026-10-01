@@ -230,6 +230,7 @@ test("engine does not mutate the supplied facts or coverage", () => {
 test("WhatsApp intelligence detects actionable sales signals and links to the correct queues", () => {
   const result = analyzeCore(snapshot({ whatsapp: [
     whatsapp("due", { followUpAt: "2026-09-15T09:00:00Z" }),
+    whatsapp("manual-due", { attentionState: "follow_up_due", followUpAt: null }),
     whatsapp("owner", { assigned: false }),
     whatsapp("unread", { unreadCount: 2 }),
     whatsapp("waiting", { attentionState: "waiting_customer" }),
@@ -239,12 +240,14 @@ test("WhatsApp intelligence detects actionable sales signals and links to the co
   const ids = result.findings.map((item) => item.id);
 
   assert.equal(ids.includes("whatsapp:followup:due"), true);
+  assert.equal(ids.includes("whatsapp:followup:manual-due"), true);
   assert.equal(ids.includes("whatsapp:unassigned:owner"), true);
   assert.equal(ids.includes("whatsapp:unread"), true);
   assert.equal(ids.includes("whatsapp:waiting"), true);
   assert.equal(ids.includes("whatsapp:won-unpaid"), true);
 
   assert.equal(result.findings.find((item) => item.id === "whatsapp:followup:due")?.href, "/whatsapp?filter=follow_up");
+  assert.equal(result.findings.find((item) => item.id === "whatsapp:followup:manual-due")?.href, "/whatsapp?filter=follow_up");
   assert.equal(result.findings.find((item) => item.id === "whatsapp:unassigned:owner")?.href, "/whatsapp?filter=unassigned");
   assert.equal(result.findings.find((item) => item.id === "whatsapp:unread")?.href, "/whatsapp?filter=unread");
   assert.equal(result.findings.find((item) => item.id === "whatsapp:waiting")?.href, "/whatsapp?filter=waiting");

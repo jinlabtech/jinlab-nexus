@@ -127,14 +127,18 @@ function inspect(snapshot: CoreSnapshot) {
     const conversations = unique(snapshot.whatsapp);
     const open = conversations.filter((item) => status(item.status) === "open");
     const now = Date.parse(snapshot.checkedAt);
-    const due = open.filter((item) => item.followUpAt && Date.parse(item.followUpAt) <= now);
+    const due = open.filter(
+      (item) =>
+        status(item.attentionState) === "follow_up_due" ||
+        Boolean(item.followUpAt && Date.parse(item.followUpAt) <= now),
+    );
     const unassigned = open.filter((item) => !item.assigned);
     const unread = open.filter((item) => finite(item.unreadCount) && item.unreadCount > 0);
     const waiting = open.filter((item) => status(item.attentionState) === "waiting_customer");
     const won = open.filter((item) => status(item.salesStage) === "won");
 
     metric("whatsapp", "whatsapp.open", "Open WhatsApp sales conversations", number(open.length), "Open WhatsApp conversations available to Nexus Intelligence.");
-    metric("whatsapp", "whatsapp.followup", "WhatsApp follow-ups due", number(due.length), "Open conversations with a recorded follow-up time at or before the review time.");
+    metric("whatsapp", "whatsapp.followup", "WhatsApp follow-ups due", number(due.length), "Open conversations explicitly marked follow-up due or with a recorded follow-up time at or before the review time.");
     metric("whatsapp", "whatsapp.unassigned", "Unassigned WhatsApp conversations", number(unassigned.length), "Open conversations without a recorded salesperson owner.");
     metric("whatsapp", "whatsapp.waiting", "Waiting on customer", number(waiting.length), "Open WhatsApp conversations explicitly marked as waiting for the customer.");
 
