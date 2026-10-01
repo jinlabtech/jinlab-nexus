@@ -1142,6 +1142,13 @@ export default function InventoryPage() {
             </Link>
 
             <Link
+              href="/inventory/labels"
+              className="inline-flex h-9 items-center justify-center rounded-md border bg-background px-4 text-sm font-medium"
+            >
+              Barcode Labels
+            </Link>
+
+            <Link
               href="/inventory/archived"
               className="inline-flex h-9 items-center justify-center rounded-md border bg-background px-4 text-sm font-medium"
             >

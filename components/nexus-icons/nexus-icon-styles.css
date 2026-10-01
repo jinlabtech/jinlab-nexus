@@ -1,0 +1,481 @@
+/* =========================================================
+   JINLAB NEXUS ICON PERSONALITIES
+   ========================================================= */
+
+.nexus-icon-settings {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(
+    in srgb,
+    var(--border) 74%,
+    transparent
+  );
+  border-radius: 1.45rem;
+  padding: 1.5rem;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--card) 94%,
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--card) 74%,
+        transparent
+      )
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    0 18px 50px rgba(0,0,0,.06);
+}
+
+.nexus-icon-settings::before {
+  content: "";
+  position: absolute;
+  width: 18rem;
+  height: 18rem;
+  right: -7rem;
+  top: -9rem;
+  border-radius: 999px;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle,
+      color-mix(
+        in srgb,
+        var(--primary) 17%,
+        transparent
+      ),
+      transparent 68%
+    );
+}
+
+.nexus-icon-settings__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nexus-icon-settings__mark {
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 auto;
+  border-radius: .95rem;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--primary) 86%,
+        white
+      ),
+      var(--primary)
+    );
+
+  color: white;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.36),
+    0 10px 25px color-mix(
+      in srgb,
+      var(--primary) 24%,
+      transparent
+    );
+}
+
+.nexus-icon-style-grid {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(210px,1fr)
+    );
+
+  gap: .9rem;
+  margin-top: 1.4rem;
+}
+
+.nexus-icon-style-card {
+  position: relative;
+  min-height: 15.5rem;
+  padding: 1rem;
+
+  border: 1px solid color-mix(
+    in srgb,
+    var(--border) 72%,
+    transparent
+  );
+
+  border-radius: 1.2rem;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--card) 88%,
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--muted) 50%,
+        transparent
+      )
+    );
+
+  transition:
+    transform 210ms
+      cubic-bezier(.2,.8,.2,1),
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+.nexus-icon-style-card:hover {
+  transform: translateY(-3px);
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 26%,
+      var(--border)
+    );
+
+  box-shadow:
+    0 18px 35px rgba(0,0,0,.08);
+}
+
+.nexus-icon-style-card.is-selected {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 48%,
+      transparent
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    0 0 0 3px color-mix(
+      in srgb,
+      var(--primary) 9%,
+      transparent
+    ),
+    0 18px 40px color-mix(
+      in srgb,
+      var(--primary) 10%,
+      transparent
+    );
+}
+
+.nexus-icon-style-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nexus-icon-style-card__badge {
+  padding: .28rem .52rem;
+  border-radius: 999px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--muted) 76%,
+      transparent
+    );
+
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+.nexus-icon-style-card__check {
+  display: grid;
+  place-items: center;
+
+  width: 1.55rem;
+  height: 1.55rem;
+
+  border-radius: 999px;
+
+  color: white;
+  background: var(--primary);
+}
+
+.nexus-icon-preview {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+
+  margin-top: 1.4rem;
+  padding: 1rem;
+
+  border-radius: 1rem;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--muted) 42%,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   LUMINA — luminous JINLAB signature
+   ========================================================= */
+
+html[data-nexus-icon-style="lumina"]
+.nexus-icon,
+[data-preview-icon-style="lumina"]
+.nexus-icon {
+  border-color: rgba(255,255,255,.42);
+
+  background:
+    radial-gradient(
+      circle at 25% 15%,
+      rgba(255,255,255,.55),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 78% 86%,
+      rgba(255,255,255,.10),
+      transparent 44%
+    ),
+    linear-gradient(
+      145deg,
+      var(--ni-a),
+      var(--ni-b)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.58),
+    inset 0 -1px 1px rgba(0,0,0,.14),
+    0 8px 18px color-mix(
+      in srgb,
+      var(--ni-b) 29%,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   CERAMIC — pearl sculpted material
+   ========================================================= */
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-icon,
+[data-preview-icon-style="ceramic"]
+.nexus-icon {
+  color: var(--ni-b);
+
+  border-color: rgba(255,255,255,.72);
+
+  background:
+    radial-gradient(
+      circle at 28% 20%,
+      rgba(255,255,255,.98),
+      rgba(255,255,255,.15) 33%,
+      transparent 52%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.94),
+      rgba(223,230,239,.82)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.96),
+    inset 0 -1px 2px rgba(30,50,70,.12),
+    0 7px 18px rgba(40,60,80,.14);
+}
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-icon::after,
+[data-preview-icon-style="ceramic"]
+.nexus-icon::after {
+  background:
+    color-mix(
+      in srgb,
+      var(--ni-a) 72%,
+      white
+    );
+
+  box-shadow:
+    0 0 7px color-mix(
+      in srgb,
+      var(--ni-a) 40%,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   TITANIUM — machined professional metal
+   ========================================================= */
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon,
+[data-preview-icon-style="titanium"]
+.nexus-icon {
+  color: rgba(245,248,252,.96);
+
+  border-color: rgba(255,255,255,.13);
+
+  background:
+    linear-gradient(
+      165deg,
+      rgba(95,108,124,.98),
+      rgba(37,45,57,.98) 48%,
+      rgba(16,21,29,.99)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -1px 0 rgba(0,0,0,.55),
+    0 7px 16px rgba(0,0,0,.28);
+}
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon::before,
+[data-preview-icon-style="titanium"]
+.nexus-icon::before {
+  opacity: .30;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.18) 0,
+      rgba(255,255,255,.18) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon::after,
+[data-preview-icon-style="titanium"]
+.nexus-icon::after {
+  background:
+    color-mix(
+      in srgb,
+      var(--ni-a) 72%,
+      white
+    );
+}
+
+
+/* =========================================================
+   AURORA — artistic spectral glass
+   ========================================================= */
+
+html[data-nexus-icon-style="aurora"]
+.nexus-icon,
+[data-preview-icon-style="aurora"]
+.nexus-icon {
+  border-color: rgba(255,255,255,.48);
+
+  background:
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(255,255,255,.60),
+      transparent 27%
+    ),
+    linear-gradient(
+      135deg,
+      var(--ni-a) 0%,
+      #886cff 38%,
+      #38b9e9 70%,
+      var(--ni-b) 100%
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.62),
+    0 7px 20px color-mix(
+      in srgb,
+      #746dff 27%,
+      transparent
+    );
+}
+
+html[data-nexus-icon-style="aurora"]
+.nexus-icon::before,
+[data-preview-icon-style="aurora"]
+.nexus-icon::before {
+  width: 155%;
+  height: 62%;
+  top: -30%;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255,255,255,.62),
+      rgba(255,255,255,.03)
+    );
+}
+
+
+/* =========================================================
+   MONO — calm, highly focused
+   ========================================================= */
+
+html[data-nexus-icon-style="mono"]
+.nexus-icon,
+[data-preview-icon-style="mono"]
+.nexus-icon {
+  color: var(--foreground);
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--border) 90%,
+      transparent
+    );
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--card) 98%,
+        white
+      ),
+      color-mix(
+        in srgb,
+        var(--muted) 82%,
+        transparent
+      )
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    0 4px 10px rgba(0,0,0,.08);
+}
+
+html[data-nexus-icon-style="mono"]
+.nexus-icon::before,
+[data-preview-icon-style="mono"]
+.nexus-icon::before {
+  opacity: .15;
+}
+
+html[data-nexus-icon-style="mono"]
+.nexus-icon::after,
+[data-preview-icon-style="mono"]
+.nexus-icon::after {
+  display: none;
+}

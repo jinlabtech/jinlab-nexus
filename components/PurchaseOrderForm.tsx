@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import { useEffect, useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
@@ -101,28 +103,28 @@ export default function PurchaseOrderForm({
           <label className="grid gap-2">
             <span className="text-sm font-medium">Supplier</span>
 
-            <select
+            <SearchableSelect searchLabel="Suppliers"
               value={supplierId}
-              onChange={(event) => setSupplierId(event.target.value)}
+              onValueChange={(selectedValue) => setSupplierId(selectedValue)}
               className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
               required
             >
               <option value="">Select supplier</option>
 
               {suppliers.map((supplier) => (
-                <option key={supplier.id} value={supplier.id}>
+                <option data-search={[supplier.phone, supplier.email].filter(Boolean).join(" ")} key={supplier.id} value={supplier.id}>
                   {supplier.supplier_name}
                 </option>
               ))}
-            </select>
+            </SearchableSelect>
           </label>
 
           <label className="grid gap-2">
             <span className="text-sm font-medium">Receiving Branch</span>
 
-            <select
+            <SearchableSelect searchLabel="Branches"
               value={branchId}
-              onChange={(event) => setBranchId(event.target.value)}
+              onValueChange={(selectedValue) => setBranchId(selectedValue)}
               className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
               required
             >
@@ -133,7 +135,7 @@ export default function PurchaseOrderForm({
                   {branch.branch_name}
                 </option>
               ))}
-            </select>
+            </SearchableSelect>
           </label>
 
           <label className="grid gap-2">

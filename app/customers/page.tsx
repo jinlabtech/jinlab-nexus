@@ -409,6 +409,11 @@ export default function CustomersPage() {
           key={`${customer.id}-actions`}
           className="flex flex-wrap gap-2"
         >
+          {can("whatsapp.view") && (customer.phone || customer.alternative_phone) && (
+            <Button type="button" variant="outline" size="sm" onClick={() => router.push(`/whatsapp?customerId=${encodeURIComponent(customer.id)}&phone=${encodeURIComponent(customer.phone || customer.alternative_phone || "")}`)}>
+              WhatsApp
+            </Button>
+          )}
           {can(
             "customer.update"
           ) && (

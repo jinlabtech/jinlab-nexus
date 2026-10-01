@@ -1,0 +1,289 @@
+[data-nexus-theme="jinlab_frost"] {
+  color-scheme: light;
+  --background: #eef4fb;
+  --foreground: #142033;
+  --card: #ffffff;
+  --card-foreground: #142033;
+  --popover: #ffffff;
+  --popover-foreground: #142033;
+  --primary: #0a84ff;
+  --primary-foreground: #ffffff;
+  --secondary: #e6edf5;
+  --secondary-foreground: #22324a;
+  --muted: #edf2f7;
+  --muted-foreground: #5d6b7e;
+  --accent: #dfeeff;
+  --accent-foreground: #075ea8;
+  --destructive: #d92d20;
+  --border: #ccd8e6;
+  --input: #b9c8da;
+  --ring: #0a84ff;
+  --sidebar: #f7fbff;
+  --sidebar-foreground: #142033;
+  --sidebar-primary: #0a84ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e3f1ff;
+  --sidebar-accent-foreground: #075ea8;
+  --sidebar-border: #d4e0ec;
+  --sidebar-ring: #0a84ff;
+}
+
+[data-nexus-theme="jinlab_graphite"] {
+  color-scheme: dark;
+  --background: #0e1116;
+  --foreground: #f3f6fa;
+  --card: #171b22;
+  --card-foreground: #f3f6fa;
+  --popover: #1c2129;
+  --popover-foreground: #f3f6fa;
+  --primary: #5aa9ff;
+  --primary-foreground: #07111e;
+  --secondary: #232a34;
+  --secondary-foreground: #f3f6fa;
+  --muted: #1d232c;
+  --muted-foreground: #aeb9c7;
+  --accent: #183653;
+  --accent-foreground: #dcebff;
+  --destructive: #ff6b63;
+  --border: #313a46;
+  --input: #44505e;
+  --ring: #5aa9ff;
+  --sidebar: #13171d;
+  --sidebar-foreground: #f3f6fa;
+  --sidebar-primary: #5aa9ff;
+  --sidebar-primary-foreground: #07111e;
+  --sidebar-accent: #1b3248;
+  --sidebar-accent-foreground: #dcebff;
+  --sidebar-border: #2d3540;
+  --sidebar-ring: #5aa9ff;
+}
+
+[data-nexus-theme="jinlab_glass"] {
+  color-scheme: light;
+  --background: rgba(242,247,255,.72);
+  --foreground: #122033;
+  --card: rgba(255,255,255,.68);
+  --card-foreground: #122033;
+  --popover: rgba(255,255,255,.82);
+  --popover-foreground: #122033;
+  --primary: #007aff;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(228,237,248,.68);
+  --secondary-foreground: #23334a;
+  --muted: rgba(232,239,247,.70);
+  --muted-foreground: #59687a;
+  --accent: rgba(215,235,255,.72);
+  --accent-foreground: #075ea8;
+  --destructive: #d92d20;
+  --border: rgba(150,170,195,.42);
+  --input: rgba(130,155,185,.55);
+  --ring: #007aff;
+  --sidebar: rgba(248,251,255,.62);
+  --sidebar-foreground: #122033;
+  --sidebar-primary: #007aff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(215,235,255,.68);
+  --sidebar-accent-foreground: #075ea8;
+  --sidebar-border: rgba(150,170,195,.35);
+  --sidebar-ring: #007aff;
+}
+
+
+[data-nexus-theme="jinlab_glass"] body {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(0,122,255,.18), transparent 30%),
+    radial-gradient(circle at 85% 20%, rgba(90,180,255,.18), transparent 28%),
+    linear-gradient(135deg,#edf5ff,#f9fbff 45%,#e8f2ff);
+  background-attachment: fixed;
+}
+
+[data-nexus-theme="jinlab_glass"] aside,
+[data-nexus-theme="jinlab_glass"] header,
+[data-nexus-theme="jinlab_glass"] [data-slot="card"],
+[data-nexus-theme="jinlab_glass"] [data-slot="dialog-content"],
+[data-nexus-theme="jinlab_glass"] [data-slot="popover-content"] {
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+}
+
+[data-nexus-theme="jinlab_glass"] [data-slot="dialog-content"],
+[data-nexus-theme="jinlab_glass"] [data-slot="popover-content"] {
+  box-shadow: 0 24px 70px rgba(22,45,75,.18);
+}
+
+
+/* =========================================================
+   NEXUS PREMIUM MATERIAL LAYER
+   ========================================================= */
+
+html[data-nexus-theme] body,
+html[data-nexus-theme] aside,
+html[data-nexus-theme] header,
+html[data-nexus-theme] [data-slot="card"],
+html[data-nexus-theme] [data-slot="dialog-content"],
+html[data-nexus-theme] [data-slot="popover-content"],
+html[data-nexus-theme] input,
+html[data-nexus-theme] select,
+html[data-nexus-theme] textarea {
+  transition:
+    background-color 280ms cubic-bezier(.2,.8,.2,1),
+    color 220ms ease,
+    border-color 240ms ease,
+    box-shadow 280ms ease,
+    opacity 220ms ease,
+    backdrop-filter 280ms ease;
+}
+
+/* Premium sidebar icon tiles */
+html[data-nexus-theme] aside a > span > svg:first-child,
+html[data-nexus-theme] aside button > span > svg:first-child {
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: .4rem;
+  border-radius: .65rem;
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--primary) 16%, var(--card)),
+      color-mix(in srgb, var(--primary) 5%, var(--card))
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.42),
+    0 5px 14px rgba(15,35,60,.10);
+  transition:
+    transform 180ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+html[data-nexus-theme] aside :is(a,button):hover > span > svg:first-child {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    0 8px 18px rgba(10,70,140,.16);
+}
+
+/* Frost = soft pearl material */
+[data-nexus-theme="jinlab_frost"] body {
+  background:
+    radial-gradient(circle at 10% 0%, #ffffff 0, transparent 34%),
+    radial-gradient(circle at 90% 10%, #dceeff 0, transparent 30%),
+    linear-gradient(145deg,#f7fbff,#eaf2fa);
+  background-attachment: fixed;
+}
+
+[data-nexus-theme="jinlab_frost"] [data-slot="card"],
+[data-nexus-theme="jinlab_frost"] [data-slot="dialog-content"] {
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.96),rgba(246,250,255,.88));
+  border-color: rgba(150,175,205,.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 14px 38px rgba(43,77,110,.09);
+}
+
+/* Graphite = premium dark metal */
+[data-nexus-theme="jinlab_graphite"] body {
+  background:
+    radial-gradient(circle at 85% 5%, #1d344a 0, transparent 28%),
+    linear-gradient(145deg,#0b0e13,#121820 55%,#0d1117);
+  background-attachment: fixed;
+}
+
+[data-nexus-theme="jinlab_graphite"] [data-slot="card"],
+[data-nexus-theme="jinlab_graphite"] [data-slot="dialog-content"] {
+  background:
+    linear-gradient(145deg,rgba(31,38,48,.96),rgba(18,23,31,.94));
+  border-color: rgba(130,155,185,.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 18px 44px rgba(0,0,0,.28);
+}
+
+/* Glass = iOS-inspired translucent material */
+[data-nexus-theme="jinlab_glass"] body {
+  background:
+    radial-gradient(circle at 12% 5%, rgba(70,160,255,.34), transparent 32%),
+    radial-gradient(circle at 88% 18%, rgba(120,205,255,.28), transparent 30%),
+    radial-gradient(circle at 48% 90%, rgba(120,135,255,.18), transparent 36%),
+    linear-gradient(135deg,#e9f3ff,#f8fbff 46%,#e4efff);
+  background-size: 150% 150%;
+  background-attachment: fixed;
+  animation: nexusGlassDrift 18s ease-in-out infinite alternate;
+}
+
+[data-nexus-theme="jinlab_glass"] aside {
+  background:
+    linear-gradient(155deg,rgba(255,255,255,.72),rgba(238,246,255,.48));
+  -webkit-backdrop-filter: blur(30px) saturate(175%);
+  backdrop-filter: blur(30px) saturate(175%);
+  border-color: rgba(255,255,255,.58);
+  box-shadow:
+    inset -1px 0 0 rgba(255,255,255,.68),
+    12px 0 38px rgba(45,90,145,.10);
+}
+
+[data-nexus-theme="jinlab_glass"] [data-slot="card"],
+[data-nexus-theme="jinlab_glass"] [data-slot="dialog-content"],
+[data-nexus-theme="jinlab_glass"] [data-slot="popover-content"] {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.78),
+      rgba(255,255,255,.46)
+    );
+  -webkit-backdrop-filter: blur(28px) saturate(175%);
+  backdrop-filter: blur(28px) saturate(175%);
+  border-color: rgba(255,255,255,.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -1px 0 rgba(120,150,185,.10),
+    0 20px 55px rgba(34,79,130,.14);
+}
+
+[data-nexus-theme="jinlab_glass"] input,
+[data-nexus-theme="jinlab_glass"] select,
+[data-nexus-theme="jinlab_glass"] textarea {
+  background-color: rgba(255,255,255,.52);
+  border-color: rgba(125,155,190,.42);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.78);
+}
+
+[data-nexus-theme="jinlab_glass"] button {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* Smooth theme-change settling */
+html.nexus-theme-transition body {
+  animation: nexusThemeSettle 320ms cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes nexusThemeSettle {
+  from {
+    opacity: .94;
+    filter: saturate(.90);
+  }
+  to {
+    opacity: 1;
+    filter: saturate(1);
+  }
+}
+
+@keyframes nexusGlassDrift {
+  0% { background-position: 0% 20%; }
+  100% { background-position: 100% 80%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-nexus-theme="jinlab_glass"] body {
+    animation: none;
+  }
+
+  html.nexus-theme-transition body {
+    animation: none;
+  }
+}

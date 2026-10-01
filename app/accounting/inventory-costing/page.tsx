@@ -15,6 +15,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -49,6 +51,7 @@ type OpeningStockRow = {
 
 type Readiness = {
   ok: boolean;
+  company_id: string;
   enabled: boolean;
   costing_method: string;
   can_activate: boolean;
@@ -103,6 +106,10 @@ function money(
 
 
 export default function InventoryCostingPage() {
+
+  const [costDrafts, setCostDrafts] = useState<Record<string, string>>({});
+  const [savingCost, setSavingCost] = useState<string | null>(null);
+  const [stockSearch, setStockSearch] = useState("");
 
   const router =
     useRouter();
@@ -314,8 +321,8 @@ export default function InventoryCostingPage() {
     ) {
 
       setErrorMessage(
-        error instanceof Error
-          ? error.message
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
           : "Inventory costing could not be loaded."
       );
 
@@ -361,6 +368,35 @@ export default function InventoryCostingPage() {
     ]
   );
 
+
+  async function saveOpeningCost(row: OpeningStockRow) {
+    const cost = Number(costDrafts[row.inventory_item_id]);
+    if (!readiness || readiness.enabled || !can("inventory.update") || savingCost) return;
+    if (!Number.isFinite(cost) || cost <= 0) {
+      setErrorMessage("Enter the actual purchase cost per unit, greater than zero.");
+      return;
+    }
+    setSavingCost(row.inventory_item_id);
+    setErrorMessage("");
+    setConfirmed(false);
+    try {
+      const { data, error } = await supabase.from("inventory_item")
+        .update({ cost_price: cost })
+        .eq("id", row.inventory_item_id)
+        .eq("company_id", readiness.company_id)
+        .eq("cost_price", row.catalog_unit_cost)
+        .select("id").single();
+      if (error) throw error;
+      if (!data) throw new Error("Cost was not saved. Refresh and try again.");
+      setSuccessMessage(`Purchase cost saved for ${row.item_name}.`);
+      await loadData(true);
+    } catch (error) {
+      setErrorMessage(error && typeof error === "object" && "message" in error
+        ? String(error.message) : "Purchase cost could not be saved.");
+    } finally {
+      setSavingCost(null);
+    }
+  }
 
   async function activateCosting() {
 
@@ -451,8 +487,8 @@ export default function InventoryCostingPage() {
     ) {
 
       setErrorMessage(
-        error instanceof Error
-          ? error.message
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
           : "Inventory costing could not be activated."
       );
 
@@ -613,6 +649,19 @@ export default function InventoryCostingPage() {
 
 
         <AccountingNav />
+
+        {readiness && !readiness.enabled && (
+          <section className="my-5 rounded-xl border p-5">
+            <h2 className="font-semibold">Prepare POS for sales</h2>
+            <p className="mt-2 text-sm">Save missing purchase costs below, review the stock quantities, then confirm and activate costing at the bottom of this page.</p>
+            {summary && summary.missing_cost_items > 0 && <p className="mt-2 font-medium text-amber-800">{summary.missing_cost_items} stocked product entries need a purchase cost. Use the amount paid per unit, not the selling price.</p>}
+            {(!readiness.accounting.enabled || !readiness.accounting.automatic_journals || !readiness.accounting.automatic_invoice_posting || readiness.accounting.basis !== "accrual") && <p className="mt-2">Enable accounting, automatic journals and invoice posting with accrual accounting in <Link className="underline" href="/settings/finance">Finance Settings</Link>.</p>}
+            {(!readiness.accounting.inventory_account_configured || !readiness.accounting.cost_of_sales_account_configured || !readiness.accounting.owner_equity_account_configured) && <p className="mt-2">Configure Inventory, Cost of Sales and Owner Equity accounts in Accounting before activation.</p>}
+            {readiness.can_activate && <p className="mt-2 font-medium text-emerald-700">All setup checks passed. Review and confirm your opening stock below to activate.</p>}
+          </section>
+        )}
+        {readiness?.enabled && <Link className="my-4 inline-block rounded-lg bg-emerald-700 px-4 py-2 text-white" href="/pos">Open Point of Sale</Link>}
+
 
 
         {
@@ -789,6 +838,9 @@ export default function InventoryCostingPage() {
           </div>
 
 
+          <div className="p-4">
+            <input aria-label="Search opening stock" placeholder="Search product, SKU or branch" value={stockSearch} onChange={(event) => setStockSearch(event.target.value)} className="w-full rounded-lg border px-3 py-2" />
+          </div>
           <div className="overflow-x-auto">
 
             <table className="w-full min-w-[800px] text-sm">
@@ -827,6 +879,8 @@ export default function InventoryCostingPage() {
                 {
                   readiness
                     ?.opening_stock
+                    .filter((row) => `${row.item_name} ${row.sku ?? ""} ${row.branch_name}`.toLowerCase().includes(stockSearch.trim().toLowerCase()))
+                    .sort((a, b) => Number(a.cost_ok) - Number(b.cost_ok))
                     .map(
                       (
                         row
@@ -871,9 +925,12 @@ export default function InventoryCostingPage() {
 
                           <td className="px-4 py-4 text-right">
                             {
-                              money(
-                                row.catalog_unit_cost
-                              )
+                              !readiness.enabled && !row.cost_ok && canManage && can("inventory.update") ? (
+                                <div className="flex items-center justify-end gap-2">
+                                  <input aria-label={`Purchase cost for ${row.item_name}`} type="number" min="0.01" step="0.01" value={costDrafts[row.inventory_item_id] ?? ""} onChange={(event) => setCostDrafts((current) => ({ ...current, [row.inventory_item_id]: event.target.value }))} className="w-28 rounded border px-2 py-1" placeholder="Cost (R)" disabled={savingCost !== null || activating} />
+                                  <Button type="button" disabled={savingCost !== null || activating || !costDrafts[row.inventory_item_id]} onClick={() => void saveOpeningCost(row)}>{savingCost === row.inventory_item_id ? "Saving…" : "Save cost"}</Button>
+                                </div>
+                              ) : money(row.catalog_unit_cost)
                             }
                           </td>
 
@@ -980,7 +1037,7 @@ export default function InventoryCostingPage() {
                 <Button
                   type="button"
                   disabled={
-                    !confirmed ||
+                    !confirmed || savingCost !== null ||
                     !(readiness?.can_activate ?? false) ||
                     activating
                   }

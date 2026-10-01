@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   useEffect,
   useState,
@@ -373,11 +375,11 @@ export default function InventoryItemForm({
               Category
             </span>
 
-            <select
+            <SearchableSelect searchLabel="Categories"
               value={categoryId}
-              onChange={(event) =>
+              onValueChange={(selectedValue) =>
                 setCategoryId(
-                  event.target.value
+                  selectedValue
                 )
               }
               className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
@@ -402,7 +404,7 @@ export default function InventoryItemForm({
                   </option>
                 )
               )}
-            </select>
+            </SearchableSelect>
           </label>
 
           <label className="grid gap-2">
@@ -410,11 +412,11 @@ export default function InventoryItemForm({
               Supplier
             </span>
 
-            <select
+            <SearchableSelect searchLabel="Suppliers"
               value={supplierId}
-              onChange={(event) =>
+              onValueChange={(selectedValue) =>
                 setSupplierId(
-                  event.target.value
+                  selectedValue
                 )
               }
               className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
@@ -425,7 +427,7 @@ export default function InventoryItemForm({
 
               {suppliers.map(
                 (supplier) => (
-                  <option
+                  <option data-search={[supplier.phone, supplier.email].filter(Boolean).join(" ")}
                     key={
                       supplier.id
                     }
@@ -439,7 +441,7 @@ export default function InventoryItemForm({
                   </option>
                 )
               )}
-            </select>
+            </SearchableSelect>
           </label>
 
           <AppInput
@@ -479,11 +481,11 @@ export default function InventoryItemForm({
                   Opening Stock Branch
                 </span>
 
-                <select
+                <SearchableSelect searchLabel="Branches"
                   value={branchId}
-                  onChange={(event) =>
+                  onValueChange={(selectedValue) =>
                     setBranchId(
-                      event.target.value
+                      selectedValue
                     )
                   }
                   className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
@@ -508,7 +510,7 @@ export default function InventoryItemForm({
                       </option>
                     )
                   )}
-                </select>
+                </SearchableSelect>
               </label>
 
               <AppInput

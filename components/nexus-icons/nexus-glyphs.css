@@ -1,0 +1,723 @@
+/* =========================================================
+   JINLAB NEXUS — SEMANTIC ICON LANGUAGE
+
+   Principle:
+   Meaning first.
+   Material second.
+   Decoration last.
+   ========================================================= */
+
+
+.nexus-semantic-glyph {
+  position: relative;
+  z-index: 3;
+
+  width: 52%;
+  height: 52%;
+
+  transition:
+    transform 180ms ease,
+    filter 180ms ease,
+    opacity 180ms ease;
+}
+
+
+/* Remove previous abstract decorative treatment */
+
+.nexus-icon::before {
+  opacity: .34;
+}
+
+.nexus-icon::after {
+  width: 3px;
+  height: 3px;
+
+  right: 5px;
+  bottom: 5px;
+
+  opacity: .72;
+}
+
+
+/* =========================================================
+   SIDEBAR
+
+   Keep this restrained.
+   Sidebar must be readable before it is decorative.
+   ========================================================= */
+
+.nexus-icon--sidebar {
+  width: 2rem;
+  height: 2rem;
+
+  border-radius:
+    .68rem;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.24),
+    0 4px 10px
+      color-mix(
+        in srgb,
+        var(--ni-b) 18%,
+        transparent
+      );
+}
+
+
+aside
+:is(a,button):hover
+.nexus-icon--sidebar {
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.35),
+    0 6px 14px
+      color-mix(
+        in srgb,
+        var(--ni-b) 23%,
+        transparent
+      );
+}
+
+
+aside
+.nexus-semantic-glyph {
+  width: 55%;
+  height: 55%;
+}
+
+
+/* =========================================================
+   LUMINA
+
+   Signature polished JINLAB.
+   Familiar shape + soft dimensional light.
+   ========================================================= */
+
+html[data-nexus-icon-style="lumina"]
+.nexus-icon,
+[data-preview-icon-style="lumina"]
+.nexus-icon {
+  border-radius:
+    .72rem;
+
+  color:
+    white;
+
+  background:
+    radial-gradient(
+      circle at 26% 18%,
+      rgba(255,255,255,.46),
+      transparent 31%
+    ),
+    linear-gradient(
+      145deg,
+      var(--ni-a),
+      var(--ni-b)
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.32);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.47),
+    0 5px 13px
+      color-mix(
+        in srgb,
+        var(--ni-b) 25%,
+        transparent
+      );
+}
+
+
+/* =========================================================
+   CERAMIC
+
+   Clean pearl object.
+   Coloured symbol on light material.
+   ========================================================= */
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-icon,
+[data-preview-icon-style="ceramic"]
+.nexus-icon {
+  border-radius:
+    .8rem;
+
+  color:
+    var(--ni-b);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.98),
+      rgba(226,232,239,.94)
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.82);
+
+  box-shadow:
+    inset 0 1px 0
+      white,
+    inset 0 -1px 1px
+      rgba(20,40,60,.09),
+    0 5px 12px
+      rgba(20,40,60,.12);
+}
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-icon::after,
+[data-preview-icon-style="ceramic"]
+.nexus-icon::after {
+  background:
+    var(--ni-a);
+}
+
+
+/* =========================================================
+   TITANIUM
+
+   Neutral professional metal.
+   NOT rainbow.
+   ========================================================= */
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon,
+[data-preview-icon-style="titanium"]
+.nexus-icon {
+  border-radius:
+    .6rem;
+
+  color:
+    rgba(244,248,252,.95);
+
+  background:
+    linear-gradient(
+      145deg,
+      #59636f,
+      #2f3741 52%,
+      #20262e
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.12);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.16),
+    inset 0 -1px 0
+      rgba(0,0,0,.30),
+    0 5px 12px
+      rgba(0,0,0,.20);
+}
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon::after,
+[data-preview-icon-style="titanium"]
+.nexus-icon::after {
+  background:
+    #69baff;
+
+  box-shadow:
+    0 0 5px
+      rgba(80,175,255,.55);
+}
+
+
+/* =========================================================
+   AURORA
+
+   Artistic, but the symbol remains obvious.
+   Colour belongs mainly to the light around it.
+   ========================================================= */
+
+html[data-nexus-icon-style="aurora"]
+.nexus-icon,
+[data-preview-icon-style="aurora"]
+.nexus-icon {
+  border-radius:
+    .76rem;
+
+  color:
+    white;
+
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      rgba(255,255,255,.42),
+      transparent 29%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--ni-a) 78%,
+        #976cff
+      ),
+      color-mix(
+        in srgb,
+        var(--ni-b) 82%,
+        #27a9d8
+      )
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.34);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.48),
+    0 6px 16px
+      color-mix(
+        in srgb,
+        var(--ni-b) 24%,
+        transparent
+      );
+}
+
+
+/* =========================================================
+   MONO
+
+   Similar spirit to the clean screenshot.
+   Almost no decoration.
+   ========================================================= */
+
+html[data-nexus-icon-style="mono"]
+.nexus-icon,
+[data-preview-icon-style="mono"]
+.nexus-icon {
+  border-radius:
+    .52rem;
+
+  color:
+    var(--foreground);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--card) 62%,
+      transparent
+    );
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--foreground) 12%,
+      transparent
+    );
+
+  box-shadow:
+    none;
+}
+
+html[data-nexus-icon-style="mono"]
+.nexus-icon::before,
+[data-preview-icon-style="mono"]
+.nexus-icon::before,
+html[data-nexus-icon-style="mono"]
+.nexus-icon::after,
+[data-preview-icon-style="mono"]
+.nexus-icon::after {
+  display:
+    none;
+}
+
+
+/* =========================================================
+   MODULE COLOUR ACCENTS
+
+   Keep differences meaningful, not random.
+   ========================================================= */
+
+
+/* Communication */
+
+[data-nexus-icon="email"] {
+  --ni-a: #5ab5ff;
+  --ni-b: #0874ca;
+}
+
+[data-nexus-icon="whatsapp"] {
+  --ni-a: #55d99b;
+  --ni-b: #118b58;
+}
+
+
+/* Shipping — obvious blue logistics */
+
+[data-nexus-icon="shipping"],
+[data-nexus-icon^="shipping-"] {
+  --ni-a: #64bfff;
+  --ni-b: #1479bf;
+}
+
+
+/* Sales */
+
+[data-nexus-icon="sales"],
+[data-nexus-icon="customers"],
+[data-nexus-icon="quotations"],
+[data-nexus-icon="sales-orders"],
+[data-nexus-icon="invoices"],
+[data-nexus-icon^="pos"] {
+  --ni-a: #598fff;
+  --ni-b: #3451c7;
+}
+
+
+/* Repairs */
+
+[data-nexus-icon="repairs"] {
+  --ni-a: #ffae55;
+  --ni-b: #c76618;
+}
+
+
+/* Stock / purchasing */
+
+[data-nexus-icon="inventory"],
+[data-nexus-icon^="inventory-"],
+[data-nexus-icon="purchasing"] {
+  --ni-a: #53cfc8;
+  --ni-b: #14858b;
+}
+
+
+/* Finance */
+
+[data-nexus-icon="finance"],
+[data-nexus-icon="accounting"],
+[data-nexus-icon^="payroll"] {
+  --ni-a: #8e82ed;
+  --ni-b: #5549b7;
+}
+
+
+/* People */
+
+[data-nexus-icon="hr"],
+[data-nexus-icon="users"] {
+  --ni-a: #58b6df;
+  --ni-b: #287aa5;
+}
+
+
+/* Administration */
+
+[data-nexus-icon="security"],
+[data-nexus-icon="administration"],
+[data-nexus-icon="settings"] {
+  --ni-a: #6a9be8;
+  --ni-b: #3c62a5;
+}
+
+
+/* Recycle bin deliberately neutral */
+
+[data-nexus-icon="recycle"] {
+  --ni-a: #8795a6;
+  --ni-b: #536170;
+}
+
+
+/* =========================================================
+   ACTIVE/HOVER
+
+   Do not turn icon into a glowing toy.
+   ========================================================= */
+
+.nexus-icon.is-active {
+  transform:
+    none;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.38),
+    0 0 0 2px
+      color-mix(
+        in srgb,
+        var(--ni-a) 18%,
+        transparent
+      ),
+    0 6px 15px
+      color-mix(
+        in srgb,
+        var(--ni-b) 20%,
+        transparent
+      );
+}
+
+
+:is(a,button):hover
+.nexus-semantic-glyph {
+  transform:
+    scale(1.045);
+}
+
+
+/* =========================================================
+   JINLAB NEXUS — LARGE SUBMENU ICON PASS
+   Expanded module items must be instantly readable.
+   ========================================================= */
+
+
+/* Main sidebar module icons */
+
+aside .nexus-icon--sidebar {
+  width: 2.35rem;
+  height: 2.35rem;
+
+  border-radius: .78rem;
+
+  flex: 0 0 2.35rem;
+}
+
+
+aside .nexus-icon--sidebar
+.nexus-semantic-glyph {
+  width: 62%;
+  height: 62%;
+}
+
+
+/* Expanded submenu icons */
+
+aside .nexus-icon--sm {
+  width: 2.15rem;
+  height: 2.15rem;
+
+  flex: 0 0 2.15rem;
+
+  border-radius: .68rem;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.28),
+    0 4px 10px
+      color-mix(
+        in srgb,
+        var(--ni-b) 17%,
+        transparent
+      );
+}
+
+
+aside .nexus-icon--sm
+.nexus-semantic-glyph {
+  width: 63%;
+  height: 63%;
+
+  stroke-width: 2;
+}
+
+
+/*
+  Submenu icons should be easier to distinguish
+  from their parent module.
+*/
+
+aside a
+.nexus-icon--sm {
+  filter:
+    saturate(.92)
+    brightness(1.03);
+}
+
+
+aside a:hover
+.nexus-icon--sm {
+  transform:
+    translateY(-1px)
+    scale(1.045);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.36),
+    0 6px 14px
+      color-mix(
+        in srgb,
+        var(--ni-b) 23%,
+        transparent
+      );
+}
+
+
+/* Active submenu */
+
+aside a
+.nexus-icon--sm.is-active {
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.42),
+    0 0 0 2px
+      color-mix(
+        in srgb,
+        var(--ni-a) 18%,
+        transparent
+      ),
+    0 7px 16px
+      color-mix(
+        in srgb,
+        var(--ni-b) 22%,
+        transparent
+      );
+}
+
+
+/* Slightly more room for submenu text */
+
+aside a:has(.nexus-icon--sm) {
+  min-height: 3rem;
+
+  display: flex;
+  align-items: center;
+
+  gap: .8rem !important;
+}
+
+
+/* =========================================================
+   SEMANTIC SUBMENU SIGNATURES
+   Still simple, but visually distinct.
+   ========================================================= */
+
+
+/* Shipping */
+
+[data-nexus-icon="shipping-shipments"] {
+  --ni-a: #67c7ff;
+  --ni-b: #1a83c4;
+}
+
+[data-nexus-icon="shipping-history"] {
+  --ni-a: #7ab2e8;
+  --ni-b: #416d99;
+}
+
+[data-nexus-icon="shipping-new"] {
+  --ni-a: #58c8a9;
+  --ni-b: #198268;
+}
+
+[data-nexus-icon="shipping-tracking"] {
+  --ni-a: #65baff;
+  --ni-b: #176fb0;
+}
+
+[data-nexus-icon="shipping-connections"] {
+  --ni-a: #749ddf;
+  --ni-b: #485f9b;
+}
+
+
+/* Sales */
+
+[data-nexus-icon="customers"] {
+  --ni-a: #65b8ef;
+  --ni-b: #3275a8;
+}
+
+[data-nexus-icon="quotations"] {
+  --ni-a: #718ee9;
+  --ni-b: #4b5cb4;
+}
+
+[data-nexus-icon="sales-orders"] {
+  --ni-a: #667fe1;
+  --ni-b: #414caa;
+}
+
+[data-nexus-icon="invoices"] {
+  --ni-a: #6e9df1;
+  --ni-b: #3c67b9;
+}
+
+
+/* POS */
+
+[data-nexus-icon="pos-approvals"] {
+  --ni-a: #67c598;
+  --ni-b: #32805d;
+}
+
+[data-nexus-icon="pos-receipts"] {
+  --ni-a: #70a5ef;
+  --ni-b: #466bb0;
+}
+
+[data-nexus-icon="pos-cash-up"] {
+  --ni-a: #75c99a;
+  --ni-b: #42825d;
+}
+
+[data-nexus-icon="pos-pricing"] {
+  --ni-a: #9486ec;
+  --ni-b: #5c4cac;
+}
+
+[data-nexus-icon="pos-returns"] {
+  --ni-a: #e69a72;
+  --ni-b: #aa5838;
+}
+
+
+/* Inventory */
+
+[data-nexus-icon="inventory-scanner"] {
+  --ni-a: #59d4cd;
+  --ni-b: #178d91;
+}
+
+[data-nexus-icon="inventory-barcodes"] {
+  --ni-a: #62b9c9;
+  --ni-b: #347982;
+}
+
+
+/* Payroll */
+
+[data-nexus-icon="payroll-runs"] {
+  --ni-a: #9688e8;
+  --ni-b: #6052b2;
+}
+
+[data-nexus-icon="payroll-compliance"] {
+  --ni-a: #8297e7;
+  --ni-b: #5368ad;
+}
+
+
+/* =========================================================
+   MOBILE / SMALL SCREEN
+   Keep readable without becoming oversized.
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  aside .nexus-icon--sidebar {
+    width: 2.2rem;
+    height: 2.2rem;
+
+    flex-basis: 2.2rem;
+  }
+
+
+  aside .nexus-icon--sm {
+    width: 2rem;
+    height: 2rem;
+
+    flex-basis: 2rem;
+  }
+
+}

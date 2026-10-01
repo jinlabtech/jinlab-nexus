@@ -457,6 +457,13 @@ export async function saveCompanyDocumentLogo(logoPath: string | null): Promise<
 
 export async function getDocumentLogoUrl(logoPath: string | null): Promise<string | null> {
   if (!logoPath) return null;
+
+  // Application-owned static branding. Other tenants continue to use
+  // Supabase Storage paths exactly as before.
+  if (logoPath.startsWith("public:")) {
+    return logoPath.slice("public:".length);
+  }
+
   const { data, error } = await supabase.storage
     .from("company-logos")
     .createSignedUrl(logoPath, 3600);

@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   FormEvent,
   useEffect,
@@ -164,11 +166,11 @@ export default function SalesOrderForm({
           Customer
         </label>
 
-        <select
+        <SearchableSelect searchLabel="Customers"
           value={customerId}
-          onChange={(event) =>
+          onValueChange={(selectedValue) =>
             setCustomerId(
-              event.target.value
+              selectedValue
             )
           }
           className="h-10 w-full rounded-md border bg-background px-3 text-sm"
@@ -180,7 +182,7 @@ export default function SalesOrderForm({
 
           {customers.map(
             (customer) => (
-              <option
+              <option data-search={[customer.customer_number, customer.phone, customer.email].filter(Boolean).join(" ")}
                 key={
                   customer.id
                 }
@@ -194,7 +196,7 @@ export default function SalesOrderForm({
               </option>
             )
           )}
-        </select>
+        </SearchableSelect>
       </div>
 
       <div>
@@ -202,11 +204,11 @@ export default function SalesOrderForm({
           Branch
         </label>
 
-        <select
+        <SearchableSelect searchLabel="Branches"
           value={branchId}
-          onChange={(event) =>
+          onValueChange={(selectedValue) =>
             setBranchId(
-              event.target.value
+              selectedValue
             )
           }
           className="h-10 w-full rounded-md border bg-background px-3 text-sm"
@@ -228,7 +230,7 @@ export default function SalesOrderForm({
               </option>
             )
           )}
-        </select>
+        </SearchableSelect>
       </div>
 
       <div>

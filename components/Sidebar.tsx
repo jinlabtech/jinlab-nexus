@@ -1,6 +1,11 @@
 "use client";
 
 import {
+  NexusIcon,
+  nexusIconForRoute,
+} from "@/components/nexus-icons/NexusIcon";
+
+import {
   useEffect,
   useState,
 } from "react";
@@ -16,10 +21,12 @@ import {
   ChevronDown,
   ChevronRight,
   CircleDollarSign,
-  LayoutDashboard,
+  Mail,
+  MessageCircle,
   Package,
   ShoppingCart,
-  Settings as SettingsIcon,
+  Wrench,
+  Truck,
 } from "lucide-react";
 
 import {
@@ -29,6 +36,10 @@ import {
 import type {
   PermissionName,
 } from "@/types/permissions";
+
+import {
+  supabase,
+} from "@/lib/supabase";
 
 
 type NavigationItem = {
@@ -60,7 +71,82 @@ const settingsItem: NavigationItem = {
   permission: "settings.view",
 };
 
+const recycleBinItem: NavigationItem = {
+  name: "Recycle Bin",
+  href: "/settings/recycle-bin",
+  permission: "settings.view",
+};
+
 const navigationGroups: NavigationGroup[] = [
+  {
+    key: "email",
+    name: "Email",
+    icon: (
+      <Mail className="h-4 w-4" />
+    ),
+    items: [
+      {
+        name: "Inbox",
+        href: "/email",
+        permission: "email.view",
+      },
+      {
+        name: "Mailboxes",
+        href: "/email/mailboxes",
+        permission: "email.manage",
+      },
+      {
+        name: "Templates",
+        href: "/email/templates",
+        permission: "templates.view",
+      },
+      {
+        name: "Marketing",
+        href: "/email/marketing",
+        permission: "marketing.view",
+      },
+      {
+        name: "Schedules",
+        href: "/email/marketing/recurring",
+        permission: "marketing.view",
+      },
+      {
+        name: "Bulk Email",
+        href: "/email/bulk",
+        permission: "email.send",
+      },
+    ],
+  },
+
+  {
+    key: "whatsapp",
+    name: "WhatsApp",
+    icon: (
+      <MessageCircle className="h-4 w-4" />
+    ),
+    items: [
+      {
+        name: "WhatsApp Workspace",
+        href: "/whatsapp",
+        permission: "whatsapp.view",
+      },
+    ],
+  },
+
+  {
+    key: "shipping",
+    name: "Shipping",
+    icon: <Truck className="h-4 w-4" />,
+    items: [
+      { name: "Overview", href: "/shipping", permission: "shipping.view" },
+      { name: "Shipments", href: "/shipping/shipments", permission: "shipping.view" },
+      { name: "History", href: "/shipping/history", permission: "shipping.view" },
+      { name: "New Shipment", href: "/shipping/new", permission: "shipping.manage" },
+      { name: "Tracking", href: "/shipping/tracking", permission: "shipping.view" },
+      { name: "Courier Connections", href: "/shipping/connections", permission: "shipping.manage" },
+    ],
+  },
+
   {
     key: "sales",
     name: "Sales",
@@ -94,6 +180,51 @@ const navigationGroups: NavigationGroup[] = [
         href: "/pos",
         permission: "pos.view",
       },
+      {
+        name: "Returns & Exchanges",
+        href: "/pos/returns",
+        permission: "pos.return.view",
+      },
+      {
+        name: "POS Approvals",
+        href: "/pos/approvals",
+        permission: "pos.discount.approve",
+      },
+      {
+        name: "Pricing & Promotions",
+        href: "/pos/pricing",
+        permission: "pos.pricing.view",
+      },
+      {
+        name: "Receipts",
+        href: "/pos/receipts",
+        permission: "pos.view",
+      },
+      {
+        name: "Cash-up & Reconciliation",
+        href: "/pos/cashup",
+        permission: "pos.cashup.view",
+      },
+      {
+        name: "POS Analytics",
+        href: "/pos/analytics",
+        permission: "pos.analytics.view",
+      },
+    ],
+  },
+
+  {
+    key: "repairs",
+    name: "Repairs & Job Cards",
+    icon: (
+      <Wrench className="h-4 w-4" />
+    ),
+    items: [
+      {
+        name: "Job Cards & Scanner",
+        href: "/repairs/scanner",
+        permission: "repair.view" as PermissionName,
+      },
     ],
   },
 
@@ -107,6 +238,16 @@ const navigationGroups: NavigationGroup[] = [
       {
         name: "Inventory",
         href: "/inventory",
+        permission: "inventory.view",
+      },
+      {
+        name: "Barcodes & Labels",
+        href: "/inventory/barcodes",
+        permission: "inventory.view",
+      },
+      {
+        name: "Mobile Scanner",
+        href: "/inventory/scan",
         permission: "inventory.view",
       },
       {
@@ -128,6 +269,91 @@ const navigationGroups: NavigationGroup[] = [
         name: "Accounting",
         href: "/accounting",
         permission: "accounting.view",
+      },
+      {
+        name: "Payroll",
+        href: "/payroll",
+        permission: "payroll.view" as PermissionName,
+      },
+      {
+        name: "Payroll Runs",
+        href: "/payroll/runs",
+        permission: "payroll.run" as PermissionName,
+      },
+      {
+        name: "Payroll Compliance",
+        href: "/payroll/compliance",
+        permission: "payroll.view" as PermissionName,
+      },
+      {
+        name: "My Payslips",
+        href: "/payroll/my-payslips",
+        permission: "payroll.self",
+      },
+    ],
+  },
+
+  {
+    key: "hr",
+    name: "People & HR",
+    icon: (
+      <Building2 className="h-4 w-4" />
+    ),
+    items: [
+      {
+        name: "Human Resources",
+        href: "/hr",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "HR Intelligence",
+        href: "/hr/intelligence",
+        permission: "hr.view" as PermissionName,
+      },
+      {
+        name: "HR Notifications",
+        href: "/hr/notifications",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "HR Reports",
+        href: "/hr/reports",
+        permission: "hr.view" as PermissionName,
+      },
+      {
+        name: "My Schedule",
+        href: "/hr/my-schedule",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "Digital Time Book",
+        href: "/hr/timebook",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "Attendance Devices",
+        href: "/hr/devices",
+        permission: "hr.attendance.manage" as PermissionName,
+      },
+      {
+        name: "HR Management",
+        href: "/hr/manage",
+        permission: "hr.view" as PermissionName,
+      },
+      {
+        name: "User Linking",
+        href: "/hr/link-users",
+        permission: "hr.employee.manage" as PermissionName,
+      },
+      {
+        name: "HR Records",
+        href: "/hr/records",
+        permission: "hr.self" as PermissionName,
+      },
+      {
+        name: "Secure Documents",
+        href: "/hr/documents",
+        permission: "hr.documents.manage" as PermissionName,
       },
     ],
   },
@@ -159,16 +385,45 @@ const navigationGroups: NavigationGroup[] = [
 ];
 
 
+const sidebarRouteHrefs = [
+  dashboardItem.href,
+  settingsItem.href,
+  recycleBinItem.href,
+  ...navigationGroups.flatMap(
+    (group) =>
+      group.items.map(
+        (item) =>
+          item.href
+      )
+  ),
+];
+
+
 function routeIsActive(
   pathname: string,
   href: string
 ) {
 
+  const activeHref =
+    sidebarRouteHrefs
+      .filter(
+        (candidate) =>
+          pathname === candidate ||
+          pathname.startsWith(
+            `${candidate}/`
+          )
+      )
+      .sort(
+        (a, b) =>
+          b.length -
+          a.length
+      )[0] ??
+    null;
+
+
   return (
-    pathname === href ||
-    pathname.startsWith(
-      `${href}/`
-    )
+    href ===
+    activeHref
   );
 }
 
@@ -177,6 +432,36 @@ export default function Sidebar() {
 
   const pathname =
     usePathname();
+
+  const [
+    isOwner,
+    setIsOwner,
+  ] =
+    useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadOwnerStatus() {
+      const {
+        data,
+      } = await supabase.rpc(
+        "current_user_is_owner"
+      );
+
+      if (!cancelled) {
+        setIsOwner(
+          Boolean(data)
+        );
+      }
+    }
+
+    void loadOwnerStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
 
   const {
@@ -217,33 +502,6 @@ export default function Sidebar() {
     >({});
 
 
-  useEffect(
-    () => {
-
-      if (
-        !activeGroupKey
-      ) {
-        return;
-      }
-
-
-      setOpenGroups(
-        (
-          current
-        ) => ({
-          ...current,
-          [activeGroupKey]:
-            true,
-        })
-      );
-
-    },
-    [
-      activeGroupKey,
-    ]
-  );
-
-
   function toggleGroup(
     key: string
   ) {
@@ -251,11 +509,23 @@ export default function Sidebar() {
     setOpenGroups(
       (
         current
-      ) => ({
-        ...current,
-        [key]:
-          !current[key],
-      })
+      ) => {
+
+        const currentlyOpen =
+          current[key] ??
+          (
+            activeGroupKey ===
+            key
+          );
+
+
+        return {
+          ...current,
+
+          [key]:
+            !currentlyOpen,
+        };
+      }
     );
   }
 
@@ -269,6 +539,12 @@ export default function Sidebar() {
   const settingsVisible =
     can(
       settingsItem.permission
+    );
+
+  const recycleBinVisible =
+    isOwner &&
+    can(
+      recycleBinItem.permission
     );
 
 
@@ -301,7 +577,7 @@ export default function Sidebar() {
 
 
   return (
-    <aside className="flex w-full flex-col border-b bg-sidebar text-sidebar-foreground md:min-h-screen md:w-64 md:border-b-0 md:border-r">
+    <aside className="flex w-full flex-col border-b bg-sidebar text-sidebar-foreground md:h-screen md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-r">
 
       <div className="flex h-20 shrink-0 items-center border-b px-6">
 
@@ -352,12 +628,21 @@ export default function Sidebar() {
                         pathname,
                         dashboardItem.href
                       )
-                        ? "flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+                        ? "flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-semibold text-primary"
                         : "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     }
                   >
 
-                    <LayoutDashboard className="h-4 w-4" />
+                    <NexusIcon
+                  name="dashboard"
+                  active={
+                    routeIsActive(
+                      pathname,
+                      dashboardItem.href
+                    )
+                  }
+                  size="sidebar"
+                />
 
                     Dashboard
 
@@ -377,10 +662,12 @@ export default function Sidebar() {
                   ) => {
 
                     const isOpen =
-                      Boolean(
-                        openGroups[
-                          group.key
-                        ]
+                      openGroups[
+                        group.key
+                      ] ??
+                      (
+                        activeGroupKey ===
+                        group.key
                       );
 
 
@@ -421,9 +708,11 @@ export default function Sidebar() {
 
                           <span className="flex min-w-0 items-center gap-3">
 
-                            {
-                              group.icon
-                            }
+                            <NexusIcon
+                              name={group.key}
+                              active={groupActive}
+                              size="sidebar"
+                            />
 
                             <span className="truncate">
                               {
@@ -474,13 +763,27 @@ export default function Sidebar() {
                                         }
                                         className={
                                           active
-                                            ? "block rounded-lg bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-800"
-                                            : "block rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                            ? "flex items-center gap-2.5 rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary"
+                                            : "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                         }
                                       >
-                                        {
-                                          item.name
-                                        }
+                                        <NexusIcon
+                                          name={
+                                            nexusIconForRoute(
+                                              item.href
+                                            )
+                                          }
+                                          active={
+                                            active
+                                          }
+                                          size="sm"
+                                        />
+
+                                        <span className="truncate">
+                                          {
+                                            item.name
+                                          }
+                                        </span>
                                       </Link>
 
                                     );
@@ -516,6 +819,39 @@ export default function Sidebar() {
 
 
               {
+                recycleBinVisible && (
+                  <>
+                    <div className="my-3 border-t" />
+
+                    <Link
+                      href={recycleBinItem.href}
+                      className={
+                        routeIsActive(
+                          pathname,
+                          recycleBinItem.href
+                        )
+                          ? "flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-semibold text-primary"
+                          : "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      }
+                    >
+                      <NexusIcon
+                        name="recycle"
+                        active={
+                          routeIsActive(
+                            pathname,
+                            recycleBinItem.href
+                          )
+                        }
+                        size="sidebar"
+                      />
+
+                      Recycle Bin
+                    </Link>
+                  </>
+                )
+              }
+
+              {
                 settingsVisible && (
                   <>
                     <div className="my-3 border-t" />
@@ -527,11 +863,20 @@ export default function Sidebar() {
                           pathname,
                           settingsItem.href
                         )
-                          ? "flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+                          ? "flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-semibold text-primary"
                           : "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                       }
                     >
-                      <SettingsIcon className="h-4 w-4" />
+                      <NexusIcon
+                        name="settings"
+                        active={
+                          routeIsActive(
+                            pathname,
+                            settingsItem.href
+                          )
+                        }
+                        size="sidebar"
+                      />
 
                       Settings
                     </Link>

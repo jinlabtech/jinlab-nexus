@@ -451,7 +451,7 @@ export default function TillSessionPanel({
                         true
                       )
                     }
-                    className="bg-emerald-600 text-white hover:bg-emerald-700"
+                    className="bg-primary text-white hover:bg-primary"
                   >
 
                     <UnlockKeyhole className="mr-2 h-4 w-4" />
@@ -471,7 +471,7 @@ export default function TillSessionPanel({
           <div className={
             wrongBranch
               ? "mb-5 rounded-2xl border border-red-200 bg-red-50 p-5"
-              : "mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5"
+              : "mb-5 rounded-2xl border border-primary/20 bg-primary/10 p-5"
           }>
 
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -480,7 +480,7 @@ export default function TillSessionPanel({
 
                 <div className="flex items-center gap-2">
 
-                  <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
 
 
                   <p className="font-bold">
@@ -661,7 +661,7 @@ export default function TillSessionPanel({
                   Expected Cash
                 </p>
 
-                <p className="mt-1 font-bold text-emerald-700">
+                <p className="mt-1 font-bold text-primary">
                   {
                     money(
                       session
@@ -784,7 +784,7 @@ export default function TillSessionPanel({
               onClick={() =>
                 void openTill()
               }
-              className="bg-emerald-600 text-white hover:bg-emerald-700"
+              className="bg-primary text-white hover:bg-primary"
             >
               {
                 saving
@@ -891,7 +891,7 @@ export default function TillSessionPanel({
                     Expected Drawer
                   </p>
 
-                  <p className="mt-1 font-bold text-emerald-700">
+                  <p className="mt-1 font-bold text-primary">
                     {
                       money(
                         session
@@ -964,7 +964,7 @@ export default function TillSessionPanel({
                       .expected_cash
                   ) <
                   0.01
-                    ? "mt-1 text-xl font-bold text-emerald-700"
+                    ? "mt-1 text-xl font-bold text-primary"
                     : "mt-1 text-xl font-bold text-red-700"
                 }>
                   {
@@ -1038,7 +1038,7 @@ export default function TillSessionPanel({
               onClick={() =>
                 void closeTill()
               }
-              className="bg-emerald-600 text-white hover:bg-emerald-700"
+              className="bg-primary text-white hover:bg-primary"
             >
               {
                 saving

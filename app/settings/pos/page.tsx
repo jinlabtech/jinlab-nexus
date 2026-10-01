@@ -137,14 +137,14 @@ const capabilityGroups = [
         label: "Suspend & Recall",
         description:
           "Pause a sale and continue it later.",
-        ready: false,
+        ready: true,
       },
       {
         key: "split_tender",
         label: "Split Payments",
         description:
           "Pay one transaction using multiple payment methods.",
-        ready: false,
+        ready: true,
       },
     ],
   },
@@ -178,7 +178,7 @@ const capabilityGroups = [
         label: "Price Override",
         description:
           "Allow authorised selling-price changes.",
-        ready: false,
+        ready: true,
       },
       {
         key: "promotions",
@@ -212,14 +212,14 @@ const capabilityGroups = [
         label: "Returns",
         description:
           "Controlled product return workflows.",
-        ready: false,
+        ready: true,
       },
       {
         key: "exchanges",
         label: "Exchanges",
         description:
           "Exchange returned products for other items.",
-        ready: false,
+        ready: true,
       },
       {
         key: "receipt_printing",
@@ -900,7 +900,7 @@ export default function PosSettingsPage() {
                 onClick={() =>
                   void save()
                 }
-                className="bg-emerald-600 text-white hover:bg-emerald-700"
+                className="bg-primary text-white hover:bg-primary"
               >
 
                 <Save className="mr-2 h-4 w-4" />
@@ -931,7 +931,7 @@ export default function PosSettingsPage() {
 
         {
           successMessage && (
-            <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+            <div className="mb-6 rounded-xl border border-primary/20 bg-primary/10 p-4 text-sm text-primary">
               {
                 successMessage
               }
@@ -985,8 +985,8 @@ export default function PosSettingsPage() {
                       }
                       className={
                         selected
-                          ? "rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-5 text-left"
-                          : "rounded-2xl border bg-background p-5 text-left transition hover:border-emerald-300 hover:bg-muted/20"
+                          ? "rounded-2xl border-2 border-primary/30 bg-primary/10 p-5 text-left"
+                          : "rounded-2xl border bg-background p-5 text-left transition hover:border-primary/30 hover:bg-muted/20"
                       }
                     >
 
@@ -1020,7 +1020,7 @@ export default function PosSettingsPage() {
 
                         {
                           selected && (
-                            <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+                            <CheckCircle2 className="h-5 w-5 text-primary" />
                           )
                         }
 
@@ -1434,7 +1434,7 @@ export default function PosSettingsPage() {
                                 }
                                 className={
                                   enabled
-                                    ? "rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-left"
+                                    ? "rounded-xl border border-primary/20 bg-primary/10 p-4 text-left"
                                     : "rounded-xl border bg-background p-4 text-left opacity-70"
                                 }
                               >
@@ -1464,7 +1464,7 @@ export default function PosSettingsPage() {
                                     <span
                                       className={
                                         enabled
-                                          ? "rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-semibold uppercase text-white"
+                                          ? "rounded-full bg-primary px-2 py-1 text-[10px] font-semibold uppercase text-white"
                                           : "rounded-full bg-muted px-2 py-1 text-[10px] font-semibold uppercase"
                                       }
                                     >
@@ -1679,7 +1679,7 @@ export default function PosSettingsPage() {
 
           <div className="flex items-start gap-3">
 
-            <Settings2 className="mt-0.5 h-5 w-5 text-emerald-700" />
+            <Settings2 className="mt-0.5 h-5 w-5 text-primary" />
 
             <div>
 
@@ -1711,7 +1711,7 @@ export default function PosSettingsPage() {
                 onClick={() =>
                   void save()
                 }
-                className="bg-emerald-600 text-white hover:bg-emerald-700"
+                className="bg-primary text-white hover:bg-primary"
               >
 
                 <Save className="mr-2 h-4 w-4" />

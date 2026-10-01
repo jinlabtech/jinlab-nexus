@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   FormEvent,
   useEffect,
@@ -358,13 +360,13 @@ export default function SalesOrderItemForm({
             Inventory Product
           </span>
 
-          <select
+          <SearchableSelect searchLabel="Products"
             value={
               inventoryItemId
             }
-            onChange={(event) =>
+            onValueChange={(selectedValue) =>
               selectInventoryItem(
-                event.target.value
+                selectedValue
               )
             }
             className="h-10 rounded-md border bg-background px-3 text-sm"
@@ -375,7 +377,7 @@ export default function SalesOrderItemForm({
 
             {inventoryItems.map(
               (inventoryItem) => (
-                <option
+                <option data-search={[inventoryItem.sku, inventoryItem.barcode].filter(Boolean).join(" ")}
                   key={
                     inventoryItem.id
                   }
@@ -393,7 +395,7 @@ export default function SalesOrderItemForm({
                 </option>
               )
             )}
-          </select>
+          </SearchableSelect>
         </label>
 
         <AppInput

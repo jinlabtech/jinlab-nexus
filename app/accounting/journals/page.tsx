@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   useEffect,
   useMemo,
@@ -1407,17 +1409,16 @@ export default function JournalsPage() {
                   Branch
                 </span>
 
-                <select
+                <SearchableSelect searchLabel="Branches"
                   value={
                     branchId
                   }
-                  onChange={
+                  onValueChange={
                     (
-                      event
+                      selectedValue
                     ) =>
                       setBranchId(
-                        event.target
-                          .value
+                        selectedValue
                       )
                   }
                   className="w-full rounded-md border bg-background px-3 py-2"
@@ -1444,7 +1445,7 @@ export default function JournalsPage() {
                       </option>
                     )
                   )}
-                </select>
+                </SearchableSelect>
               </label>
 
 
@@ -1538,20 +1539,19 @@ export default function JournalsPage() {
                         >
 
                           <td className="px-2 py-3">
-                            <select
+                            <SearchableSelect searchLabel="Accounts"
                               value={
                                 line.accountId
                               }
-                              onChange={
+                              onValueChange={
                                 (
-                                  event
+                                  selectedValue
                                 ) =>
                                   updateLine(
                                     index,
                                     {
                                       accountId:
-                                        event.target
-                                          .value,
+                                        selectedValue,
                                     }
                                   )
                               }
@@ -1579,7 +1579,7 @@ export default function JournalsPage() {
                                   </option>
                                 )
                               )}
-                            </select>
+                            </SearchableSelect>
                           </td>
 
 

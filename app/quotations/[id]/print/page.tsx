@@ -256,9 +256,33 @@ export default function QuotationPrintPage() {
               .company_name,
         });
 
-        setCustomer(
-          customerResult.data as CustomerInfo
-        );
+        const customerRow = customerResult.data as Record<string, unknown>;
+
+        const customerAddress = [
+          customerRow.address_line_1,
+          customerRow.address_line_2,
+          customerRow.city,
+          customerRow.province,
+          customerRow.postal_code,
+          customerRow.country,
+        ]
+          .filter((value): value is string =>
+            typeof value === "string" && value.trim().length > 0
+          )
+          .join("\n");
+
+        setCustomer({
+          customer_name: String(customerRow.customer_name ?? ""),
+          email:
+            typeof customerRow.email === "string"
+              ? customerRow.email
+              : null,
+          phone:
+            typeof customerRow.phone === "string"
+              ? customerRow.phone
+              : null,
+          address: customerAddress || null,
+        });
 
         if (
           !branchResult.error

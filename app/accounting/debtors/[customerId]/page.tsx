@@ -402,12 +402,19 @@ export default function CustomerDebtorPage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
-    void loadData();
+    const timer = window.setTimeout(() => {
+      void loadData();
+    }, 0);
 
+    return () => {
+      window.clearTimeout(timer);
+    };
+
+    // loadData is intentionally triggered by resolved permission/customer state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     permissionsLoading,
     canView,
@@ -469,7 +476,7 @@ export default function CustomerDebtorPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>
@@ -1286,6 +1293,29 @@ export default function CustomerDebtorPage() {
         <section
           id="formal-customer-statement"
         >
+          {companyName.trim().toUpperCase() === "JINLAB" && (
+            <div
+              className="statement-no-break"
+              style={{
+                marginBottom: "12px",
+                paddingBottom: "8px",
+                borderBottom: "1px solid #d7d7d7",
+              }}
+            >
+              {/* Exact company letterhead supplied by JINLAB. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/branding/jinlab-letterhead.jpg"
+                alt="JINLAB letterhead"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                }}
+              />
+            </div>
+          )}
           <div
             style={{
               padding:
@@ -1309,16 +1339,17 @@ export default function CustomerDebtorPage() {
             >
 
               <div>
-                <div
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: 800,
-                    letterSpacing:
-                      "-0.02em",
-                  }}
-                >
-                  {companyName}
-                </div>
+                {companyName.trim().toUpperCase() !== "JINLAB" && (
+                  <div
+                    style={{
+                      fontSize: "22px",
+                      fontWeight: 800,
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {companyName}
+                  </div>
+                )}
 
                 <div
                   style={{

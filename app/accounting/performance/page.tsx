@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   useEffect,
   useMemo,
@@ -1386,16 +1388,16 @@ export default function AccountingPerformancePage() {
                   Budget
                 </span>
 
-                <select
+                <SearchableSelect searchLabel="Records"
                   value={
                     selectedBudgetId
                   }
-                  onChange={
+                  onValueChange={
                     (
-                      event
+                      selectedValue
                     ) =>
                       setSelectedBudgetId(
-                        event.target.value
+                        selectedValue
                       )
                   }
                   className="min-w-64 rounded-md border bg-background px-3 py-2"
@@ -1422,7 +1424,7 @@ export default function AccountingPerformancePage() {
                       </option>
                     )
                   )}
-                </select>
+                </SearchableSelect>
               </label>
             )}
 
@@ -1797,16 +1799,16 @@ export default function AccountingPerformancePage() {
                 Financial Year
               </span>
 
-              <select
+              <SearchableSelect searchLabel="Records"
                 value={
                   yearId
                 }
-                onChange={
+                onValueChange={
                   (
-                    event
+                    selectedValue
                   ) =>
                     setYearId(
-                      event.target.value
+                      selectedValue
                     )
                 }
                 className="w-full rounded-md border bg-background px-3 py-2.5"
@@ -1833,7 +1835,7 @@ export default function AccountingPerformancePage() {
                     </option>
                   )
                 )}
-              </select>
+              </SearchableSelect>
 
             </label>
 
@@ -1868,16 +1870,16 @@ export default function AccountingPerformancePage() {
                 Scope
               </span>
 
-              <select
+              <SearchableSelect searchLabel="Branches"
                 value={
                   branchId
                 }
-                onChange={
+                onValueChange={
                   (
-                    event
+                    selectedValue
                   ) =>
                     setBranchId(
-                      event.target.value
+                      selectedValue
                     )
                 }
                 className="w-full rounded-md border bg-background px-3 py-2.5"
@@ -1904,7 +1906,7 @@ export default function AccountingPerformancePage() {
                     </option>
                   )
                 )}
-              </select>
+              </SearchableSelect>
 
             </label>
 

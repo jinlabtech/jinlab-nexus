@@ -8,6 +8,7 @@ import type {
 } from "@/types/userProfile";
 
 const allowedRoles: UserRole[] = [
+  "owner",
   "admin",
   "manager",
   "technician",
@@ -223,6 +224,24 @@ export async function POST(request: Request) {
         },
         {
           status: 400,
+        }
+      );
+    }
+
+    // Only an existing Owner may create another Owner.
+    // Administrators may invite operational users,
+    // but may never elevate somebody to Owner.
+    if (
+      role === "owner" &&
+      requestingProfile.role !== "owner"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Only an existing owner may invite another owner.",
+        },
+        {
+          status: 403,
         }
       );
     }

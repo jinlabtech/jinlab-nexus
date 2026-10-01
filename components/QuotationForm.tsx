@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   useEffect,
   useState,
@@ -197,13 +199,13 @@ export default function QuotationForm({
               Customer
             </span>
 
-            <select
+            <SearchableSelect searchLabel="Customers"
               value={
                 customerId
               }
-              onChange={(event) =>
+              onValueChange={(selectedValue) =>
                 setCustomerId(
-                  event.target.value
+                  selectedValue
                 )
               }
               className="h-10 rounded-md border bg-background px-3 text-sm"
@@ -215,7 +217,7 @@ export default function QuotationForm({
 
               {customers.map(
                 (customer) => (
-                  <option
+                  <option data-search={[customer.customer_number, customer.phone, customer.email].filter(Boolean).join(" ")}
                     key={
                       customer.id
                     }
@@ -232,7 +234,7 @@ export default function QuotationForm({
                   </option>
                 )
               )}
-            </select>
+            </SearchableSelect>
           </label>
 
           <label className="grid gap-2">
@@ -240,13 +242,13 @@ export default function QuotationForm({
               Branch
             </span>
 
-            <select
+            <SearchableSelect searchLabel="Branches"
               value={
                 branchId
               }
-              onChange={(event) =>
+              onValueChange={(selectedValue) =>
                 setBranchId(
-                  event.target.value
+                  selectedValue
                 )
               }
               className="h-10 rounded-md border bg-background px-3 text-sm"
@@ -272,7 +274,7 @@ export default function QuotationForm({
                   </option>
                 )
               )}
-            </select>
+            </SearchableSelect>
           </label>
 
           <label className="grid gap-2">

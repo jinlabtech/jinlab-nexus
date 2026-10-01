@@ -1,0 +1,692 @@
+/* =========================================================
+   JINLAB NEXUS — MODULE SURFACE ENGINE
+   Extends visual identity deep inside every workspace.
+   ========================================================= */
+
+html[data-nexus-theme] {
+  --nx-workspace: transparent;
+  --nx-section: var(--nexus-surface);
+  --nx-section-alt: var(--nexus-surface-2);
+
+  --nx-section-border:
+    rgba(120,140,160,.14);
+
+  --nx-section-highlight:
+    rgba(255,255,255,.25);
+
+  --nx-toolbar:
+    color-mix(
+      in srgb,
+      var(--card) 78%,
+      transparent
+    );
+
+  --nx-table-head:
+    color-mix(
+      in srgb,
+      var(--muted) 72%,
+      transparent
+    );
+
+  --nx-row-hover:
+    color-mix(
+      in srgb,
+      var(--primary) 5%,
+      transparent
+    );
+
+  --nx-inner-shadow:
+    rgba(30,60,90,.07);
+
+  --nx-inner-radius:
+    1rem;
+
+  --nx-inner-blur:
+    18px;
+}
+
+
+/* =========================================================
+   MAIN WORKSPACE
+   ========================================================= */
+
+html[data-nexus-theme]
+main {
+  position: relative;
+
+  background:
+    var(--nx-workspace);
+
+  isolation: isolate;
+}
+
+
+/* faint optical atmosphere behind module content */
+
+html[data-nexus-theme]
+main::before {
+  content: "";
+
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+
+  width: 28rem;
+  height: 28rem;
+
+  top: 1rem;
+  right: 2%;
+
+  border-radius: 999px;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--nexus-ambient-2),
+      transparent 70%
+    );
+
+  filter: blur(55px);
+  opacity: .48;
+}
+
+
+/* =========================================================
+   NESTED MODULE PANELS
+   Covers panels used inside POS, Inventory, HR,
+   Payroll, Accounting, Repairs, Settings, etc.
+   ========================================================= */
+
+html[data-nexus-theme]
+main :where(
+  [role="tabpanel"],
+  [data-nexus-panel],
+  .nexus-module-panel,
+  [class*="rounded-xl"][class*="border"],
+  [class*="rounded-2xl"][class*="border"]
+) {
+  border-color:
+    var(--nx-section-border);
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--nx-section),
+      var(--nx-section-alt)
+    );
+
+  -webkit-backdrop-filter:
+    blur(var(--nx-inner-blur))
+    saturate(140%);
+
+  backdrop-filter:
+    blur(var(--nx-inner-blur))
+    saturate(140%);
+
+  box-shadow:
+    inset 0 1px 0
+      var(--nx-section-highlight),
+    0 10px 28px
+      var(--nx-inner-shadow);
+
+  transition:
+    background 240ms ease,
+    border-color 220ms ease,
+    box-shadow 240ms ease,
+    transform 220ms
+      cubic-bezier(.2,.8,.2,1);
+}
+
+
+/* Avoid lifting structural containers too much */
+
+html[data-nexus-theme]
+main :where(
+  [role="tabpanel"],
+  [data-nexus-panel]
+):hover {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 13%,
+      var(--nx-section-border)
+    );
+}
+
+
+/* =========================================================
+   MODULE HEADERS / TOOLBARS / FILTER AREAS
+   ========================================================= */
+
+html[data-nexus-theme]
+main :where(
+  [role="toolbar"],
+  [class*="sticky"][class*="border"],
+  [class*="rounded-lg"][class*="border"][class*="flex"],
+  [class*="rounded-xl"][class*="border"][class*="flex"]
+) {
+  background:
+    var(--nx-toolbar);
+
+  -webkit-backdrop-filter:
+    blur(calc(
+      var(--nx-inner-blur) * .78
+    ))
+    saturate(135%);
+
+  backdrop-filter:
+    blur(calc(
+      var(--nx-inner-blur) * .78
+    ))
+    saturate(135%);
+
+  border-color:
+    var(--nx-section-border);
+
+  box-shadow:
+    inset 0 1px 0
+      var(--nx-section-highlight);
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+html[data-nexus-theme]
+main [role="tablist"] {
+  padding: .28rem;
+
+  border:
+    1px solid
+    var(--nx-section-border);
+
+  border-radius:
+    calc(
+      var(--nx-inner-radius) * .82
+    );
+
+  background:
+    color-mix(
+      in srgb,
+      var(--nx-toolbar) 84%,
+      transparent
+    );
+
+  box-shadow:
+    inset 0 1px 2px
+      rgba(0,0,0,.035),
+    inset 0 1px 0
+      var(--nx-section-highlight);
+
+  -webkit-backdrop-filter:
+    blur(var(--nx-inner-blur));
+
+  backdrop-filter:
+    blur(var(--nx-inner-blur));
+}
+
+html[data-nexus-theme]
+main [role="tab"] {
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+html[data-nexus-theme]
+main [role="tab"][data-state="active"] {
+  background:
+    var(--nx-section);
+
+  box-shadow:
+    inset 0 1px 0
+      var(--nx-section-highlight),
+    0 4px 12px
+      var(--nx-inner-shadow);
+}
+
+
+/* =========================================================
+   TABLES / DATA WORKSPACES
+   ========================================================= */
+
+html[data-nexus-theme]
+main table {
+  position: relative;
+}
+
+html[data-nexus-theme]
+main thead {
+  background:
+    var(--nx-table-head);
+}
+
+html[data-nexus-theme]
+main thead th {
+  border-color:
+    var(--nx-section-border);
+}
+
+html[data-nexus-theme]
+main tbody tr {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--nx-section-border) 82%,
+      transparent
+    );
+
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+html[data-nexus-theme]
+main tbody tr:hover {
+  background:
+    var(--nx-row-hover);
+
+  box-shadow:
+    inset 3px 0 0
+      color-mix(
+        in srgb,
+        var(--primary) 48%,
+        transparent
+      );
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+html[data-nexus-theme]
+main fieldset {
+  border-color:
+    var(--nx-section-border);
+
+  border-radius:
+    var(--nx-inner-radius);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--nx-section) 72%,
+      transparent
+    );
+}
+
+html[data-nexus-theme]
+main :where(
+  input,
+  textarea,
+  select
+) {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--nx-section-border) 92%,
+      var(--border)
+    );
+}
+
+
+/* =========================================================
+   EMPTY / DROP / PLACEHOLDER AREAS
+   ========================================================= */
+
+html[data-nexus-theme]
+main [class*="border-dashed"] {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 21%,
+      var(--nx-section-border)
+    );
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--nx-section) 64%,
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--nx-section-alt) 42%,
+        transparent
+      )
+    );
+}
+
+
+/* =========================================================
+   BADGES / SMALL STATUS ELEMENTS
+   ========================================================= */
+
+html[data-nexus-theme]
+main :where(
+  [data-slot="badge"],
+  [class*="rounded-full"]
+) {
+  -webkit-backdrop-filter:
+    blur(10px);
+
+  backdrop-filter:
+    blur(10px);
+}
+
+
+/* =========================================================
+   BLUE
+   Precise optical business material
+   ========================================================= */
+
+html[
+  data-nexus-theme="jinlab_blue"
+] {
+  --nx-section:
+    rgba(255,255,255,.90);
+
+  --nx-section-alt:
+    rgba(244,249,255,.78);
+
+  --nx-toolbar:
+    rgba(247,251,255,.80);
+
+  --nx-table-head:
+    rgba(230,241,252,.72);
+
+  --nx-section-border:
+    rgba(67,127,184,.14);
+
+  --nx-section-highlight:
+    rgba(255,255,255,.88);
+
+  --nx-inner-shadow:
+    rgba(46,90,130,.075);
+
+  --nx-inner-radius:
+    .92rem;
+
+  --nx-inner-blur:
+    15px;
+}
+
+
+/* =========================================================
+   BLUE DARK
+   Midnight acrylic workstation
+   ========================================================= */
+
+html[
+  data-nexus-theme="jinlab_blue_dark"
+] {
+  --nx-section:
+    rgba(29,37,48,.90);
+
+  --nx-section-alt:
+    rgba(18,25,34,.80);
+
+  --nx-toolbar:
+    rgba(26,34,45,.76);
+
+  --nx-table-head:
+    rgba(38,50,65,.70);
+
+  --nx-section-border:
+    rgba(104,169,230,.105);
+
+  --nx-section-highlight:
+    rgba(255,255,255,.075);
+
+  --nx-inner-shadow:
+    rgba(0,0,0,.24);
+
+  --nx-inner-radius:
+    .82rem;
+
+  --nx-inner-blur:
+    17px;
+}
+
+
+/* =========================================================
+   FROST
+   Soft sculpted pearl surfaces
+   ========================================================= */
+
+html[
+  data-nexus-theme="jinlab_frost"
+] {
+  --nx-section:
+    rgba(255,255,255,.74);
+
+  --nx-section-alt:
+    rgba(240,248,255,.50);
+
+  --nx-toolbar:
+    rgba(255,255,255,.55);
+
+  --nx-table-head:
+    rgba(233,244,252,.58);
+
+  --nx-section-border:
+    rgba(255,255,255,.76);
+
+  --nx-section-highlight:
+    rgba(255,255,255,.96);
+
+  --nx-inner-shadow:
+    rgba(77,116,145,.09);
+
+  --nx-inner-radius:
+    1.28rem;
+
+  --nx-inner-blur:
+    26px;
+}
+
+html[
+  data-nexus-theme="jinlab_frost"
+]
+main :where(
+  [role="tabpanel"],
+  [data-nexus-panel],
+  [class*="rounded-xl"][class*="border"],
+  [class*="rounded-2xl"][class*="border"]
+) {
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.98),
+    inset 0 -1px 0
+      rgba(80,120,150,.045),
+    0 18px 40px
+      rgba(67,108,140,.085);
+}
+
+
+/* =========================================================
+   GRAPHITE
+   Precision-machined engineering workspace
+   ========================================================= */
+
+html[
+  data-nexus-theme="jinlab_graphite"
+] {
+  --nx-section:
+    rgba(35,43,54,.96);
+
+  --nx-section-alt:
+    rgba(18,24,32,.94);
+
+  --nx-toolbar:
+    rgba(31,39,49,.94);
+
+  --nx-table-head:
+    rgba(42,51,63,.96);
+
+  --nx-section-border:
+    rgba(255,255,255,.075);
+
+  --nx-section-highlight:
+    rgba(255,255,255,.085);
+
+  --nx-inner-shadow:
+    rgba(0,0,0,.32);
+
+  --nx-inner-radius:
+    .64rem;
+
+  --nx-inner-blur:
+    11px;
+}
+
+html[
+  data-nexus-theme="jinlab_graphite"
+]
+main :where(
+  [role="tabpanel"],
+  [data-nexus-panel],
+  [class*="rounded-xl"][class*="border"],
+  [class*="rounded-2xl"][class*="border"]
+) {
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.08),
+    inset 0 -1px 0
+      rgba(0,0,0,.38),
+    0 16px 35px
+      rgba(0,0,0,.24);
+}
+
+
+/* =========================================================
+   GLASS
+   Layered spatial / optical environment
+   ========================================================= */
+
+html[
+  data-nexus-theme="jinlab_glass"
+] {
+  --nx-section:
+    rgba(255,255,255,.52);
+
+  --nx-section-alt:
+    rgba(232,244,255,.25);
+
+  --nx-toolbar:
+    rgba(255,255,255,.34);
+
+  --nx-table-head:
+    rgba(235,246,255,.38);
+
+  --nx-section-border:
+    rgba(255,255,255,.52);
+
+  --nx-section-highlight:
+    rgba(255,255,255,.78);
+
+  --nx-inner-shadow:
+    rgba(35,80,130,.12);
+
+  --nx-inner-radius:
+    1.42rem;
+
+  --nx-inner-blur:
+    30px;
+}
+
+html[
+  data-nexus-theme="jinlab_glass"
+]
+main :where(
+  [role="tabpanel"],
+  [data-nexus-panel],
+  [class*="rounded-xl"][class*="border"],
+  [class*="rounded-2xl"][class*="border"]
+) {
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.84),
+    inset 0 -1px 0
+      rgba(255,255,255,.15),
+    0 22px 48px
+      rgba(32,79,130,.11);
+}
+
+
+/* =========================================================
+   ICON PERSONALITY + THEME INTERACTION
+   ========================================================= */
+
+html[
+  data-nexus-theme="jinlab_frost"
+][
+  data-nexus-icon-style="ceramic"
+]
+.nexus-icon {
+  filter:
+    saturate(.82)
+    brightness(1.035);
+}
+
+html[
+  data-nexus-theme="jinlab_graphite"
+][
+  data-nexus-icon-style="titanium"
+]
+.nexus-icon {
+  border-color:
+    rgba(255,255,255,.095);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.17),
+    inset 0 -1px 0
+      rgba(0,0,0,.55),
+    0 9px 18px
+      rgba(0,0,0,.34);
+}
+
+html[
+  data-nexus-theme="jinlab_glass"
+][
+  data-nexus-icon-style="aurora"
+]
+.nexus-icon {
+  -webkit-backdrop-filter:
+    blur(18px)
+    saturate(190%);
+
+  backdrop-filter:
+    blur(18px)
+    saturate(190%);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.74),
+    0 10px 26px
+      rgba(86,99,225,.20);
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  html[data-nexus-theme]
+  main *,
+  html[data-nexus-theme]
+  main *::before,
+  html[data-nexus-theme]
+  main *::after {
+    scroll-behavior: auto !important;
+  }
+}

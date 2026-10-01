@@ -1,0 +1,348 @@
+
+/* =========================================================
+   JINLAB NEXUS MATERIAL ENGINE
+   Premium OS-style material, depth, motion and reflections
+   ========================================================= */
+
+html[data-nexus-theme] {
+  --nexus-ease: cubic-bezier(.22,.8,.22,1);
+}
+
+html[data-nexus-theme] body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+html[data-nexus-theme] body::before,
+html[data-nexus-theme] body::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: 999px;
+  filter: blur(70px);
+  opacity: .8;
+  transition:
+    background 500ms var(--nexus-ease),
+    opacity 500ms var(--nexus-ease),
+    transform 900ms var(--nexus-ease);
+}
+
+html[data-nexus-theme] body::before {
+  width: 34rem;
+  height: 34rem;
+  top: -12rem;
+  left: -8rem;
+  background: var(--nexus-ambient-1);
+  animation: nexusAmbientOne 18s ease-in-out infinite alternate;
+}
+
+html[data-nexus-theme] body::after {
+  width: 32rem;
+  height: 32rem;
+  right: -10rem;
+  bottom: -12rem;
+  background: var(--nexus-ambient-2);
+  animation: nexusAmbientTwo 22s ease-in-out infinite alternate;
+}
+
+html[data-nexus-theme] aside,
+html[data-nexus-theme] header,
+html[data-nexus-theme] [data-slot="card"],
+html[data-nexus-theme] [data-slot="dialog-content"],
+html[data-nexus-theme] [data-slot="popover-content"],
+html[data-nexus-theme] [data-slot="dropdown-menu-content"],
+html[data-nexus-theme] [data-slot="sheet-content"] {
+  -webkit-backdrop-filter:
+    blur(var(--nexus-blur))
+    saturate(145%);
+  backdrop-filter:
+    blur(var(--nexus-blur))
+    saturate(145%);
+}
+
+html[data-nexus-theme] [data-slot="card"],
+html[data-nexus-theme] [data-slot="dialog-content"],
+html[data-nexus-theme] [data-slot="popover-content"] {
+  position: relative;
+  background:
+    linear-gradient(
+      145deg,
+      var(--nexus-surface),
+      var(--nexus-surface-2)
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.30),
+    0 1px 1px rgba(0,0,0,.03),
+    0 12px 32px var(--nexus-shadow);
+  transition:
+    transform 220ms var(--nexus-ease),
+    box-shadow 250ms var(--nexus-ease),
+    background 280ms var(--nexus-ease),
+    border-color 220ms ease;
+}
+
+html[data-nexus-theme] [data-slot="card"]:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.40),
+    0 2px 3px rgba(0,0,0,.04),
+    0 18px 42px var(--nexus-shadow);
+}
+
+html[data-nexus-theme] aside {
+  background:
+    linear-gradient(
+      160deg,
+      var(--nexus-surface),
+      var(--nexus-surface-2)
+    );
+  box-shadow:
+    inset -1px 0 0 rgba(255,255,255,.10),
+    10px 0 30px var(--nexus-shadow);
+}
+
+html[data-nexus-theme] aside a,
+html[data-nexus-theme] aside button {
+  transition:
+    transform 180ms var(--nexus-ease),
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+html[data-nexus-theme] aside a:hover,
+html[data-nexus-theme] aside button:hover {
+  transform: translateX(2px);
+}
+
+html[data-nexus-theme] aside a > span > svg:first-child,
+html[data-nexus-theme] aside button > span > svg:first-child {
+  width: 2rem;
+  height: 2rem;
+  padding: .42rem;
+  border-radius: .72rem;
+  color: white;
+  background:
+    linear-gradient(
+      145deg,
+      var(--nexus-icon-1),
+      var(--nexus-icon-2)
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.38),
+    inset 0 -1px 0 rgba(0,0,0,.14),
+    0 5px 12px rgba(0,80,170,.18);
+  transition:
+    transform 180ms var(--nexus-ease),
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+html[data-nexus-theme] aside :is(a,button):hover > span > svg:first-child {
+  transform: translateY(-1px) scale(1.06);
+  filter: saturate(1.08) brightness(1.03);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.52),
+    0 8px 18px rgba(0,90,190,.25);
+}
+
+html[data-nexus-theme] input,
+html[data-nexus-theme] select,
+html[data-nexus-theme] textarea {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb,var(--card) 92%,transparent),
+      color-mix(in srgb,var(--card) 78%,transparent)
+    );
+  box-shadow:
+    inset 0 1px 2px rgba(0,0,0,.04),
+    inset 0 1px 0 rgba(255,255,255,.16);
+  transition:
+    border-color 170ms ease,
+    box-shadow 190ms ease,
+    transform 170ms ease,
+    background 200ms ease;
+}
+
+html[data-nexus-theme] input:focus,
+html[data-nexus-theme] select:focus,
+html[data-nexus-theme] textarea:focus {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,var(--primary) 16%,transparent),
+    0 7px 18px color-mix(in srgb,var(--primary) 9%,transparent);
+}
+
+html[data-nexus-theme] button {
+  position: relative;
+  overflow: hidden;
+}
+
+html[data-nexus-theme] button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 15%,
+      rgba(255,255,255,.15) 42%,
+      transparent 68%
+    );
+  transform: translateX(-140%);
+  transition: transform 420ms var(--nexus-ease);
+}
+
+html[data-nexus-theme] button:hover::after {
+  transform: translateX(140%);
+}
+
+html[data-nexus-theme] button:active:not(:disabled) {
+  transform: scale(.985);
+}
+
+html[data-nexus-theme] table tbody tr {
+  transition:
+    background-color 160ms ease,
+    transform 160ms var(--nexus-ease);
+}
+
+html[data-nexus-theme] table tbody tr:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 5%,
+      transparent
+    );
+}
+
+html[data-nexus-theme] ::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+html[data-nexus-theme] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html[data-nexus-theme] ::-webkit-scrollbar-thumb {
+  background:
+    color-mix(
+      in srgb,
+      var(--muted-foreground) 28%,
+      transparent
+    );
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+html[data-nexus-theme] ::-webkit-scrollbar-thumb:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 44%,
+      transparent
+    );
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+html.nexus-theme-transition body {
+  animation:
+    nexusThemeReveal
+    360ms
+    var(--nexus-ease);
+}
+
+@keyframes nexusThemeReveal {
+  0% {
+    opacity: .88;
+    filter: saturate(.86) blur(2px);
+  }
+  100% {
+    opacity: 1;
+    filter: saturate(1) blur(0);
+  }
+}
+
+@keyframes nexusAmbientOne {
+  from { transform: translate3d(-2%,0,0) scale(1); }
+  to   { transform: translate3d(12%,8%,0) scale(1.12); }
+}
+
+@keyframes nexusAmbientTwo {
+  from { transform: translate3d(0,4%,0) scale(1.05); }
+  to   { transform: translate3d(-12%,-8%,0) scale(1.16); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-nexus-theme] body::before,
+  html[data-nexus-theme] body::after,
+  html.nexus-theme-transition body {
+    animation: none !important;
+  }
+}
+
+
+[data-nexus-theme="jinlab_blue"] {
+  --nexus-ambient-1: rgba(0,103,192,.16);
+  --nexus-ambient-2: rgba(80,170,255,.12);
+  --nexus-surface: rgba(255,255,255,.88);
+  --nexus-surface-2: rgba(245,249,255,.78);
+  --nexus-blur: 14px;
+  --nexus-shadow: rgba(35,75,120,.12);
+  --nexus-icon-1: #1990ff;
+  --nexus-icon-2: #0067c0;
+}
+
+
+[data-nexus-theme="jinlab_blue_dark"] {
+  --nexus-ambient-1: rgba(0,110,255,.18);
+  --nexus-ambient-2: rgba(90,170,255,.10);
+  --nexus-surface: rgba(30,37,47,.88);
+  --nexus-surface-2: rgba(20,26,34,.78);
+  --nexus-blur: 16px;
+  --nexus-shadow: rgba(0,0,0,.30);
+  --nexus-icon-1: #5bb1ff;
+  --nexus-icon-2: #1677d2;
+}
+
+
+[data-nexus-theme="jinlab_frost"] {
+  --nexus-ambient-1: rgba(255,255,255,.60);
+  --nexus-ambient-2: rgba(100,180,255,.18);
+  --nexus-surface: rgba(255,255,255,.78);
+  --nexus-surface-2: rgba(244,249,255,.62);
+  --nexus-blur: 24px;
+  --nexus-shadow: rgba(55,95,135,.12);
+  --nexus-icon-1: #7cc4ff;
+  --nexus-icon-2: #0a84ff;
+}
+
+
+[data-nexus-theme="jinlab_graphite"] {
+  --nexus-ambient-1: rgba(70,110,150,.14);
+  --nexus-ambient-2: rgba(0,95,200,.10);
+  --nexus-surface: rgba(31,38,48,.90);
+  --nexus-surface-2: rgba(16,21,28,.80);
+  --nexus-blur: 18px;
+  --nexus-shadow: rgba(0,0,0,.40);
+  --nexus-icon-1: #8bc5ff;
+  --nexus-icon-2: #427eb9;
+}
+
+
+[data-nexus-theme="jinlab_glass"] {
+  --nexus-ambient-1: rgba(60,155,255,.30);
+  --nexus-ambient-2: rgba(155,205,255,.26);
+  --nexus-surface: rgba(255,255,255,.55);
+  --nexus-surface-2: rgba(238,247,255,.34);
+  --nexus-blur: 30px;
+  --nexus-shadow: rgba(40,85,140,.16);
+  --nexus-icon-1: #65baff;
+  --nexus-icon-2: #007aff;
+}

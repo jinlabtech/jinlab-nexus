@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   useEffect,
   useState,
@@ -1549,16 +1551,16 @@ export default function ExpensesPage() {
                   What was the money spent on?
                 </span>
 
-                <select
+                <SearchableSelect searchLabel="Categories"
                   value={
                     categoryId
                   }
-                  onChange={
+                  onValueChange={
                     (
-                      event
+                      selectedValue
                     ) =>
                       setCategoryId(
-                        event.target.value
+                        selectedValue
                       )
                   }
                   className="w-full rounded-lg border bg-background px-3 py-2"
@@ -1585,7 +1587,7 @@ export default function ExpensesPage() {
                     )
                   }
 
-                </select>
+                </SearchableSelect>
 
               </label>
 
@@ -1763,16 +1765,16 @@ export default function ExpensesPage() {
                   Existing Supplier
                 </span>
 
-                <select
+                <SearchableSelect searchLabel="Suppliers"
                   value={
                     supplierId
                   }
-                  onChange={
+                  onValueChange={
                     (
-                      event
+                      selectedValue
                     ) =>
                       setSupplierId(
-                        event.target.value
+                        selectedValue
                       )
                   }
                   className="w-full rounded-lg border bg-background px-3 py-2"
@@ -1803,7 +1805,7 @@ export default function ExpensesPage() {
                     )
                   }
 
-                </select>
+                </SearchableSelect>
 
               </label>
 
@@ -1822,16 +1824,16 @@ export default function ExpensesPage() {
                     Branch
                   </span>
 
-                  <select
+                  <SearchableSelect searchLabel="Branches"
                     value={
                       branchId
                     }
-                    onChange={
+                    onValueChange={
                       (
-                        event
+                        selectedValue
                       ) =>
                         setBranchId(
-                          event.target.value
+                          selectedValue
                         )
                     }
                     className="w-full rounded-lg border bg-background px-3 py-2"
@@ -1862,7 +1864,7 @@ export default function ExpensesPage() {
                       )
                     }
 
-                  </select>
+                  </SearchableSelect>
 
                 </label>
               )

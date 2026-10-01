@@ -1,0 +1,1143 @@
+/* =========================================================
+   JINLAB NEXUS CONTROL CENTRE
+   Interactive glass / bento dashboard
+   ========================================================= */
+
+.nexus-control-deck {
+  --deck-border:
+    color-mix(
+      in srgb,
+      var(--border) 76%,
+      transparent
+    );
+
+  --deck-glass:
+    color-mix(
+      in srgb,
+      var(--card) 72%,
+      transparent
+    );
+
+  --deck-highlight:
+    rgba(255,255,255,.22);
+
+  --deck-shadow:
+    rgba(10,30,55,.10);
+}
+
+
+/* =========================================================
+   NEXUS PULSE
+   ========================================================= */
+
+.nexus-pulse {
+  position: relative;
+
+  margin-bottom: 1rem;
+
+  border:
+    1px solid
+    var(--deck-border);
+
+  border-radius:
+    1.35rem;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--card) 80%,
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--muted) 52%,
+        transparent
+      )
+    );
+
+  -webkit-backdrop-filter:
+    blur(26px)
+    saturate(160%);
+
+  backdrop-filter:
+    blur(26px)
+    saturate(160%);
+
+  box-shadow:
+    inset 0 1px 0
+      var(--deck-highlight),
+    0 16px 40px
+      var(--deck-shadow);
+
+  transition:
+    border-color 220ms ease,
+    box-shadow 260ms ease,
+    transform 220ms ease;
+}
+
+
+.nexus-pulse[data-open="true"] {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 27%,
+      var(--deck-border)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.28),
+    0 20px 48px
+      var(--deck-shadow);
+}
+
+
+.nexus-pulse__trigger {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  min-height: 4.65rem;
+
+  padding:
+    .8rem
+    1rem;
+
+  text-align: left;
+
+  background:
+    transparent;
+
+  transition:
+    background 180ms ease,
+    transform 160ms ease;
+}
+
+
+.nexus-pulse__trigger:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 4%,
+      transparent
+    );
+}
+
+
+.nexus-pulse__trigger:active {
+  transform:
+    scale(.995);
+}
+
+
+.nexus-pulse__identity {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  gap: .85rem;
+}
+
+
+.nexus-pulse__identity strong {
+  display: block;
+
+  font-size: .94rem;
+
+  line-height: 1.2;
+}
+
+
+.nexus-pulse__summary {
+  display: block;
+
+  margin-top: .22rem;
+
+  overflow: hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  font-size: .76rem;
+
+  color:
+    var(--muted-foreground);
+}
+
+
+.nexus-pulse__orb {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  width: 2.65rem;
+  height: 2.65rem;
+
+  border-radius:
+    .92rem;
+
+  color: white;
+
+  background:
+    radial-gradient(
+      circle at 30% 18%,
+      rgba(255,255,255,.5),
+      transparent 31%
+    ),
+    linear-gradient(
+      145deg,
+      #54adff,
+      #0067c0
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.50),
+    0 8px 18px
+      rgba(0,103,192,.22);
+}
+
+
+.nexus-pulse__orb svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+
+.nexus-pulse__right {
+  display: flex;
+  align-items: center;
+
+  flex: 0 0 auto;
+
+  gap: .65rem;
+}
+
+
+.nexus-pulse__right svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+
+.nexus-pulse__chevron {
+  transition:
+    transform 240ms
+    cubic-bezier(.2,.8,.2,1);
+}
+
+
+.nexus-pulse[data-open="true"]
+.nexus-pulse__chevron {
+  transform:
+    rotate(180deg);
+}
+
+
+.nexus-pulse__spinner {
+  animation:
+    nexusDeckSpin
+    .9s linear infinite;
+
+  color:
+    var(--primary);
+}
+
+
+/* notification stack */
+
+.nexus-pulse__stack {
+  display: grid;
+
+  gap: .55rem;
+
+  padding:
+    0
+    .75rem
+    .75rem;
+}
+
+
+.nexus-pulse-item {
+  display: grid;
+
+  grid-template-columns:
+    auto 1fr;
+
+  align-items: center;
+
+  gap: .75rem;
+
+  padding:
+    .75rem
+    .8rem;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--border) 65%,
+      transparent
+    );
+
+  border-radius:
+    .95rem;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--card) 65%,
+      transparent
+    );
+
+  opacity: 0;
+
+  transform:
+    translateY(-6px)
+    scale(.99);
+
+  animation:
+    nexusPulseAppend
+    280ms
+    cubic-bezier(.2,.8,.2,1)
+    forwards;
+}
+
+
+.nexus-pulse-item__icon {
+  display: grid;
+  place-items: center;
+
+  width: 2rem;
+  height: 2rem;
+
+  border-radius:
+    .68rem;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--muted) 75%,
+      transparent
+    );
+}
+
+
+.nexus-pulse-item__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+
+.nexus-pulse-item strong {
+  display: block;
+
+  font-size: .8rem;
+}
+
+
+.nexus-pulse-item small {
+  display: block;
+
+  margin-top: .18rem;
+
+  font-size: .7rem;
+
+  line-height: 1.45;
+
+  color:
+    var(--muted-foreground);
+}
+
+
+.nexus-pulse-item[
+  data-tone="attention"
+]
+.nexus-pulse-item__icon {
+  color:
+    #d28b21;
+
+  background:
+    rgba(217,145,35,.12);
+}
+
+
+.nexus-pulse-item[
+  data-tone="success"
+]
+.nexus-pulse-item__icon {
+  color:
+    #259466;
+
+  background:
+    rgba(38,154,105,.11);
+}
+
+
+.nexus-pulse-item[
+  data-tone="working"
+]
+.nexus-pulse-item__icon {
+  color:
+    var(--primary);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 10%,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   BENTO GRID
+   ========================================================= */
+
+.nexus-deck-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      12,
+      minmax(0,1fr)
+    );
+
+  gap: .8rem;
+}
+
+
+.nexus-deck-card {
+  position: relative;
+
+  overflow: hidden;
+
+  min-height: 9.3rem;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content:
+    space-between;
+
+  gap: 1rem;
+
+  padding: 1.15rem;
+
+  border:
+    1px solid
+    var(--deck-border);
+
+  border-radius:
+    1.35rem;
+
+  text-align: left;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--card) 79%,
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--muted) 42%,
+        transparent
+      )
+    );
+
+  -webkit-backdrop-filter:
+    blur(24px)
+    saturate(155%);
+
+  backdrop-filter:
+    blur(24px)
+    saturate(155%);
+
+  box-shadow:
+    inset 0 1px 0
+      var(--deck-highlight),
+    0 13px 34px
+      var(--deck-shadow);
+
+  transform:
+    translateY(0)
+    scale(1);
+
+  transition:
+    transform 210ms
+      cubic-bezier(.2,.8,.2,1),
+    border-color 190ms ease,
+    box-shadow 230ms ease,
+    background 230ms ease;
+
+  animation:
+    nexusDeckEnter
+    340ms
+    cubic-bezier(.2,.8,.2,1)
+    both;
+}
+
+
+.nexus-deck-card::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 18%,
+      rgba(255,255,255,.12) 44%,
+      transparent 68%
+    );
+
+  transform:
+    translateX(-90%);
+
+  transition:
+    transform 500ms ease,
+    opacity 200ms ease;
+}
+
+
+.nexus-deck-card:hover {
+  transform:
+    translateY(-3px)
+    scale(1.006);
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 24%,
+      var(--deck-border)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.28),
+    0 20px 44px
+      var(--deck-shadow);
+}
+
+
+.nexus-deck-card:hover::after {
+  opacity: 1;
+
+  transform:
+    translateX(90%);
+}
+
+
+.nexus-deck-card:active {
+  transform:
+    translateY(-1px)
+    scale(.985);
+
+  transition-duration:
+    90ms;
+}
+
+
+.nexus-deck-card[
+  data-selected="true"
+] {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 56%,
+      transparent
+    );
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--primary) 8%,
+        var(--card)
+      ),
+      color-mix(
+        in srgb,
+        var(--card) 72%,
+        transparent
+      )
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.30),
+    0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--primary) 8%,
+        transparent
+      ),
+    0 20px 45px
+      var(--deck-shadow);
+}
+
+
+.nexus-deck-card:focus-visible,
+.nexus-pulse__trigger:focus-visible {
+  outline:
+    2px solid
+    var(--ring);
+
+  outline-offset:
+    2px;
+}
+
+
+.nexus-deck-card:disabled {
+  cursor:
+    wait;
+
+  opacity:
+    .72;
+}
+
+
+.nexus-deck-card--hero {
+  grid-column:
+    span 5;
+
+  min-height:
+    12rem;
+}
+
+
+.nexus-deck-card--urgent {
+  grid-column:
+    span 3;
+}
+
+
+.nexus-deck-card--coverage {
+  grid-column:
+    span 4;
+}
+
+
+.nexus-deck-card--metrics {
+  grid-column:
+    span 7;
+}
+
+
+.nexus-deck-card--refresh {
+  grid-column:
+    span 5;
+}
+
+
+/* Card inner content */
+
+.nexus-deck-card__icon {
+  display: grid;
+  place-items: center;
+
+  width: 2.55rem;
+  height: 2.55rem;
+
+  border-radius:
+    .86rem;
+
+  color:
+    var(--foreground);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--muted) 68%,
+      transparent
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.18);
+}
+
+
+.nexus-deck-card__icon svg {
+  width: 1.16rem;
+  height: 1.16rem;
+}
+
+
+.nexus-deck-card--urgent
+.nexus-deck-card__icon {
+  color:
+    #d58e27;
+
+  background:
+    rgba(218,145,40,.11);
+}
+
+
+.nexus-deck-card--refresh
+.nexus-deck-card__icon {
+  color:
+    var(--primary);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 10%,
+      transparent
+    );
+}
+
+
+.nexus-deck-card__content {
+  display: block;
+}
+
+
+.nexus-deck-card__eyebrow {
+  display: block;
+
+  margin-bottom: .35rem;
+
+  font-size: .66rem;
+
+  font-weight: 700;
+
+  letter-spacing: .07em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--muted-foreground);
+}
+
+
+.nexus-deck-card__value {
+  display: block;
+
+  font-size:
+    clamp(
+      2rem,
+      4vw,
+      3.7rem
+    );
+
+  line-height: .95;
+
+  font-weight: 720;
+
+  letter-spacing:
+    -.055em;
+}
+
+
+.nexus-deck-card__label {
+  display: block;
+
+  margin-top: .35rem;
+
+  font-size: .82rem;
+
+  font-weight: 600;
+}
+
+
+.nexus-deck-card small {
+  display: block;
+
+  margin-top: .48rem;
+
+  max-width: 28rem;
+
+  font-size: .7rem;
+
+  line-height: 1.45;
+
+  color:
+    var(--muted-foreground);
+}
+
+
+.nexus-deck-card__action {
+  display: block;
+
+  font-size: 1.15rem;
+
+  font-weight: 650;
+}
+
+
+/* coverage progress */
+
+.nexus-deck-progress {
+  display: block;
+
+  height: .35rem;
+
+  margin-top: .8rem;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--muted) 74%,
+      transparent
+    );
+}
+
+
+.nexus-deck-progress span {
+  display: block;
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #258ce7,
+      #58b7ff
+    );
+
+  transition:
+    width 550ms
+    cubic-bezier(.2,.8,.2,1);
+}
+
+
+/* =========================================================
+   THEME PERSONALITY
+   ========================================================= */
+
+html[
+  data-nexus-theme="jinlab_frost"
+]
+.nexus-deck-card,
+html[
+  data-nexus-theme="jinlab_frost"
+]
+.nexus-pulse {
+  border-radius:
+    1.65rem;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.73),
+      rgba(236,247,255,.47)
+    );
+}
+
+
+html[
+  data-nexus-theme="jinlab_graphite"
+]
+.nexus-deck-card,
+html[
+  data-nexus-theme="jinlab_graphite"
+]
+.nexus-pulse {
+  border-radius:
+    .85rem;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(47,55,65,.94),
+      rgba(20,26,34,.92)
+    );
+}
+
+
+html[
+  data-nexus-theme="jinlab_glass"
+]
+.nexus-deck-card,
+html[
+  data-nexus-theme="jinlab_glass"
+]
+.nexus-pulse {
+  border-radius:
+    1.6rem;
+
+  border-color:
+    rgba(255,255,255,.48);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.50),
+      rgba(225,240,255,.20)
+    );
+
+  -webkit-backdrop-filter:
+    blur(34px)
+    saturate(185%);
+
+  backdrop-filter:
+    blur(34px)
+    saturate(185%);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255,255,255,.72),
+    0 22px 55px
+      rgba(40,75,120,.12);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (
+  max-width: 1024px
+) {
+
+  .nexus-deck-card--hero,
+  .nexus-deck-card--metrics {
+    grid-column:
+      span 7;
+  }
+
+
+  .nexus-deck-card--urgent,
+  .nexus-deck-card--coverage,
+  .nexus-deck-card--refresh {
+    grid-column:
+      span 5;
+  }
+
+}
+
+
+@media (
+  max-width: 700px
+) {
+
+  .nexus-deck-grid {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+
+  .nexus-deck-card--hero,
+  .nexus-deck-card--metrics {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .nexus-deck-card--urgent,
+  .nexus-deck-card--coverage,
+  .nexus-deck-card--refresh {
+    grid-column:
+      span 1;
+  }
+
+
+  .nexus-deck-card {
+    min-height:
+      8.5rem;
+
+    padding:
+      1rem;
+  }
+
+}
+
+
+@media (
+  max-width: 480px
+) {
+
+  .nexus-deck-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .nexus-deck-card--hero,
+  .nexus-deck-card--metrics,
+  .nexus-deck-card--urgent,
+  .nexus-deck-card--coverage,
+  .nexus-deck-card--refresh {
+    grid-column:
+      1;
+  }
+
+
+  .nexus-pulse__trigger {
+    min-height:
+      4.25rem;
+  }
+
+}
+
+
+/* =========================================================
+   MOTION
+   ========================================================= */
+
+@keyframes nexusPulseAppend {
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+@keyframes nexusDeckEnter {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+@keyframes nexusDeckSpin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .nexus-deck-card,
+  .nexus-pulse-item,
+  .nexus-pulse__chevron,
+  .nexus-deck-progress span {
+    animation:
+      none !important;
+
+    transition:
+      none !important;
+  }
+
+}
+
+/* Nexus Control Deck motion */
+.nexus-deck-card,
+.nexus-pulse__trigger,
+.nexus-pulse-item {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.nexus-deck-card:hover {
+  transform: translateY(-3px) scale(1.01);
+}
+
+.nexus-deck-card:active,
+.nexus-pulse__trigger:active {
+  transform: scale(.975);
+}
+
+.nexus-deck-card[data-selected="true"] {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 34px rgba(0,0,0,.14);
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.nexus-deck-card:focus-visible,
+.nexus-pulse__trigger:focus-visible,
+.nexus-pulse-item:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+}
+
+.nexus-pulse__stack {
+  animation: nexus-pulse-open 240ms cubic-bezier(.2,.8,.2,1);
+  transform-origin: top center;
+}
+
+.nexus-pulse-item {
+  animation: nexus-pulse-item-in 260ms ease both;
+}
+
+.nexus-pulse-item:nth-child(2) { animation-delay: 35ms; }
+.nexus-pulse-item:nth-child(3) { animation-delay: 70ms; }
+.nexus-pulse-item:nth-child(4) { animation-delay: 105ms; }
+
+@keyframes nexus-pulse-open {
+  from { opacity: 0; transform: translateY(-8px) scale(.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes nexus-pulse-item-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nexus-deck-card,
+  .nexus-pulse__trigger,
+  .nexus-pulse-item,
+  .nexus-pulse__stack {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+.nexus-pulse-item--action{width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.nexus-pulse-item--action:hover{transform:translateY(-2px)}
+.nexus-pulse-item--action:active{transform:scale(.985)}

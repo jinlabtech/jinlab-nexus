@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.nexus-backups/
+.nexus-recovery/
+
+# local development snapshots
+*.bak
+*.before-*.css
+
+# local Zoho import data and generated output
+scripts/zoho-import/data/
+scripts/zoho-import/generated-import.sql
+scripts/zoho-import/reports/

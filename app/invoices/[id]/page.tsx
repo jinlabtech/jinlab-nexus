@@ -1,5 +1,7 @@
 "use client";
 
+import ArrangeShippingLink from "@/components/ArrangeShippingLink";
+
 import {
   useCallback,
   useEffect,
@@ -1183,6 +1185,7 @@ export default function InvoiceDetailPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <ArrangeShippingLink invoiceId={invoice.id} status={invoice.status} />
             {invoice.status ===
               "draft" && (
               <>

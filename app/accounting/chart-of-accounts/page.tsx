@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
   useEffect,
   useMemo,
@@ -1012,16 +1014,16 @@ export default function ChartOfAccountsPage() {
                   Parent Account
                 </span>
 
-                <select
+                <SearchableSelect searchLabel="Accounts"
                   value={
                     parentAccountId
                   }
-                  onChange={
+                  onValueChange={
                     (
-                      event
+                      selectedValue
                     ) =>
                       setParentAccountId(
-                        event.target.value
+                        selectedValue
                       )
                   }
                   className="w-full rounded-md border bg-background px-3 py-2"
@@ -1046,7 +1048,7 @@ export default function ChartOfAccountsPage() {
                       </option>
                     )
                   )}
-                </select>
+                </SearchableSelect>
               </label>
 
 

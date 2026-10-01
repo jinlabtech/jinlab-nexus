@@ -1,0 +1,199 @@
+/*
+ * JINLAB Nexus Appearance Layer
+ *
+ * This file controls application feel and visibility.
+ * Business modules should use semantic theme colours rather
+ * than implementing their own light/dark appearance systems.
+ */
+
+
+@layer base {
+
+  html {
+    background:
+      var(--background);
+  }
+
+
+  body {
+    min-height:
+      100vh;
+
+    background:
+      var(--background);
+
+    color:
+      var(--foreground);
+
+    -webkit-font-smoothing:
+      antialiased;
+
+    text-rendering:
+      optimizeLegibility;
+  }
+
+
+  ::selection {
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 28%,
+        transparent
+      );
+
+    color:
+      var(--foreground);
+  }
+
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease,
+      opacity 180ms ease,
+      transform 140ms ease;
+  }
+
+
+  input:not(
+    [type="checkbox"]
+  ):not(
+    [type="radio"]
+  ):not(
+    [type="range"]
+  ),
+
+  select,
+
+  textarea {
+    background-color:
+      var(--card);
+
+    color:
+      var(--foreground);
+
+    border-color:
+      var(--input);
+
+    caret-color:
+      var(--primary);
+  }
+
+
+  input::placeholder,
+  textarea::placeholder {
+    color:
+      var(--muted-foreground);
+
+    opacity:
+      0.82;
+  }
+
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color:
+      var(--primary);
+
+    box-shadow:
+      0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--primary) 16%,
+        transparent
+      );
+  }
+
+
+  button:active:not(:disabled) {
+    transform:
+      scale(0.985);
+  }
+
+
+  [data-slot="dialog-content"],
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="sheet-content"] {
+    background:
+      var(--popover);
+
+    color:
+      var(--popover-foreground);
+
+    border-color:
+      var(--border);
+
+    box-shadow:
+      0 18px 55px
+      color-mix(
+        in srgb,
+        #000 18%,
+        transparent
+      );
+  }
+
+
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="select-trigger"] {
+    background:
+      var(--card);
+
+    color:
+      var(--foreground);
+
+    border-color:
+      var(--input);
+  }
+
+
+  aside {
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease;
+  }
+
+
+  main,
+  header,
+  nav,
+  section,
+  article {
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+  }
+}
+
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior:
+      auto !important;
+
+    transition-duration:
+      0.01ms !important;
+
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+  }
+}

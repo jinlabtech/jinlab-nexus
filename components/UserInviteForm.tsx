@@ -11,7 +11,7 @@ import type {
   UserRole,
 } from "@/types/userProfile";
 
-type InvitableRole = Exclude<UserRole, "owner">;
+type InvitableRole = UserRole;
 
 type UserInviteFormProps = {
   onInvite: (data: InviteUserData) => Promise<void>;
@@ -19,6 +19,7 @@ type UserInviteFormProps = {
 };
 
 const availableRoles: InvitableRole[] = [
+  "owner",
   "admin",
   "manager",
   "technician",
@@ -145,6 +146,7 @@ export default function UserInviteForm({
           <Button
             type="submit"
             disabled={sending}
+            className="bg-blue-600 text-white hover:bg-blue-700"
           >
             {sending
               ? "Sending..."

@@ -25,5 +25,5 @@ export type UpdateUserProfileData = {
 export type InviteUserData = {
   full_name: string;
   email: string;
-  role: Exclude<UserRole, "owner">;
+  role: UserRole;
 };

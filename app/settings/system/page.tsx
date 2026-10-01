@@ -3,10 +3,13 @@
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
+import WhatsAppConnectionCard from "@/components/whatsapp/WhatsAppConnectionCard";
+import { usePermissions } from "@/hooks/usePermissions";
 import { supabase } from "@/lib/supabase";
 
 export default function SystemSettingsPage() {
   const router = useRouter();
+  const { can } = usePermissions();
 
   async function logout() {
     await supabase.auth.signOut();
@@ -41,6 +44,7 @@ export default function SystemSettingsPage() {
         </div>
 
         <div className="space-y-5">
+          {(can("whatsapp.view") || can("settings.integrations.manage")) && <WhatsAppConnectionCard />}
           <section className="rounded-xl border bg-card p-5">
             <h2 className="font-semibold">
               Security
@@ -91,7 +95,7 @@ export default function SystemSettingsPage() {
             </h2>
 
             <p className="mt-1 text-sm text-muted-foreground">
-              Banking, email, WhatsApp, accounting,
+              Banking, email, accounting,
               payment and external service integrations will appear here.
             </p>
           </section>

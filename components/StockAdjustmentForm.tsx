@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import { useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
@@ -159,11 +161,11 @@ export default function StockAdjustmentForm({
             Branch
           </span>
 
-          <select
+          <SearchableSelect searchLabel="Branches"
             value={branchId}
-            onChange={(event) =>
+            onValueChange={(selectedValue) =>
               setBranchId(
-                event.target.value
+                selectedValue
               )
             }
             className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
@@ -182,7 +184,7 @@ export default function StockAdjustmentForm({
                 </option>
               )
             )}
-          </select>
+          </SearchableSelect>
         </label>
 
         <label className="grid gap-2">

@@ -1,0 +1,16 @@
+# Local backups, recovery files, credentials, and tooling state.
+.nexus-backups/
+.nexus-recovery/
+.env*
+.git/
+.next/
+node_modules/
+*.tsbuildinfo
+*.log
+.DS_Store
+supabase/.temp/
+
+# Import inputs and reports are local business records, not application assets.
+scripts/zoho-import/data/
+scripts/zoho-import/reports/
+scripts/zoho-import/generated-import.sql

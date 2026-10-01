@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import { useEffect, useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
@@ -206,12 +208,12 @@ export default function PurchaseOrderItemForm({
             Inventory Item
           </span>
 
-          <select
+          <SearchableSelect searchLabel="Products"
             value={inventoryItemId}
             disabled={isEditing}
-            onChange={(event) =>
+            onValueChange={(selectedValue) =>
               handleInventoryItemChange(
-                event.target.value
+                selectedValue
               )
             }
             className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
@@ -223,7 +225,7 @@ export default function PurchaseOrderItemForm({
 
             {inventoryItems.map(
               (inventoryItem) => (
-                <option
+                <option data-search={[inventoryItem.sku, inventoryItem.barcode].filter(Boolean).join(" ")}
                   key={
                     inventoryItem.id
                   }
@@ -240,7 +242,7 @@ export default function PurchaseOrderItemForm({
                 </option>
               )
             )}
-          </select>
+          </SearchableSelect>
         </label>
 
         <div className="grid gap-4 md:grid-cols-3">

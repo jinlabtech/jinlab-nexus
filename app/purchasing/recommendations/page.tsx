@@ -1,5 +1,7 @@
 "use client";
 
+import SearchableSelect from "@/components/ui/SearchableSelect";
+
 import {
 	useEffect,
 	useMemo,
@@ -615,15 +617,15 @@ export default function PurchasingRecommendationsPage() {
 							Supplier
 						</span>
 
-						<select
+						<SearchableSelect searchLabel="Suppliers"
 							value={
 								selectedSupplierId
 							}
-							onChange={(
-								event
+							onValueChange={(
+								selectedValue
 							) => {
 								setSelectedSupplierId(
-									event.target.value
+									selectedValue
 								);
 							}}
 							className="h-10 rounded-md border bg-background px-3"
@@ -634,7 +636,7 @@ export default function PurchasingRecommendationsPage() {
 
 							{suppliers.map(
 								(supplier) => (
-									<option
+									<option data-search={[supplier.phone, supplier.email].filter(Boolean).join(" ")}
 										key={
 											supplier.id
 										}
@@ -648,7 +650,7 @@ export default function PurchasingRecommendationsPage() {
 									</option>
 								)
 							)}
-						</select>
+						</SearchableSelect>
 					</label>
 
 					<label className="grid gap-2">
@@ -656,15 +658,15 @@ export default function PurchasingRecommendationsPage() {
 							Receiving Branch
 						</span>
 
-						<select
+						<SearchableSelect searchLabel="Branches"
 							value={
 								selectedBranchId
 							}
-							onChange={(
-								event
+							onValueChange={(
+								selectedValue
 							) =>
 								setSelectedBranchId(
-									event.target.value
+									selectedValue
 								)
 							}
 							className="h-10 rounded-md border bg-background px-3"
@@ -689,7 +691,7 @@ export default function PurchasingRecommendationsPage() {
 									</option>
 								)
 							)}
-						</select>
+						</SearchableSelect>
 					</label>
 				</section>
 
