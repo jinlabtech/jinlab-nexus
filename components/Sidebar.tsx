@@ -17,6 +17,7 @@ import {
   ChevronRight,
   CircleDollarSign,
   LayoutDashboard,
+  MessageCircle,
   Package,
   ShoppingCart,
   Settings as SettingsIcon,
@@ -61,6 +62,19 @@ const settingsItem: NavigationItem = {
 };
 
 const navigationGroups: NavigationGroup[] = [
+  {
+    key: "whatsapp",
+    name: "WhatsApp",
+    icon: <MessageCircle className="h-4 w-4" />,
+    items: [
+      {
+        name: "WhatsApp Workspace",
+        href: "/whatsapp",
+        permission: "whatsapp.view",
+      },
+    ],
+  },
+
   {
     key: "sales",
     name: "Sales",

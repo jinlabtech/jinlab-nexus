@@ -1,5 +1,7 @@
 export type PermissionName =
   | "dashboard.view"
+  | "whatsapp.view"
+  | "whatsapp.send"
 
   | "company.view"
   | "company.create"
