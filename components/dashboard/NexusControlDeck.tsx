@@ -148,6 +148,11 @@ export default function NexusControlDeck({
 
   const whatsappFindings = useMemo(() => intelligenceFindings.filter((item) => item.module === "whatsapp").slice(0, 4), [intelligenceFindings]);
 
+  const canvasFindings = useMemo(
+    () => intelligenceFindings.slice(0, 5),
+    [intelligenceFindings],
+  );
+
 
   const pulseItems =
     useMemo<PulseItem[]>(
@@ -573,246 +578,152 @@ export default function NexusControlDeck({
       </div>
 
 
-      <div className="nexus-deck-grid">
+      <div
+        className="nexus-intelligence-canvas"
+        data-checking={checking ? "true" : "false"}
+      >
+        <div
+          className="nexus-canvas__ambient"
+          aria-hidden="true"
+        />
 
-        <button
-          type="button"
-          className="nexus-deck-card nexus-deck-card--hero"
-          data-selected={
-            selected ===
-            "priorities"
-          }
-          onClick={() =>
-            selectSurface(
-              "priorities"
-            )
-          }
+        <div
+          className="nexus-canvas__signal-field"
+          aria-label="Live Nexus business signals"
         >
+          {canvasFindings.map((finding, index) => (
+            <button
+              key={finding.id}
+              type="button"
+              className="nexus-canvas-signal"
+              data-severity={finding.severity}
+              style={{
+                animationDelay: `${140 + index * 110}ms`,
+              }}
+              onClick={() => router.push(finding.href)}
+            >
+              <span className="nexus-canvas-signal__dot" />
 
-          <span className="nexus-deck-card__icon">
-            <Activity />
+              <span className="nexus-canvas-signal__copy">
+                <small>{finding.module}</small>
+                <strong>{finding.title}</strong>
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="nexus-canvas__core">
+          <div
+            className="nexus-canvas__rings"
+            aria-hidden="true"
+          >
+            <i />
+            <i />
+            <i />
+          </div>
+
+          <button
+            type="button"
+            className="nexus-canvas__orb"
+            aria-label="Open Nexus priorities"
+            onClick={() => selectSurface("priorities")}
+          >
+            {checking ? (
+              <RefreshCw className="animate-spin" />
+            ) : (
+              <Activity />
+            )}
+          </button>
+
+          <span className="nexus-canvas__live">
+            <i />
+            Nexus live
           </span>
 
+          <strong className="nexus-canvas__headline">
+            {checking
+              ? "Reading your business"
+              : urgent > 0
+                ? `${urgent} priorities need your attention`
+                : analysisReady
+                  ? "Your business is in view"
+                  : "Nexus is ready"}
+          </strong>
 
-          <span className="nexus-deck-card__content">
+          <p className="nexus-canvas__description">
+            {checking
+              ? "Connecting the latest business signals across Nexus."
+              : urgent > 0
+                ? "Tap a live signal or ask Nexus what deserves attention first."
+                : "Explore a live signal or ask Nexus about what is happening."}
+          </p>
+        </div>
 
-            <span className="nexus-deck-card__eyebrow">
-              Business review
-            </span>
-
-            <strong className="nexus-deck-card__value">
-              {
-                findings
-              }
-            </strong>
-
-            <span className="nexus-deck-card__label">
-              {
-                findings === 1
-                  ? "finding"
-                  : "findings"
-              }
-            </span>
-
-            <small>
-              Select to open your current priorities.
-            </small>
-
-          </span>
-
-        </button>
-
-
-        <button
-          type="button"
-          className="nexus-deck-card nexus-deck-card--urgent"
-          data-selected={
-            selected ===
-              "priorities" &&
-            urgent > 0
-          }
-          onClick={() =>
-            selectSurface(
-              "priorities"
-            )
-          }
+        <div
+          className="nexus-canvas__dock"
+          aria-label="Nexus business controls"
         >
-
-          <span className="nexus-deck-card__icon">
+          <button
+            type="button"
+            data-selected={selected === "priorities"}
+            onClick={() => selectSurface("priorities")}
+          >
             <ShieldAlert />
-          </span>
-
-          <span className="nexus-deck-card__content">
-
-            <span className="nexus-deck-card__eyebrow">
-              Needs attention
+            <span>
+              <strong>{urgent}</strong>
+              <small>Urgent</small>
             </span>
+          </button>
 
-            <strong className="nexus-deck-card__value">
-              {
-                urgent
-              }
-            </strong>
-
-            <span className="nexus-deck-card__label">
-              High priority
+          <button
+            type="button"
+            data-selected={selected === "priorities"}
+            onClick={() => selectSurface("priorities")}
+          >
+            <Activity />
+            <span>
+              <strong>{findings}</strong>
+              <small>Signals</small>
             </span>
+          </button>
 
-          </span>
-
-        </button>
-
-
-        <button
-          type="button"
-          className="nexus-deck-card nexus-deck-card--coverage"
-          data-selected={
-            selected ===
-            "coverage"
-          }
-          onClick={() =>
-            selectSurface(
-              "coverage"
-            )
-          }
-        >
-
-          <span className="nexus-deck-card__icon">
-            <Database />
-          </span>
-
-
-          <span className="nexus-deck-card__content">
-
-            <span className="nexus-deck-card__eyebrow">
-              Data coverage
-            </span>
-
-            <strong className="nexus-deck-card__value">
-              {
-                coveragePercentage
-              }%
-            </strong>
-
-            <span className="nexus-deck-card__label">
-              {
-                readyCoverage
-              }
-              /
-              {
-                totalCoverage
-              } areas ready
-            </span>
-
-            <span className="nexus-deck-progress">
-
-              <span
-                style={{
-                  width:
-                    `${coveragePercentage}%`,
-                }}
-              />
-
-            </span>
-
-          </span>
-
-        </button>
-
-
-        <button
-          type="button"
-          className="nexus-deck-card nexus-deck-card--metrics"
-          data-selected={
-            selected ===
-            "metrics"
-          }
-          onClick={() =>
-            selectSurface(
-              "metrics"
-            )
-          }
-        >
-
-          <span className="nexus-deck-card__icon">
+          <button
+            type="button"
+            data-selected={selected === "metrics"}
+            onClick={() => selectSurface("metrics")}
+          >
             <SlidersHorizontal />
-          </span>
-
-
-          <span className="nexus-deck-card__content">
-
-            <span className="nexus-deck-card__eyebrow">
-              Business measures
+            <span>
+              <strong>{metricCount}</strong>
+              <small>Measures</small>
             </span>
+          </button>
 
-            <strong className="nexus-deck-card__value">
-              {
-                metricCount
-              }
-            </strong>
-
-            <span className="nexus-deck-card__label">
-              Live measures
+          <button
+            type="button"
+            data-selected={selected === "coverage"}
+            onClick={() => selectSurface("coverage")}
+          >
+            <Database />
+            <span>
+              <strong>{coveragePercentage}%</strong>
+              <small>Coverage</small>
             </span>
+          </button>
 
-            <small>
-              Open the measures Nexus could calculate.
-            </small>
-
-          </span>
-
-        </button>
-
-
-        <button
-          type="button"
-          className="nexus-deck-card nexus-deck-card--refresh"
-          data-selected={
-            selected ===
-            "refresh"
-          }
-          disabled={
-            checking
-          }
-          onClick={
-            refresh
-          }
-        >
-
-          <span className="nexus-deck-card__icon">
-
-            <RefreshCw
-              className={
-                checking
-                  ? "animate-spin"
-                  : ""
-              }
-            />
-
-          </span>
-
-          <span className="nexus-deck-card__content">
-
-            <span className="nexus-deck-card__eyebrow">
-              Nexus Core
+          <button
+            type="button"
+            data-selected={selected === "refresh"}
+            disabled={checking}
+            onClick={refresh}
+          >
+            <RefreshCw className={checking ? "animate-spin" : ""} />
+            <span>
+              <strong>{checking ? "Reading" : "Refresh"}</strong>
+              <small>Nexus</small>
             </span>
-
-            <strong className="nexus-deck-card__action">
-              {
-                checking
-                  ? "Reviewing…"
-                  : "Refresh review"
-              }
-            </strong>
-
-            <small>
-              Recheck the latest business records.
-            </small>
-
-          </span>
-
-        </button>
-
+          </button>
+        </div>
       </div>
 
     </section>

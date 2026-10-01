@@ -167,9 +167,38 @@ export default function DashboardPage() {
             openDashboardSurface
           }
         />
+
+        <section
+          className="border-y border-border/60 py-2"
+          aria-label="Ask Nexus"
+        >
+          <CoreQuestionPanel
+            route="/dashboard"
+            compact
+            onAnalysis={acceptAnalysis}
+          />
+        </section>
+
         {reviewError && <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">{reviewError}{analysis ? " Your last completed review remains below." : ""}</div>}
         {!analysis && checking && <div role="status" className="rounded-2xl border bg-card p-8"><p className="font-semibold">Checking your business records</p><p className="mt-2 text-sm text-muted-foreground">Reviewing stock, money owed, quotations, purchasing, repairs and accounting checks within your access.</p></div>}
-        {analysis && <>
+        {analysis && (
+          <details className="group border-t border-border/60 pt-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3 text-sm">
+              <span>
+                <strong>Detailed business review</strong>
+                <span className="ml-2 text-xs text-muted-foreground">
+                  {analysis.findings.length} findings
+                </span>
+              </span>
+              <span className="text-xs text-muted-foreground group-open:hidden">
+                Open
+              </span>
+              <span className="hidden text-xs text-muted-foreground group-open:inline">
+                Close
+              </span>
+            </summary>
+
+            <div className="space-y-6 pt-2">
           <section className="rounded-2xl border bg-card p-5 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Business review · {analysis.asOf}</p><span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"><Clock3 className="size-3.5" />Checked {new Date(analysis.checkedAt).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span></div>
             <h2 className="mt-4 max-w-4xl text-xl font-semibold leading-snug sm:text-2xl">{analysis.headline}</h2>
@@ -182,8 +211,9 @@ export default function DashboardPage() {
             <div className="space-y-6"><section ref={prioritiesRef} className="scroll-mt-6" aria-label="Business priorities"><div className="mb-4 flex items-end justify-between gap-3"><div><h2 className="text-lg font-semibold">Where to focus</h2><p className="mt-1 text-xs text-muted-foreground">Open a finding to see the facts and the check behind it.</p></div><span className="text-xs text-muted-foreground">{findings.length} findings</span></div>{findings.length ? <div className="grid gap-3 2xl:grid-cols-2">{findings.map((finding) => <CoreFindingCard key={finding.id} finding={finding} />)}</div> : <div className="rounded-xl border bg-card p-6"><CircleCheck className="size-6 text-muted-foreground" /><h3 className="mt-3 font-semibold">No priorities identified in this view</h3><p className="mt-2 text-sm text-muted-foreground">{canConclude ? "The current business checks did not flag a priority in the records reviewed." : "Some records could not be checked. Review the coverage gaps before drawing a conclusion."}</p></div>}</section></div>
             <aside ref={coverageRef} className="scroll-mt-6 rounded-2xl border bg-card p-4 sm:p-5"><div className="mb-4"><h2 className="font-semibold">Data coverage</h2><p className="mt-2 text-xs leading-relaxed text-muted-foreground">What Nexus checked, what is missing and what your access allows.</p></div><CoreCoverage coverage={analysis.coverage} /><p className="mt-4 border-t pt-4 text-[11px] leading-relaxed text-muted-foreground">Nexus Core applies defined business checks to your records. Opening a record lets you review it; this workspace does not make changes.</p></aside>
           </div>
-        </>}
-        <CoreQuestionPanel route="/dashboard" onAnalysis={acceptAnalysis} />
+            </div>
+          </details>
+        )}
       </>}
     </main>
   </DashboardLayout>;
