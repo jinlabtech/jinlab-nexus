@@ -1141,3 +1141,362 @@ html[
 .nexus-pulse-item--action{width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit}
 .nexus-pulse-item--action:hover{transform:translateY(-2px)}
 .nexus-pulse-item--action:active{transform:scale(.985)}
+
+/* =========================================================
+   NEXUS ARRIVAL EXPERIENCE
+   ========================================================= */
+
+.nexus-control-deck {
+  animation:
+    nexusControlArrival
+    620ms
+    cubic-bezier(.16,1,.3,1)
+    both;
+}
+
+.nexus-pulse {
+  animation:
+    nexusPulseArrival
+    720ms
+    cubic-bezier(.16,1,.3,1)
+    both;
+}
+
+.nexus-pulse__orb::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(84,173,255,.34);
+  opacity: 0;
+  animation:
+    nexusOrbWake
+    2.4s
+    ease-out
+    2;
+}
+
+.nexus-pulse__orb::after {
+  content: "";
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(43,145,255,.22),
+      transparent 68%
+    );
+  opacity: .35;
+  filter: blur(5px);
+  animation:
+    nexusOrbGlow
+    2.8s
+    ease-in-out
+    infinite;
+  pointer-events: none;
+}
+
+.nexus-arrival-notifications {
+  position: fixed;
+  top: 1.1rem;
+  right: 1.15rem;
+  z-index: 80;
+
+  width:
+    min(
+      24rem,
+      calc(100vw - 2rem)
+    );
+
+  display: grid;
+  gap: .55rem;
+
+  padding: .7rem;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--primary) 24%,
+      var(--border)
+    );
+
+  border-radius: 1.25rem;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--card) 88%,
+      transparent
+    );
+
+  -webkit-backdrop-filter:
+    blur(30px)
+    saturate(180%);
+
+  backdrop-filter:
+    blur(30px)
+    saturate(180%);
+
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.18);
+
+  animation:
+    nexusNotificationShell
+    520ms
+    cubic-bezier(.16,1,.3,1)
+    both;
+}
+
+.nexus-arrival-notifications__heading {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+
+  padding:
+    .35rem
+    .4rem
+    .55rem;
+}
+
+.nexus-arrival-notifications__heading strong {
+  display: block;
+  font-size: .82rem;
+}
+
+.nexus-arrival-notifications__heading small {
+  display: block;
+  margin-top: .1rem;
+  font-size: .68rem;
+  color: var(--muted-foreground);
+}
+
+.nexus-arrival-notifications__signal {
+  width: 2rem;
+  height: 2rem;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: .7rem;
+
+  color: #fff;
+
+  background:
+    linear-gradient(
+      145deg,
+      #58b0ff,
+      #0067c0
+    );
+
+  box-shadow:
+    0 7px 18px rgba(0,103,192,.28);
+}
+
+.nexus-arrival-notifications__signal svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.nexus-arrival-notification {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .7rem;
+  align-items: start;
+
+  width: 100%;
+  padding: .75rem;
+
+  text-align: left;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--border) 70%,
+      transparent
+    );
+
+  border-radius: .9rem;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--card) 72%,
+      transparent
+    );
+
+  opacity: 0;
+
+  transform:
+    translateX(32px)
+    scale(.97);
+
+  animation:
+    nexusNotificationEnter
+    560ms
+    cubic-bezier(.16,1,.3,1)
+    forwards;
+
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.nexus-arrival-notification:hover {
+  transform:
+    translateX(-3px)
+    scale(1.01);
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 40%,
+      var(--border)
+    );
+
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 6%,
+      var(--card)
+    );
+}
+
+.nexus-arrival-notification__dot {
+  width: .55rem;
+  height: .55rem;
+
+  margin-top: .35rem;
+
+  border-radius: 999px;
+
+  background: #e79a2f;
+
+  box-shadow:
+    0 0 0 5px
+    rgba(231,154,47,.10);
+
+  animation:
+    nexusAttentionBeat
+    1.8s
+    ease-in-out
+    infinite;
+}
+
+.nexus-arrival-notification strong {
+  display: block;
+  font-size: .78rem;
+}
+
+.nexus-arrival-notification small {
+  display: block;
+  margin-top: .2rem;
+  font-size: .68rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+
+@keyframes nexusControlArrival {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(.985);
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes nexusPulseArrival {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(.98);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.004);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes nexusNotificationShell {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(.96);
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes nexusNotificationEnter {
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes nexusOrbWake {
+  0% {
+    opacity: .65;
+    transform: scale(.75);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+@keyframes nexusOrbGlow {
+  0%,
+  100% {
+    opacity: .18;
+    transform: scale(.9);
+  }
+
+  50% {
+    opacity: .5;
+    transform: scale(1.16);
+  }
+}
+
+@keyframes nexusAttentionBeat {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: .75;
+  }
+
+  50% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nexus-control-deck,
+  .nexus-pulse,
+  .nexus-pulse__orb::before,
+  .nexus-pulse__orb::after,
+  .nexus-arrival-notifications,
+  .nexus-arrival-notification,
+  .nexus-arrival-notification__dot {
+    animation: none !important;
+  }
+}

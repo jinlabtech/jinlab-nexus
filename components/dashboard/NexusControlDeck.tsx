@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -98,6 +100,39 @@ export default function NexusControlDeck({
     setPulseOpen,
   ] =
     useState(false);
+
+
+  const [arrivalVisible, setArrivalVisible] = useState(false);
+  const hasArrived = useRef(false);
+
+  const urgentFindings = useMemo(
+    () =>
+      intelligenceFindings
+        .filter((item) => item.severity === "high")
+        .slice(0, 3),
+    [intelligenceFindings],
+  );
+
+  useEffect(() => {
+    if (hasArrived.current || checking || !analysisReady) return;
+
+    hasArrived.current = true;
+
+    if (urgent > 0) {
+      setPulseOpen(true);
+    }
+
+    if (urgentFindings.length > 0) {
+      setArrivalVisible(true);
+
+      const timer = window.setTimeout(
+        () => setArrivalVisible(false),
+        6500,
+      );
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [analysisReady, checking, urgent, urgentFindings]);
 
 
   const coveragePercentage =
@@ -311,6 +346,42 @@ export default function NexusControlDeck({
       className="nexus-control-deck"
       aria-label="Nexus Control Centre"
     >
+
+      {arrivalVisible && urgentFindings.length > 0 && (
+        <div
+          className="nexus-arrival-notifications"
+          aria-live="polite"
+        >
+          <div className="nexus-arrival-notifications__heading">
+            <span className="nexus-arrival-notifications__signal">
+              <Bell />
+            </span>
+            <span>
+              <strong>Nexus Intelligence</strong>
+              <small>New priorities detected</small>
+            </span>
+          </div>
+
+          {urgentFindings.map((finding, index) => (
+            <button
+              key={finding.id}
+              type="button"
+              className="nexus-arrival-notification"
+              style={{ animationDelay: `${160 + index * 120}ms` }}
+              onClick={() => {
+                setArrivalVisible(false);
+                router.push(finding.href);
+              }}
+            >
+              <span className="nexus-arrival-notification__dot" />
+              <span>
+                <strong>{finding.title}</strong>
+                <small>{finding.summary}</small>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div
         className="nexus-pulse"
