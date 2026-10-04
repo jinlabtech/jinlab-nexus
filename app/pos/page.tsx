@@ -1183,6 +1183,58 @@ export default function PosPage() {
   );
 
 
+  /*
+   * Browser-level protection for a live sale.
+   *
+   * Nexus navigation is recoverable through the
+   * POS session draft. Closing/reloading the tab
+   * receives an additional browser warning.
+   */
+  useEffect(
+    () => {
+
+      if (
+        cart.length ===
+        0
+      ) {
+        return;
+      }
+
+
+      function protectLiveSale(
+        event: BeforeUnloadEvent
+      ) {
+
+        event.preventDefault();
+
+        event.returnValue =
+          "";
+
+      }
+
+
+      window.addEventListener(
+        "beforeunload",
+        protectLiveSale
+      );
+
+
+      return () => {
+
+        window.removeEventListener(
+          "beforeunload",
+          protectLiveSale
+        );
+
+      };
+
+    },
+    [
+      cart.length,
+    ]
+  );
+
+
   const filteredProducts =
     useMemo(
       () => {
@@ -2428,6 +2480,62 @@ export default function PosPage() {
   }
 
 
+  function startNewSale() {
+
+    setSuccess(
+      null
+    );
+
+    setErrorMessage(
+      ""
+    );
+
+    setSearch(
+      ""
+    );
+
+    setSelectedCustomerId(
+      ""
+    );
+
+    setPaymentMethod(
+      "cash"
+    );
+
+    setAmountTendered(
+      ""
+    );
+
+    setPaymentReference(
+      ""
+    );
+
+    setSplitPaymentActive(
+      false
+    );
+
+    setSplitTenders(
+      []
+    );
+
+    setMobileCartOpen(
+      false
+    );
+
+    clearPosSessionDraft();
+
+
+    if (
+      window.matchMedia(
+        "(pointer: fine)"
+      ).matches
+    ) {
+      focusProductSearch();
+    }
+
+  }
+
+
   async function logout() {
 
     await supabase.auth
@@ -2661,19 +2769,35 @@ export default function PosPage() {
                 </div>
 
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    router.push(
-                      `/pos/receipt/${success.pos_sale_id}`
-                    )
-                  }
-                >
-                  <ReceiptText className="mr-2 h-4 w-4" />
+                <div className="flex w-full gap-2 sm:w-auto">
 
-                  Open POS Receipt
-                </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1 sm:flex-none"
+                    onClick={() =>
+                      router.push(
+                        `/pos/receipt/${success.pos_sale_id}`
+                      )
+                    }
+                  >
+                    <ReceiptText className="mr-2 h-4 w-4" />
+
+                    Receipt
+                  </Button>
+
+
+                  <Button
+                    type="button"
+                    className="flex-1 sm:flex-none"
+                    onClick={
+                      startNewSale
+                    }
+                  >
+                    New Sale
+                  </Button>
+
+                </div>
 
               </div>
 
