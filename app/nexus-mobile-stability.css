@@ -814,8 +814,8 @@ and
 
 @media (max-width: 767px) {
 
-  html,
-  body {
+  html:has(.nexus-shell),
+  body:has(.nexus-shell) {
     width: 100%;
     height: 100%;
     min-height: 100%;
@@ -1102,6 +1102,363 @@ and
 
     overflow-anchor:
       none;
+  }
+
+}
+
+/* One scrolling workspace and one taskbar allowance per phone screen. */
+@media (max-width: 767px) {
+  .nexus-shell .nexus-app-workspace {
+    box-sizing: border-box;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+    scroll-padding-block: 12px calc(90px + env(safe-area-inset-bottom));
+  }
+
+  .nexus-shell .nexus-page-enter {
+    min-height: 0 !important;
+    /* A persistent transform traps fixed POS carts inside scrolling content. */
+    animation: none !important;
+    transform: none !important;
+    backface-visibility: visible;
+  }
+
+  .nexus-shell .nexus-page-enter main:not(:where(.nexus-document, .nexus-document *)) {
+    min-height: 0;
+    padding-bottom: 16px !important;
+  }
+
+  /* The POS floating cart still needs its own reachable space above the dock. */
+  .nexus-shell .nexus-page-enter main.nexus-pos-screen {
+    padding-bottom: 80px !important;
+  }
+
+  .nexus-page-enter > :is(main, section, .min-h-screen, .min-h-dvh):not(.nexus-document) {
+    min-height: 0 !important;
+  }
+
+  .nexus-page-enter > main:not(.nexus-document) {
+    padding-top: 12px;
+    padding-inline: 12px;
+  }
+
+  .nexus-module-hub {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .nexus-module-hub > .mb-6 { margin-bottom: 16px; }
+  .nexus-module-hub-grid { row-gap: 18px; }
+  .nexus-module-hub-grid > a > div {
+    width: 56px;
+    height: 56px;
+    border-radius: 17px;
+  }
+  .nexus-module-hub-grid > a > div > svg { width: 26px; height: 26px; }
+
+  /* Full document previews scroll horizontally without shrinking print layouts. */
+  .nexus-page-enter .nexus-document {
+    overflow-wrap: normal;
+  }
+}
+
+.nexus-record-cards { display: none; }
+@media (max-width: 767px) {
+  .nexus-page-enter :is(p, span, a, div, td, th, code):not(:where(.nexus-document, .nexus-document *)) {
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+  .nexus-record-cards { display: grid; gap: 12px; }
+  .nexus-record-card { min-width: 0; text-align: left; }
+  .nexus-record-primary { font-size: 15px; line-height: 1.45; font-weight: 600; }
+  .nexus-record-preview { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-top: 8px; font-size: 14px; }
+  .nexus-record-details { margin-top: 12px; border-top: 1px solid var(--border); }
+  .nexus-record-details summary { min-height: 44px; padding-block: 12px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--primary); }
+  .nexus-record-field { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 12px; padding-block: 6px; font-size: 14px; line-height: 1.5; }
+  .nexus-record-field dt { color: var(--muted-foreground); }
+  .nexus-record-field dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .nexus-record-actions { margin-top: 12px; }
+  .nexus-record-actions button { white-space: nowrap; letter-spacing: normal; }
+  #nexus-core-helper {
+    top: calc(56px + env(safe-area-inset-top));
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    right: 0;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    border-radius: 0;
+  }
+}
+
+
+/* =========================================================
+   NEXUS MOBILE STABILITY V2
+   Final authority for compact module workspaces.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  /*
+   * Normal words must remain normal words.
+   * Long technical values may wrap, but Nexus must never
+   * stretch ordinary labels letter-by-letter.
+   */
+  .nexus-shell
+  .nexus-page-enter
+  :is(
+    p,
+    span,
+    a,
+    label,
+    td,
+    th,
+    button
+  ) {
+    word-break:
+      normal !important;
+
+    overflow-wrap:
+      break-word !important;
+
+    hyphens:
+      none;
+  }
+
+
+  /*
+   * One vertical scroller only:
+   * header and taskbar stay fixed,
+   * workspace content moves.
+   */
+  body:has(.nexus-shell) {
+    height:
+      100dvh;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  body:has(.nexus-shell)
+  .nexus-shell {
+    height:
+      100dvh !important;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  body:has(.nexus-shell)
+  .nexus-shell-workspace {
+    min-height:
+      0 !important;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  body:has(.nexus-shell)
+  .nexus-app-workspace {
+    min-height:
+      0 !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain;
+
+    padding-bottom:
+      calc(
+        72px +
+        env(
+          safe-area-inset-bottom
+        )
+      ) !important;
+  }
+
+
+  /*
+   * Public/login pages are NOT part of the Nexus shell
+   * and remain normal documents.
+   */
+  body:not(:has(.nexus-shell)) {
+    min-height:
+      100dvh;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  /*
+   * Feature pages should get to the work quickly.
+   */
+  .nexus-shell
+  .nexus-page-enter
+  main {
+    padding-top:
+      10px !important;
+
+    padding-left:
+      10px !important;
+
+    padding-right:
+      10px !important;
+
+    padding-bottom:
+      12px !important;
+  }
+
+
+  /*
+   * Desktop-sized section gaps waste a large part
+   * of a phone screen.
+   */
+  .nexus-shell
+  .nexus-page-enter
+  :is(
+    [class*="mb-10"],
+    [class*="mb-8"],
+    [class*="mb-6"]
+  ) {
+    margin-bottom:
+      12px !important;
+  }
+
+
+  .nexus-shell
+  .nexus-page-enter
+  :is(
+    [class*="mt-10"],
+    [class*="mt-8"]
+  ) {
+    margin-top:
+      14px !important;
+  }
+
+
+  /*
+   * Compact ordinary information panels.
+   * Forms/dialogs keep their own layout.
+   */
+  .nexus-shell
+  .nexus-page-enter
+  :is(
+    [class*="rounded-xl"][class*="p-6"],
+    [class*="rounded-2xl"][class*="p-6"],
+    [class*="rounded-xl"][class*="p-5"],
+    [class*="rounded-2xl"][class*="p-5"]
+  ):not(
+    [data-slot="dialog-content"]
+  ) {
+    padding:
+      12px !important;
+  }
+
+
+  /*
+   * Do NOT globally force every grid to one column.
+   * Module authors decide their mobile grid.
+   */
+  .nexus-shell
+  .nexus-page-enter
+  .grid {
+    min-width:
+      0;
+  }
+
+
+  /*
+   * Buttons stay useful without creating giant rows.
+   */
+  .nexus-shell
+  .nexus-page-enter
+  button {
+    min-width:
+      0;
+  }
+
+
+  /*
+   * Stable compact top app bar.
+   */
+  .nexus-mobile-app-header {
+    flex:
+      0 0 52px !important;
+
+    height:
+      52px !important;
+
+    min-height:
+      52px !important;
+  }
+
+
+  .nexus-mobile-app-header
+  > button {
+    width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    min-height:
+      36px !important;
+
+    justify-self:
+      center;
+  }
+
+
+  .nexus-mobile-app-header
+  .nexus-icon {
+    width:
+      24px !important;
+
+    height:
+      24px !important;
+
+    border-radius:
+      8px !important;
+  }
+
+
+  /*
+   * Module hubs should show more choices per screen.
+   */
+  .nexus-module-hub {
+    padding:
+      10px !important;
+  }
+
+
+  .nexus-module-hub
+  .grid {
+    gap:
+      8px !important;
+  }
+
+}
+
+
+/*
+ * Remove the old broad phone-grid coercion if it exists.
+ * Specific Nexus mobile surfaces keep their own layouts.
+ */
+@media (max-width: 767px) {
+
+  .nexus-shell
+  .nexus-page-enter
+  [class~="grid-cols-2"] {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
   }
 
 }

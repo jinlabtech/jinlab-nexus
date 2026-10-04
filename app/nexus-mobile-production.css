@@ -1,0 +1,629 @@
+/* =========================================================
+   JINLAB NEXUS — PHONE PRODUCTION LAYER V3
+   Native phone workspace + safe print previews.
+   Actual print dimensions remain untouched.
+   ========================================================= */
+
+
+/* =========================================================
+   PHONE APP WORKSPACE
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  html,
+  body {
+    max-width: 100%;
+    overscroll-behavior-x: none;
+  }
+
+
+  body:has(.nexus-shell) {
+    height: 100dvh;
+    overflow: hidden !important;
+  }
+
+
+  .nexus-shell {
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+
+  .nexus-shell-workspace {
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+
+  /*
+   * This is the only normal vertical scroller.
+   */
+  .nexus-app-workspace {
+    min-height: 0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-y: contain;
+
+    padding-bottom:
+      calc(
+        70px +
+        env(safe-area-inset-bottom)
+      ) !important;
+  }
+
+
+  /*
+   * Compact native top bar.
+   */
+  .nexus-mobile-app-header {
+    flex: 0 0 52px !important;
+
+    height: 52px !important;
+    min-height: 52px !important;
+  }
+
+
+  .nexus-mobile-app-header > button {
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+
+    justify-self: center;
+  }
+
+
+  .nexus-mobile-app-header .nexus-icon {
+    width: 24px !important;
+    height: 24px !important;
+
+    border-radius: 8px !important;
+  }
+
+
+  /*
+   * Phone modules should not carry desktop gutters.
+   */
+  .nexus-page-enter main {
+    width: 100% !important;
+
+    padding-top: 10px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-bottom: 12px !important;
+  }
+
+
+  /*
+   * Compact headings.
+   */
+  .nexus-page-enter h1 {
+    font-size: 1.35rem !important;
+    line-height: 1.15 !important;
+  }
+
+
+  .nexus-page-enter h2 {
+    font-size: 1.05rem !important;
+    line-height: 1.2 !important;
+  }
+
+
+  .nexus-page-enter h3 {
+    font-size: .95rem !important;
+  }
+
+
+  /*
+   * Stop desktop-sized vertical gaps.
+   */
+  .nexus-page-enter main > section[class*="mb-8"],
+  .nexus-page-enter main > section[class*="mb-6"] {
+    margin-bottom: 12px !important;
+  }
+
+
+  .nexus-page-enter main > section[class*="mt-8"],
+  .nexus-page-enter main > section[class*="mt-6"] {
+    margin-top: 12px !important;
+  }
+
+
+  /*
+   * Prevent stretched letter-by-letter text.
+   */
+  .nexus-page-enter :is(
+    p,
+    span,
+    label,
+    a,
+    button,
+    td,
+    th
+  ) {
+    min-width: 0;
+
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+
+    hyphens: none;
+  }
+
+
+  /*
+   * Long machine values may wrap safely.
+   */
+  .nexus-page-enter :is(
+    code,
+    pre
+  ) {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+
+  /*
+   * Native phone inputs.
+   * 16px prevents iPhone Safari auto zoom.
+   */
+  .nexus-page-enter :is(
+    input,
+    select,
+    textarea
+  ) {
+    min-width: 0;
+    max-width: 100%;
+
+    font-size: 16px !important;
+  }
+
+
+  .nexus-page-enter input:not(
+    [type="checkbox"]
+  ):not(
+    [type="radio"]
+  ) {
+    min-height: 40px;
+  }
+
+
+  .nexus-page-enter select {
+    min-height: 40px;
+  }
+
+
+  /*
+   * Touch controls remain usable but not enormous.
+   */
+  .nexus-page-enter button {
+    min-width: 0;
+    min-height: 40px;
+  }
+
+
+  /*
+   * Generic desktop tables may scroll only inside themselves,
+   * never widen the whole Nexus application.
+   */
+  .nexus-page-enter .overflow-x-auto {
+    width: 100%;
+    max-width: 100%;
+  }
+
+
+  .nexus-page-enter table {
+    max-width: 100%;
+  }
+
+
+  /*
+   * Module hub density.
+   */
+  .nexus-module-hub {
+    padding: 10px !important;
+  }
+
+
+  .nexus-module-hub .grid {
+    gap: 8px !important;
+  }
+
+}
+
+
+/* =========================================================
+   PHONE MODALS / FORMS
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-mobile-modal-backdrop {
+    align-items: flex-end !important;
+
+    padding:
+      0 !important;
+  }
+
+
+  .nexus-mobile-modal-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    max-height:
+      calc(
+        100dvh -
+        env(safe-area-inset-top)
+      ) !important;
+
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-left: 0 !important;
+
+    border-radius:
+      18px
+      18px
+      0
+      0
+      !important;
+  }
+
+
+  .nexus-mobile-modal-header {
+    min-height: 58px;
+
+    padding:
+      10px
+      12px
+      !important;
+  }
+
+
+  .nexus-mobile-modal-header
+  > div:first-child
+  > p:first-child {
+    display: none;
+  }
+
+
+  .nexus-mobile-modal-header h2 {
+    margin-top: 0 !important;
+
+    font-size:
+      1rem !important;
+  }
+
+
+  .nexus-mobile-modal-header
+  p:last-child {
+    margin-top:
+      2px !important;
+
+    font-size:
+      11px !important;
+  }
+
+
+  .nexus-mobile-modal-body {
+    max-height:
+      calc(
+        100dvh -
+        70px -
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    padding:
+      12px !important;
+
+    overscroll-behavior:
+      contain;
+  }
+
+}
+
+
+/* =========================================================
+   INVENTORY LABEL WORKSPACE
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-labels-page {
+    padding:
+      10px !important;
+  }
+
+
+  .nexus-labels-page
+  > section:first-of-type {
+    margin-bottom:
+      10px !important;
+  }
+
+
+  .nexus-label-item-row {
+    grid-template-columns:
+      26px
+      minmax(0,1fr)
+      auto
+      !important;
+
+    gap:
+      7px
+      9px
+      !important;
+
+    padding:
+      10px !important;
+
+    align-items:
+      center;
+  }
+
+
+  .nexus-label-item-row
+  > :nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+
+  .nexus-label-item-row
+  > :nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+
+    min-width: 0;
+  }
+
+
+  .nexus-label-item-row
+  > :nth-child(3) {
+    grid-column: 3;
+    grid-row: 1;
+
+    font-size: 12px;
+  }
+
+
+  .nexus-label-item-row
+  > :nth-child(4) {
+    grid-column:
+      2 / 4;
+
+    grid-row:
+      2;
+  }
+
+
+  .nexus-label-item-row
+  > :nth-child(5) {
+    grid-column:
+      2 / 4;
+
+    grid-row:
+      3;
+  }
+
+
+  .nexus-label-item-row
+  input[type="number"] {
+    width:
+      72px !important;
+  }
+
+}
+
+
+/* =========================================================
+   PRINT / PDF TOOLBAR ON PHONE
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /*
+   * Print pages are normal scrolling documents,
+   * not Nexus app-shell workspaces.
+   */
+  .nexus-print-page {
+    width: 100%;
+
+    overflow-x: hidden;
+
+    min-height: 100dvh;
+  }
+
+
+  .nexus-print-toolbar {
+    padding:
+      8px
+      10px
+      !important;
+  }
+
+
+  .nexus-print-toolbar
+  > div {
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-print-toolbar
+  > div
+  > div:last-child {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
+    width:
+      100%;
+
+    gap:
+      6px !important;
+  }
+
+
+  .nexus-print-toolbar button {
+    min-height:
+      38px;
+
+    padding:
+      6px
+      8px;
+
+    font-size:
+      11px;
+  }
+
+
+  .nexus-a4-preview-stage {
+    width: 100%;
+
+    overflow-x:
+      hidden !important;
+
+    padding:
+      8px
+      0
+      22px
+      !important;
+  }
+
+
+  /*
+   * Actual documents remain A4 internally.
+   * Only their SCREEN preview is zoomed down.
+   */
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet {
+    transform-origin:
+      top center;
+
+    margin-left:
+      auto !important;
+
+    margin-right:
+      auto !important;
+  }
+
+
+  /*
+   * Barcode print studio controls must be usable before
+   * viewing the scaled physical sheet.
+   */
+  .barcode-print-controls {
+    padding:
+      10px !important;
+  }
+
+
+  .barcode-print-controls
+  .mt-5 {
+    margin-top:
+      10px !important;
+  }
+
+
+  .barcode-print-controls
+  [class*="rounded-2xl"] {
+    padding:
+      10px !important;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE A4 SCREEN PREVIEW
+   A4 ≈ 794px wide at CSS 96dpi.
+   ========================================================= */
+
+@media screen and (max-width: 340px) {
+
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet {
+    zoom: .38;
+  }
+
+}
+
+
+@media screen and (min-width: 341px) and (max-width: 390px) {
+
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet {
+    zoom: .44;
+  }
+
+}
+
+
+@media screen and (min-width: 391px) and (max-width: 430px) {
+
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet {
+    zoom: .49;
+  }
+
+}
+
+
+@media screen and (min-width: 431px) and (max-width: 540px) {
+
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet {
+    zoom: .60;
+  }
+
+}
+
+
+@media screen and (min-width: 541px) and (max-width: 767px) {
+
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet {
+    zoom: .82;
+  }
+
+}
+
+
+/* =========================================================
+   REAL PRINT OUTPUT
+   Never inherit phone preview scaling.
+   ========================================================= */
+
+@media print {
+
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet,
+  .nexus-product-label {
+    zoom:
+      1 !important;
+
+    transform:
+      none !important;
+  }
+
+
+  .nexus-print-page,
+  .barcode-print-root {
+    overflow:
+      visible !important;
+  }
+
+}

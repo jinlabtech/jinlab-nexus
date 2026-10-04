@@ -454,8 +454,8 @@ export default function InvoicePrintPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-100 print:bg-white">
-      <div className="sticky top-0 z-50 border-b bg-white/95 px-6 py-3 backdrop-blur print:hidden">
+    <main className="nexus-print-page min-h-screen bg-neutral-100 print:bg-white">
+      <div className="nexus-print-toolbar sticky top-0 z-50 border-b bg-white/95 px-6 py-3 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-[210mm] flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-semibold">{invoice.invoice_number}</p>
@@ -487,7 +487,7 @@ export default function InvoicePrintPage() {
         </div>
       </div>
 
-      <div className="py-8 print:py-0">
+      <div className="nexus-a4-preview-stage py-8 print:py-0">
         <InvoiceTemplateRenderer
           template={template}
           invoice={invoice}

@@ -118,7 +118,7 @@ export default function ActionModal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-3 transition-opacity duration-150 sm:p-5 ${
+      className={`nexus-mobile-modal-backdrop fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-3 transition-opacity duration-150 sm:p-5 ${
         visible
           ? "opacity-100"
           : "opacity-0"
@@ -139,7 +139,7 @@ export default function ActionModal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`max-h-[92vh] w-full ${maxWidth} overflow-hidden rounded-2xl border bg-background shadow-2xl outline-none transition-all duration-200 ease-out ${
+        className={`nexus-mobile-modal-panel max-h-[92vh] w-full ${maxWidth} overflow-hidden rounded-2xl border bg-background shadow-2xl outline-none transition-all duration-200 ease-out ${
           visible
             ? "translate-y-0 scale-100 opacity-100"
             : "translate-y-2 scale-[0.985] opacity-0"
@@ -148,7 +148,7 @@ export default function ActionModal({
           event.stopPropagation();
         }}
       >
-        <div className="sticky top-0 z-20 flex items-start justify-between gap-4 border-b bg-background/95 px-5 py-4 backdrop-blur sm:px-6">
+        <div className="nexus-mobile-modal-header sticky top-0 z-20 flex items-start justify-between gap-4 border-b bg-background/95 px-5 py-4 backdrop-blur sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">
               Quick Action
@@ -175,7 +175,7 @@ export default function ActionModal({
           </button>
         </div>
 
-        <div className="max-h-[calc(92vh-88px)] overflow-y-auto p-4 sm:p-6">
+        <div className="nexus-mobile-modal-body max-h-[calc(92vh-88px)] overflow-y-auto p-4 sm:p-6">
           {children}
         </div>
       </div>

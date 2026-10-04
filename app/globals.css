@@ -13,13 +13,29 @@
 @import "../components/nexus-icons/nexus-glyphs.css";
 @import "../components/nexus-icons/nexus-premium-art.css";
 @import "../components/dashboard/nexus-control-deck.css";
+@import "./nexus-mobile-production.css";
+
+@font-face {
+  font-family: NexusUI;
+  src: url('/fonts/open-sans-400.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: NexusUI;
+  src: url('/fonts/open-sans-700.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: NexusUI, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
 
@@ -295,37 +311,7 @@
   }
 
 
-  /*
-   * Desktop multi-column workspaces become proper phone stacks.
-   */
-
-  .nexus-page-enter
-  :is(
-    [class~="grid-cols-3"],
-    [class~="grid-cols-4"],
-    [class~="grid-cols-5"],
-    [class~="grid-cols-6"],
-    [class~="grid-cols-7"],
-    [class~="grid-cols-8"],
-    [class~="grid-cols-9"],
-    [class~="grid-cols-10"],
-    [class~="grid-cols-11"],
-    [class~="grid-cols-12"]
-  ) {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-
-  /*
-   * Two-column layouts become single-column when the content
-   * is clearly a desktop workspace.
-   */
-
-  .nexus-page-enter
-  [class~="grid-cols-2"] {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
+  /* Module grids define their own responsive column counts. */
 
   /*
    * Forms become finger-friendly.

@@ -393,7 +393,7 @@ export default function InventoryLabelsPage() {
         }
       `}</style>
 
-      <main className="p-4 sm:p-6 lg:p-8">
+      <main className="nexus-labels-page p-4 sm:p-6 lg:p-8">
         <section className="mb-8 flex flex-wrap items-start justify-between gap-4 print:hidden">
           <div>
             <p className="text-sm font-medium text-primary">
@@ -519,7 +519,7 @@ export default function InventoryLabelsPage() {
                 return (
                   <div
                     key={item.id}
-                    className="grid gap-3 p-4 md:grid-cols-[36px_1fr_160px_120px_110px] md:items-center"
+                    className="nexus-label-item-row grid gap-3 p-4 md:grid-cols-[36px_1fr_160px_120px_110px] md:items-center"
                   >
                     <input
                       type="checkbox"
