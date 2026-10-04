@@ -282,9 +282,9 @@ export default function NexusModuleHub({
 
 
   return (
-    <section className="w-full px-4 pb-8 pt-5">
+    <section className="nexus-module-hub w-full px-4 pb-8 pt-5">
 
-      <div className="mb-6 px-1">
+      <div className="nexus-module-hub-header mb-6 px-1">
 
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
           Nexus Module
@@ -317,7 +317,7 @@ export default function NexusModuleHub({
               memory.href
             )
           }
-          className="mb-6 flex items-center gap-3 rounded-[22px] border border-border/45 bg-card/70 p-3.5 shadow-sm transition active:scale-[0.985]"
+          className="nexus-module-continue mb-6 flex items-center gap-3 rounded-[22px] border border-border/45 bg-card/70 p-3.5 shadow-sm transition active:scale-[0.985]"
         >
 
           <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -367,7 +367,7 @@ export default function NexusModuleHub({
       ) : null}
 
 
-      <div className="grid grid-cols-3 gap-x-3 gap-y-7">
+      <div className="nexus-module-hub-grid grid grid-cols-3 gap-x-3 gap-y-7">
 
         {items.map(
           (item) => {
@@ -405,11 +405,11 @@ export default function NexusModuleHub({
                     item.href
                   )
                 }
-                className="group flex min-w-0 flex-col items-center gap-2 text-center no-underline"
+                className="nexus-module-hub-item group flex min-w-0 flex-col items-center gap-2 text-center no-underline"
               >
 
                 <div
-                  className={`flex size-[72px] items-center justify-center rounded-[22px] border border-current/10 shadow-sm transition duration-150 group-active:scale-[0.88] ${tone}`}
+                  className={`nexus-module-hub-icon flex size-[72px] items-center justify-center rounded-[22px] border border-current/10 shadow-sm transition duration-150 group-active:scale-[0.88] ${tone}`}
                 >
                   <Icon
                     strokeWidth={1.8}

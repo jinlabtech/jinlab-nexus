@@ -542,66 +542,6 @@
 
 
 /* =========================================================
-   RESPONSIVE A4 SCREEN PREVIEW
-   A4 ≈ 794px wide at CSS 96dpi.
-   ========================================================= */
-
-@media screen and (max-width: 340px) {
-
-  .jinlab-classic-invoice,
-  .jinlab-a4-quotation,
-  .barcode-sheet {
-    zoom: .38;
-  }
-
-}
-
-
-@media screen and (min-width: 341px) and (max-width: 390px) {
-
-  .jinlab-classic-invoice,
-  .jinlab-a4-quotation,
-  .barcode-sheet {
-    zoom: .44;
-  }
-
-}
-
-
-@media screen and (min-width: 391px) and (max-width: 430px) {
-
-  .jinlab-classic-invoice,
-  .jinlab-a4-quotation,
-  .barcode-sheet {
-    zoom: .49;
-  }
-
-}
-
-
-@media screen and (min-width: 431px) and (max-width: 540px) {
-
-  .jinlab-classic-invoice,
-  .jinlab-a4-quotation,
-  .barcode-sheet {
-    zoom: .60;
-  }
-
-}
-
-
-@media screen and (min-width: 541px) and (max-width: 767px) {
-
-  .jinlab-classic-invoice,
-  .jinlab-a4-quotation,
-  .barcode-sheet {
-    zoom: .82;
-  }
-
-}
-
-
-/* =========================================================
    REAL PRINT OUTPUT
    Never inherit phone preview scaling.
    ========================================================= */
@@ -624,6 +564,1936 @@
   .barcode-print-root {
     overflow:
       visible !important;
+  }
+
+}
+
+
+/* =========================================================
+   JINLAB NEXUS — PHONE STABILITY V4
+   Compact shell, readable documents, transparent navigation.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /* -------------------------------------------------------
+     TOP NAVIGATION
+     Back button must ALWAYS remain available.
+     The content scrolls; this bar does not.
+     ------------------------------------------------------- */
+
+  .nexus-mobile-app-header {
+    position: relative !important;
+    top: auto !important;
+
+    z-index: 90 !important;
+
+    flex: 0 0 50px !important;
+
+    width: 100% !important;
+    height: 50px !important;
+    min-height: 50px !important;
+
+    background: transparent !important;
+
+    border: 0 !important;
+
+    box-shadow: none !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+
+  .nexus-mobile-app-header > button {
+    width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+
+  .nexus-mobile-app-header
+  > div {
+    min-width: 0;
+  }
+
+
+  .nexus-mobile-app-header p {
+    font-size: 15px !important;
+
+    line-height: 1.15 !important;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+
+  /* -------------------------------------------------------
+     WORKSPACE
+     Only this section scrolls.
+     ------------------------------------------------------- */
+
+  .nexus-app-workspace {
+    flex: 1 1 auto !important;
+
+    min-height: 0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    padding-bottom:
+      calc(
+        72px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    -webkit-overflow-scrolling: touch;
+
+    overscroll-behavior-y: contain;
+  }
+
+
+  /* -------------------------------------------------------
+     BOTTOM TASKBAR
+     Raised slightly, smaller and FULLY transparent.
+     ------------------------------------------------------- */
+
+  .nexus-dock-shell {
+    left: 8px !important;
+    right: 8px !important;
+
+    bottom:
+      calc(
+        7px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    width: auto !important;
+
+    padding: 0 !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-glass {
+    width: 100% !important;
+
+    min-height: 54px !important;
+
+    padding:
+      2px
+      3px !important;
+
+    gap: 0 !important;
+
+    border: 0 !important;
+
+    border-radius:
+      18px !important;
+
+    background:
+      transparent !important;
+
+    box-shadow:
+      none !important;
+
+    backdrop-filter:
+      none !important;
+
+    -webkit-backdrop-filter:
+      none !important;
+  }
+
+
+  /*
+   * Phone has:
+   * 4 apps + Search + Nexus.
+   * No collapse button — it destabilises the 6-position grid.
+   */
+  .nexus-dock-shell
+  [aria-label="Collapse Nexus Dock"] {
+    display: none !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app {
+    min-height: 50px !important;
+
+    padding:
+      2px
+      1px !important;
+
+    gap:
+      1px !important;
+
+    border: 0 !important;
+
+    background:
+      transparent !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app
+  .nexus-icon {
+    width: 30px !important;
+    height: 30px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app
+  > span:last-child {
+    font-size:
+      8.5px !important;
+
+    line-height:
+      1 !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app-active {
+    transform:
+      translateY(-3px) !important;
+
+    background:
+      transparent !important;
+  }
+
+
+  /*
+   * Nexus / Home launcher button.
+   */
+  .nexus-dock-shell
+  [aria-label="Open Nexus applications"] {
+    width: 40px !important;
+    height: 40px !important;
+
+    min-height: 40px !important;
+
+    margin: 0 auto !important;
+
+    border: 0 !important;
+
+    background:
+      transparent !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  .nexus-dock-shell
+  [aria-label="Open Nexus applications"]
+  .nexus-icon {
+    width: 32px !important;
+    height: 32px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     CONSISTENT PHONE TYPE SCALE
+     Stop modules feeling randomly enlarged/shrunk.
+     ------------------------------------------------------- */
+
+  .nexus-page-enter {
+    font-size:
+      14px;
+  }
+
+
+  .nexus-page-enter h1 {
+    font-size:
+      20px !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+
+  .nexus-page-enter h2 {
+    font-size:
+      17px !important;
+
+    line-height:
+      1.2 !important;
+  }
+
+
+  .nexus-page-enter h3 {
+    font-size:
+      15px !important;
+
+    line-height:
+      1.25 !important;
+  }
+
+
+  .nexus-page-enter p {
+    line-height:
+      1.4;
+  }
+
+
+  .nexus-page-enter
+  :is(
+    p,
+    span,
+    a,
+    button,
+    label
+  ) {
+    letter-spacing:
+      normal;
+
+    word-spacing:
+      normal;
+
+    word-break:
+      normal !important;
+
+    overflow-wrap:
+      break-word !important;
+  }
+
+
+  /*
+   * Machine-generated values are allowed to break.
+   */
+  .nexus-page-enter
+  :is(
+    code,
+    pre
+  ) {
+    overflow-wrap:
+      anywhere !important;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE INVOICE PREVIEW
+   Do NOT scale the whole A4 sheet down.
+   Reflow it for phone viewing.
+   Actual printing remains unchanged.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-a4-preview-stage {
+    padding:
+      8px !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  .jinlab-classic-invoice {
+    width:
+      100% !important;
+
+    min-height:
+      0 !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      14px !important;
+
+    font-size:
+      11px !important;
+
+    line-height:
+      1.4 !important;
+
+    zoom:
+      1 !important;
+
+    transform:
+      none !important;
+
+    box-shadow:
+      0 1px 5px
+      rgb(0 0 0 / .10) !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .masthead {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto !important;
+
+    gap:
+      10px !important;
+
+    align-items:
+      start !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .brand {
+    max-width:
+      none !important;
+
+    min-width:
+      0 !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .logo {
+    width:
+      118px !important;
+
+    height:
+      auto !important;
+
+    max-height:
+      70px !important;
+
+    margin-bottom:
+      4px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .company-name {
+    font-size:
+      12px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .company-details {
+    font-size:
+      10px !important;
+
+    line-height:
+      1.35 !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .heading {
+    min-width:
+      0 !important;
+
+    padding-top:
+      0 !important;
+  }
+
+
+  .jinlab-classic-invoice
+  h1 {
+    font-size:
+      21px !important;
+
+    line-height:
+      1 !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .number {
+    font-size:
+      10px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .balance-label {
+    margin-top:
+      10px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .balance-amount {
+    font-size:
+      13px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .billing {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      10px !important;
+
+    margin-top:
+      16px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .customer {
+    max-width:
+      none !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .dates {
+    width:
+      100% !important;
+
+    grid-template-columns:
+      1fr
+      auto !important;
+
+    gap:
+      5px
+      10px !important;
+
+    font-size:
+      10px !important;
+
+    text-align:
+      left !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .dates
+  span:nth-child(even) {
+    text-align:
+      right;
+  }
+
+
+  /*
+   * Invoice items stay readable without widening the phone.
+   */
+  .jinlab-classic-invoice
+  .items {
+    width:
+      100% !important;
+
+    margin-top:
+      12px !important;
+
+    table-layout:
+      auto !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .items th,
+  .jinlab-classic-invoice
+  .items td {
+    padding:
+      6px
+      3px !important;
+
+    overflow-wrap:
+      break-word !important;
+
+    word-break:
+      normal !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .items
+  .index {
+    width:
+      20px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .items
+  .quantity {
+    width:
+      34px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .items
+  .rate,
+  .jinlab-classic-invoice
+  .items
+  .amount {
+    width:
+      auto !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .items
+  .adjustment {
+    width:
+      auto !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .totals {
+    width:
+      100% !important;
+
+    margin-top:
+      8px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .total-row {
+    grid-template-columns:
+      1fr
+      auto !important;
+
+    min-height:
+      0 !important;
+
+    padding:
+      6px
+      4px !important;
+
+    gap:
+      10px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .document-notes,
+  .jinlab-classic-invoice
+  .conditions {
+    margin-top:
+      18px !important;
+
+    font-size:
+      9px !important;
+
+    line-height:
+      1.35 !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .banks {
+    margin-top:
+      14px !important;
+
+    font-size:
+      10px !important;
+
+    line-height:
+      1.35 !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .signatures {
+    gap:
+      14px !important;
+
+    margin-top:
+      24px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  .jinlab-classic-invoice
+  .signature {
+    width:
+      50% !important;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE QUOTATION PREVIEW
+   Readable responsive document on screen.
+   A4 geometry returns during printing.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .jinlab-a4-quotation {
+    width:
+      100% !important;
+
+    min-height:
+      0 !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      14px !important;
+
+    zoom:
+      1 !important;
+
+    transform:
+      none !important;
+
+    box-shadow:
+      0 1px 5px
+      rgb(0 0 0 / .10) !important;
+  }
+
+
+  .jinlab-a4-quotation
+  header img {
+    max-height:
+      72px !important;
+
+    object-fit:
+      contain;
+  }
+
+
+  .jinlab-a4-quotation
+  header
+  > div {
+    gap:
+      10px !important;
+  }
+
+
+  .jinlab-a4-quotation
+  h1 {
+    font-size:
+      21px !important;
+  }
+
+
+  .jinlab-a4-quotation
+  section[class*="grid-cols"] {
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      10px !important;
+  }
+
+
+  .jinlab-a4-quotation
+  table {
+    width:
+      100% !important;
+
+    table-layout:
+      auto !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  .jinlab-a4-quotation
+  col {
+    width:
+      auto !important;
+  }
+
+
+  .jinlab-a4-quotation
+  th,
+  .jinlab-a4-quotation
+  td {
+    padding:
+      6px
+      3px !important;
+
+    word-break:
+      normal !important;
+
+    overflow-wrap:
+      break-word !important;
+  }
+
+}
+
+
+/* =========================================================
+   PRINT TOOLBAR
+   Always accessible while reviewing a document.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-print-toolbar {
+    position:
+      sticky !important;
+
+    top:
+      0 !important;
+
+    z-index:
+      100 !important;
+
+    padding:
+      7px
+      8px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        white 94%,
+        transparent
+      ) !important;
+
+    box-shadow:
+      0 1px 0
+      rgb(0 0 0 / .08);
+  }
+
+
+  .nexus-print-toolbar
+  > div {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      6px !important;
+  }
+
+
+  .nexus-print-toolbar
+  > div
+  > div:last-child {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    width:
+      100%;
+  }
+
+}
+
+
+/* =========================================================
+   REAL PRINT OUTPUT
+   Restore physical A4 proportions.
+   ========================================================= */
+
+@media print {
+
+  .jinlab-classic-invoice,
+  .jinlab-a4-quotation,
+  .barcode-sheet,
+  .nexus-product-label {
+    zoom:
+      1 !important;
+
+    transform:
+      none !important;
+  }
+
+
+  .jinlab-a4-quotation {
+    width:
+      190mm !important;
+
+    max-width:
+      190mm !important;
+
+    min-height:
+      277mm !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+  }
+
+}
+
+
+/* =========================================================
+   JINLAB NEXUS — MOBILE DENSITY V5
+   More work per screen, less unnecessary scrolling.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /* -------------------------------------------------------
+     GENERAL PAGE DENSITY
+     ------------------------------------------------------- */
+
+  .nexus-page-enter main {
+    padding:
+      8px
+      9px
+      10px
+      !important;
+  }
+
+
+  .nexus-page-enter
+  main > :first-child {
+    margin-top:
+      0 !important;
+  }
+
+
+  .nexus-page-enter
+  :is(
+    [class*="gap-8"],
+    [class*="gap-6"]
+  ) {
+    gap:
+      10px !important;
+  }
+
+
+  .nexus-page-enter
+  :is(
+    [class*="gap-5"],
+    [class*="gap-4"]
+  ) {
+    gap:
+      8px !important;
+  }
+
+
+  .nexus-page-enter
+  :is(
+    [class*="space-y-8"],
+    [class*="space-y-6"]
+  )
+  > :not([hidden])
+  ~ :not([hidden]) {
+    margin-top:
+      10px !important;
+  }
+
+
+  /*
+   * Common business cards.
+   */
+  .nexus-page-enter
+  :is(
+    [class*="rounded-xl"][class*="border"][class*="p-6"],
+    [class*="rounded-xl"][class*="border"][class*="p-5"],
+    [class*="rounded-2xl"][class*="border"][class*="p-6"],
+    [class*="rounded-2xl"][class*="border"][class*="p-5"]
+  ):not(
+    [data-slot="dialog-content"]
+  ) {
+    padding:
+      10px !important;
+  }
+
+
+  /*
+   * Keep useful multi-column phone layouts.
+   */
+  .nexus-page-enter
+  .grid-cols-2 {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+
+  .nexus-page-enter
+  .grid-cols-3 {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+
+  /*
+   * KPI/stat numbers must not become huge.
+   */
+  .nexus-page-enter
+  [class*="text-4xl"] {
+    font-size:
+      1.45rem !important;
+  }
+
+
+  .nexus-page-enter
+  [class*="text-3xl"] {
+    font-size:
+      1.3rem !important;
+  }
+
+
+  .nexus-page-enter
+  [class*="text-2xl"] {
+    font-size:
+      1.12rem !important;
+  }
+
+
+  /* -------------------------------------------------------
+     TABS
+     HR, Payroll and other workspaces should not use
+     tall desktop tab bars.
+     ------------------------------------------------------- */
+
+  .nexus-page-enter
+  [role="tablist"] {
+    display:
+      flex !important;
+
+    width:
+      100%;
+
+    gap:
+      3px !important;
+
+    padding:
+      3px !important;
+
+    overflow-x:
+      auto;
+
+    scrollbar-width:
+      none;
+
+    white-space:
+      nowrap;
+  }
+
+
+  .nexus-page-enter
+  [role="tablist"]::-webkit-scrollbar {
+    display:
+      none;
+  }
+
+
+  .nexus-page-enter
+  [role="tab"] {
+    flex:
+      0 0 auto;
+
+    min-height:
+      34px !important;
+
+    padding:
+      5px
+      9px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MODULE HUBS
+     Three/four apps per row instead of giant icons.
+     ------------------------------------------------------- */
+
+  .nexus-module-hub {
+    padding:
+      8px
+      8px
+      14px
+      !important;
+  }
+
+
+  .nexus-module-hub-header {
+    margin-bottom:
+      8px !important;
+
+    padding:
+      0
+      2px !important;
+  }
+
+
+  .nexus-module-hub-header
+  > p:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-module-hub-header h1 {
+    margin-top:
+      0 !important;
+
+    font-size:
+      18px !important;
+  }
+
+
+  .nexus-module-hub-header
+  h1 + p {
+    margin-top:
+      2px !important;
+
+    max-width:
+      100% !important;
+
+    font-size:
+      10px !important;
+
+    line-height:
+      1.25 !important;
+
+    white-space:
+      nowrap;
+
+    overflow:
+      hidden;
+
+    text-overflow:
+      ellipsis;
+  }
+
+
+  .nexus-module-continue {
+    min-height:
+      44px;
+
+    margin-bottom:
+      9px !important;
+
+    padding:
+      6px
+      8px !important;
+
+    border-radius:
+      14px !important;
+  }
+
+
+  .nexus-module-continue
+  > div:first-child {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+
+  .nexus-module-continue
+  svg {
+    width:
+      17px !important;
+
+    height:
+      17px !important;
+  }
+
+
+  .nexus-module-hub-grid {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0,1fr)
+      ) !important;
+
+    column-gap:
+      5px !important;
+
+    row-gap:
+      13px !important;
+  }
+
+
+  .nexus-module-hub-item {
+    gap:
+      4px !important;
+  }
+
+
+  .nexus-module-hub-icon {
+    width:
+      48px !important;
+
+    height:
+      48px !important;
+
+    border-radius:
+      14px !important;
+  }
+
+
+  .nexus-module-hub-icon
+  svg {
+    width:
+      21px !important;
+
+    height:
+      21px !important;
+  }
+
+
+  .nexus-module-hub-item
+  > span {
+    padding:
+      0 !important;
+
+    font-size:
+      9px !important;
+
+    line-height:
+      1.1 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MOBILE HOME
+     More apps visible without scrolling.
+     ------------------------------------------------------- */
+
+  .nexus-phone-home
+  > div:first-child {
+    padding:
+      8px
+      10px
+      5px
+      !important;
+  }
+
+
+  .nexus-phone-home
+  > div:first-child
+  > p {
+    display:
+      none;
+  }
+
+
+  .nexus-phone-home
+  > div:first-child
+  h1 {
+    margin:
+      0 !important;
+
+    font-size:
+      18px !important;
+  }
+
+
+  .nexus-phone-app-grid {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      14px
+      4px
+      !important;
+
+    padding:
+      6px
+      7px
+      16px
+      !important;
+  }
+
+
+  .nexus-phone-app {
+    gap:
+      4px !important;
+  }
+
+
+  .nexus-phone-app-icon {
+    width:
+      54px !important;
+
+    height:
+      54px !important;
+  }
+
+
+  .nexus-phone-app-icon
+  .nexus-icon {
+    width:
+      50px !important;
+
+    height:
+      50px !important;
+
+    border-radius:
+      15px !important;
+  }
+
+
+  .nexus-phone-app-label {
+    min-height:
+      0 !important;
+
+    font-size:
+      9px !important;
+
+    line-height:
+      1.05 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     DATA TABLE MOBILE CARDS
+     ------------------------------------------------------- */
+
+  .nexus-page-enter
+  article[class*="rounded-2xl"][class*="border"] {
+    border-radius:
+      13px !important;
+  }
+
+
+  .nexus-page-enter
+  details summary {
+    min-height:
+      30px;
+
+    display:
+      flex;
+
+    align-items:
+      center;
+  }
+
+
+  /* -------------------------------------------------------
+     SETTINGS
+     Behave like a mobile settings application.
+     ------------------------------------------------------- */
+
+  .nexus-settings-page {
+    padding:
+      7px
+      9px
+      12px
+      !important;
+  }
+
+
+  .nexus-settings-page
+  > div:first-child {
+    margin-bottom:
+      8px !important;
+  }
+
+
+  .nexus-settings-page
+  > div:first-child
+  > p:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-settings-page
+  > div:first-child
+  > h1 {
+    margin:
+      0 !important;
+
+    font-size:
+      19px !important;
+  }
+
+
+  .nexus-settings-page
+  > div:first-child
+  > p:last-child {
+    display:
+      none;
+  }
+
+
+  .nexus-settings-appearance {
+    min-height:
+      48px;
+
+    margin-top:
+      7px !important;
+
+    padding:
+      8px
+      10px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+
+  .nexus-settings-appearance
+  p:last-child {
+    display:
+      none;
+  }
+
+
+  .nexus-settings-appearance h2 {
+    margin-top:
+      0 !important;
+
+    font-size:
+      13px !important;
+  }
+
+
+  .nexus-settings-appearance
+  > span {
+    font-size:
+      20px !important;
+  }
+
+
+  .nexus-settings-page
+  > .grid {
+    gap:
+      8px !important;
+  }
+
+
+  .nexus-settings-tabs {
+    position:
+      sticky;
+
+    top:
+      0;
+
+    z-index:
+      20;
+
+    padding:
+      3px !important;
+
+    border-radius:
+      12px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 94%,
+        transparent
+      );
+
+    backdrop-filter:
+      blur(10px);
+  }
+
+
+  .nexus-settings-tabs
+  > div {
+    gap:
+      2px !important;
+  }
+
+
+  .nexus-settings-tabs
+  button {
+    min-height:
+      35px !important;
+
+    gap:
+      5px !important;
+
+    padding:
+      5px
+      8px !important;
+
+    border-radius:
+      9px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-settings-tabs
+  svg {
+    width:
+      15px;
+
+    height:
+      15px;
+  }
+
+
+  .nexus-settings-section
+  > div:first-child {
+    margin-bottom:
+      7px !important;
+  }
+
+
+  .nexus-settings-section
+  > div:first-child
+  > div {
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-settings-section
+  > div:first-child
+  > div
+  > div:first-child {
+    padding:
+      7px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+
+  .nexus-settings-section
+  h2 {
+    font-size:
+      15px !important;
+  }
+
+
+  .nexus-settings-section
+  h2 + p {
+    display:
+      none;
+  }
+
+
+  .nexus-settings-section
+  > .grid {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      5px !important;
+  }
+
+
+  .nexus-settings-card {
+    min-height:
+      48px !important;
+
+    padding:
+      8px
+      10px !important;
+
+    border-radius:
+      12px !important;
+  }
+
+
+  .nexus-settings-card
+  > p {
+    display:
+      none;
+  }
+
+
+  .nexus-settings-card
+  > div:last-child {
+    display:
+      none;
+  }
+
+
+  .nexus-settings-card h3 {
+    font-size:
+      12px !important;
+  }
+
+
+  .nexus-settings-card
+  span {
+    font-size:
+      8px !important;
+  }
+
+}
+
+
+/* Smaller phones: keep hub readable without becoming tall. */
+
+@media screen and (max-width: 350px) {
+
+  .nexus-module-hub-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+
+  .nexus-phone-app-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS MOBILE V6
+   Compact records + bottom-sheet details + customer actions.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /* -----------------------------------------------
+     CUSTOMER ADD BUTTON
+     ----------------------------------------------- */
+
+  .nexus-customer-add-fab {
+    right:
+      11px !important;
+
+    bottom:
+      calc(
+        68px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    height:
+      40px !important;
+
+    min-height:
+      40px !important;
+
+    padding:
+      0
+      14px !important;
+
+    border-radius:
+      999px !important;
+
+    box-shadow:
+      0 8px 24px
+      rgb(0 0 0 / .18);
+  }
+
+
+  /* -----------------------------------------------
+     COMPACT MOBILE RECORDS
+     ----------------------------------------------- */
+
+  .nexus-mobile-record-card {
+    min-height:
+      64px;
+
+    border-radius:
+      12px !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  .nexus-mobile-record-card
+  p {
+    margin-top:
+      0 !important;
+  }
+
+
+  /* -----------------------------------------------
+     RECORD DETAIL POPUP
+     ----------------------------------------------- */
+
+  .nexus-mobile-record-sheet {
+    backdrop-filter:
+      blur(2px);
+
+    -webkit-backdrop-filter:
+      blur(2px);
+  }
+
+
+  .nexus-mobile-record-sheet
+  > section {
+    max-height:
+      76dvh;
+
+    padding-bottom:
+      env(safe-area-inset-bottom);
+  }
+
+
+  .nexus-mobile-record-sheet
+  button {
+    min-height:
+      38px;
+  }
+
+
+  /* -----------------------------------------------
+     CUSTOMER FORM POPUP
+     ----------------------------------------------- */
+
+  .nexus-customer-form {
+    gap:
+      9px !important;
+  }
+
+
+  /*
+   * Modal already tells us Add/Edit Customer.
+   * Remove duplicate heading inside the form.
+   */
+  .nexus-customer-form
+  > div:first-child {
+    display:
+      none;
+  }
+
+
+  /*
+   * Two compact fields per row on normal phones.
+   */
+  .nexus-customer-form-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-customer-form-grid
+  label {
+    gap:
+      3px !important;
+  }
+
+
+  .nexus-customer-form-grid
+  label > span {
+    font-size:
+      10px !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+
+  .nexus-customer-form-grid
+  :is(
+    input,
+    select
+  ) {
+    min-height:
+      39px !important;
+
+    height:
+      39px !important;
+
+    padding-left:
+      8px !important;
+
+    padding-right:
+      8px !important;
+  }
+
+
+  .nexus-customer-account {
+    padding:
+      9px !important;
+
+    border-radius:
+      12px !important;
+  }
+
+
+  .nexus-customer-account
+  > div:first-child
+  > p:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-customer-account
+  h3 {
+    margin:
+      0 !important;
+
+    font-size:
+      13px !important;
+  }
+
+
+  .nexus-customer-account
+  h3 + p {
+    display:
+      none;
+  }
+
+
+  .nexus-customer-account
+  > div:nth-child(2) {
+    margin-top:
+      7px !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-customer-account
+  > p:last-child {
+    display:
+      none;
+  }
+
+
+  .nexus-customer-form
+  textarea {
+    min-height:
+      64px !important;
+  }
+
+
+  /*
+   * Save/Cancel always easy to reach.
+   */
+  .nexus-customer-form-actions {
+    position:
+      sticky;
+
+    bottom:
+      -12px;
+
+    z-index:
+      12;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      6px !important;
+
+    margin:
+      0
+      -12px
+      -12px;
+
+    padding:
+      8px
+      12px
+      calc(
+        8px +
+        env(safe-area-inset-bottom)
+      );
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 96%,
+        transparent
+      );
+
+    border-top:
+      1px solid
+      var(--border);
+
+    backdrop-filter:
+      blur(12px);
+
+    -webkit-backdrop-filter:
+      blur(12px);
+  }
+
+
+  .nexus-customer-form-actions
+  button {
+    width:
+      100%;
+
+    min-height:
+      40px !important;
+  }
+
+}
+
+
+@media screen and (max-width: 350px) {
+
+  .nexus-customer-form-grid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .nexus-customer-account
+  > div:nth-child(2) {
+    grid-template-columns:
+      1fr !important;
   }
 
 }

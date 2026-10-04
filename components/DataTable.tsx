@@ -1,5 +1,8 @@
-import type {
-  ReactNode,
+"use client";
+
+import {
+  useState,
+  type ReactNode,
 } from "react";
 
 
@@ -16,6 +19,15 @@ export default function DataTable({
   emptyMessage = "No records found.",
 }: DataTableProps) {
 
+  const [
+    activeRow,
+    setActiveRow,
+  ] =
+    useState<number | null>(
+      null
+    );
+
+
   const actionIndex =
     headers.findIndex(
       (header) =>
@@ -26,7 +38,7 @@ export default function DataTable({
     );
 
 
-  const normalIndexes =
+  const dataIndexes =
     headers
       .map(
         (
@@ -37,36 +49,43 @@ export default function DataTable({
       .filter(
         (index) =>
           index !== 0 &&
-          index !== actionIndex
+          index !==
+            actionIndex
       );
 
 
-  const visibleIndexes =
-    normalIndexes.slice(
+  const previewIndexes =
+    dataIndexes.slice(
       0,
       2
     );
 
 
-  const detailIndexes =
-    normalIndexes.slice(
-      2
-    );
+  const selectedRow =
+    activeRow === null
+      ? null
+      : rows[
+          activeRow
+        ];
 
 
   return (
     <>
-      {/* ==================================================
-          PHONE
-          Compact native records instead of desktop tables.
-          ================================================== */}
-      <div className="space-y-2.5 md:hidden">
 
-        {rows.length === 0 ? (
-          <div className="rounded-2xl border border-dashed bg-card/60 px-5 py-9 text-center text-sm text-muted-foreground">
-            {emptyMessage}
+      {/* PHONE RECORDS */}
+      <div className="space-y-2 md:hidden">
+
+        {rows.length ===
+        0 ? (
+
+          <div className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+            {
+              emptyMessage
+            }
           </div>
+
         ) : (
+
           rows.map(
             (
               row,
@@ -74,34 +93,38 @@ export default function DataTable({
             ) => (
 
               <article
-                key={rowIndex}
-                className="min-w-0 overflow-hidden rounded-2xl border border-border/55 bg-card px-3.5 py-3 shadow-sm"
+                key={
+                  rowIndex
+                }
+                className="nexus-mobile-record-card rounded-xl border bg-card px-3 py-2.5"
               >
 
-                {/* Primary identity */}
-                <div className="min-w-0">
-                  <div className="min-w-0 text-[14px] leading-5">
-                    {row[0]}
-                  </div>
-                </div>
+                <div className="flex min-w-0 items-start gap-3">
+
+                  <div className="min-w-0 flex-1">
+
+                    <div className="min-w-0 text-[13px] font-semibold leading-5">
+                      {
+                        row[
+                          0
+                        ]
+                      }
+                    </div>
 
 
-                {/* Important fields */}
-                {visibleIndexes.length >
-                  0 && (
-                  <div className="mt-3 grid gap-2">
-
-                    {visibleIndexes.map(
-                      (index) => (
+                    {previewIndexes.map(
+                      (
+                        index
+                      ) => (
 
                         <div
                           key={
                             index
                           }
-                          className="grid min-w-0 grid-cols-[88px_minmax(0,1fr)] items-start gap-2"
+                          className="mt-1 grid min-w-0 grid-cols-[68px_minmax(0,1fr)] gap-1.5 text-[10px] leading-4"
                         >
 
-                          <span className="pt-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                          <span className="truncate text-muted-foreground">
                             {
                               headers[
                                 index
@@ -109,7 +132,7 @@ export default function DataTable({
                             }
                           </span>
 
-                          <div className="min-w-0 break-words text-[12px] leading-5">
+                          <div className="min-w-0 truncate">
                             {
                               row[
                                 index
@@ -123,71 +146,21 @@ export default function DataTable({
                     )}
 
                   </div>
-                )}
 
 
-                {/* Secondary fields stay available without
-                    making every record extremely tall. */}
-                {detailIndexes.length >
-                  0 && (
-                  <details className="mt-2.5 border-t border-border/35 pt-2.5">
-
-                    <summary className="cursor-pointer select-none text-[11px] font-semibold text-primary">
-                      More details
-                    </summary>
-
-                    <div className="mt-2.5 grid gap-2">
-
-                      {detailIndexes.map(
-                        (
-                          index
-                        ) => (
-
-                          <div
-                            key={
-                              index
-                            }
-                            className="grid min-w-0 grid-cols-[88px_minmax(0,1fr)] items-start gap-2"
-                          >
-
-                            <span className="pt-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                              {
-                                headers[
-                                  index
-                                ]
-                              }
-                            </span>
-
-                            <div className="min-w-0 break-words text-[12px] leading-5">
-                              {
-                                row[
-                                  index
-                                ]
-                              }
-                            </div>
-
-                          </div>
-
-                        )
-                      )}
-
-                    </div>
-
-                  </details>
-                )}
-
-
-                {/* Keep row actions immediately reachable. */}
-                {actionIndex >= 0 &&
-                  row[actionIndex] && (
-                  <div className="mt-3 min-w-0 border-t border-border/35 pt-3">
-                    {
-                      row[
-                        actionIndex
-                      ]
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveRow(
+                        rowIndex
+                      )
                     }
-                  </div>
-                )}
+                    className="shrink-0 rounded-lg bg-primary/10 px-3 py-2 text-[11px] font-semibold text-primary active:scale-95"
+                  >
+                    View
+                  </button>
+
+                </div>
 
               </article>
 
@@ -198,10 +171,140 @@ export default function DataTable({
       </div>
 
 
-      {/* ==================================================
-          TABLET / DESKTOP
-          Existing Nexus table behaviour remains unchanged.
-          ================================================== */}
+      {/* PHONE DETAILS SHEET */}
+      {selectedRow && (
+
+        <div
+          className="nexus-mobile-record-sheet fixed inset-0 z-[230] flex items-end bg-black/35 md:hidden"
+          onMouseDown={
+            (
+              event
+            ) => {
+
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                setActiveRow(
+                  null
+                );
+              }
+
+            }
+          }
+        >
+
+          <section className="w-full overflow-hidden rounded-t-[20px] bg-background shadow-2xl">
+
+            <header className="flex min-h-[52px] items-center justify-between gap-3 border-b px-4 py-2.5">
+
+              <div className="min-w-0 flex-1">
+
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  Details
+                </p>
+
+                <div className="mt-0.5 min-w-0 text-sm font-semibold">
+                  {
+                    selectedRow[
+                      0
+                    ]
+                  }
+                </div>
+
+              </div>
+
+
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveRow(
+                    null
+                  )
+                }
+                className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-lg"
+                aria-label="Close details"
+              >
+                ×
+              </button>
+
+            </header>
+
+
+            <div className="max-h-[62dvh] overflow-y-auto px-4 py-3">
+
+              <div className="grid gap-1">
+
+                {dataIndexes.map(
+                  (
+                    index
+                  ) => (
+
+                    <div
+                      key={
+                        index
+                      }
+                      className="grid min-w-0 grid-cols-[92px_minmax(0,1fr)] gap-3 border-b border-border/35 py-2 text-[12px] last:border-0"
+                    >
+
+                      <span className="text-muted-foreground">
+                        {
+                          headers[
+                            index
+                          ]
+                        }
+                      </span>
+
+                      <div className="min-w-0 break-words font-medium">
+                        {
+                          selectedRow[
+                            index
+                          ]
+                        }
+                      </div>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+
+              {actionIndex >=
+                0 &&
+                selectedRow[
+                  actionIndex
+                ] && (
+
+                <div className="mt-3 border-t pt-3">
+
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Actions
+                  </p>
+
+                  <div className="min-w-0">
+                    {
+                      selectedRow[
+                        actionIndex
+                      ]
+                    }
+                  </div>
+
+                </div>
+
+              )}
+
+            </div>
+
+          </section>
+
+        </div>
+
+      )}
+
+
+      {/* TABLET / DESKTOP */}
       <div className="hidden overflow-hidden rounded-xl border bg-card shadow-sm md:block">
 
         <div className="overflow-x-auto">
@@ -211,10 +314,12 @@ export default function DataTable({
             <thead className="bg-muted/60">
 
               <tr>
+
                 {headers.map(
                   (
                     header
                   ) => (
+
                     <th
                       key={
                         header
@@ -225,8 +330,10 @@ export default function DataTable({
                         header
                       }
                     </th>
+
                   )
                 )}
+
               </tr>
 
             </thead>
@@ -301,6 +408,7 @@ export default function DataTable({
         </div>
 
       </div>
+
     </>
   );
 }

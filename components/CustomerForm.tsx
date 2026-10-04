@@ -294,7 +294,7 @@ export default function CustomerForm({
     <AppCard>
       <form
         onSubmit={handleSubmit}
-        className="grid gap-6"
+        className="nexus-customer-form grid gap-6"
       >
         <div>
           <h2 className="text-xl font-semibold">
@@ -310,7 +310,7 @@ export default function CustomerForm({
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="nexus-customer-form-grid grid gap-4 md:grid-cols-2">
           <label className="grid gap-2">
             <span className="text-sm font-medium">
               Customer Type
@@ -435,7 +435,7 @@ export default function CustomerForm({
 
         </div>
 
-        <div className="rounded-xl border bg-muted/20 p-5">
+        <div className="nexus-customer-account rounded-xl border bg-muted/20 p-5">
           <div>
             <p className="text-sm font-medium text-primary">
               Account Control
@@ -503,7 +503,7 @@ export default function CustomerForm({
           </div>
         )}
 
-        <div className="flex flex-wrap gap-3">
+        <div className="nexus-customer-form-actions flex flex-wrap gap-3">
           <Button
             type="submit"
             disabled={saving}

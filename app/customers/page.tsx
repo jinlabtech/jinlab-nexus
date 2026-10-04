@@ -468,7 +468,7 @@ export default function CustomersPage() {
         onLogout={logout}
       />
 
-      <main className="p-4 sm:p-6 lg:p-8">
+      <main className="nexus-customers-page p-4 sm:p-6 lg:p-8">
         <section className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium text-primary">
@@ -592,6 +592,16 @@ export default function CustomersPage() {
             emptyMessage="No customers yet."
           />
         )}
+        {can("customer.create") && !showForm && (
+          <Button
+            type="button"
+            onClick={openAddForm}
+            className="nexus-customer-add-fab fixed z-[75] md:hidden"
+          >
+            + Customer
+          </Button>
+        )}
+
       </main>
     </DashboardLayout>
   );

@@ -400,7 +400,7 @@ export default function SettingsPage() {
       />
 
 
-      <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+      <main className="nexus-settings-page mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
 
         <div className="mb-8">
 
@@ -415,7 +415,7 @@ export default function SettingsPage() {
 
           <a
             href="/settings/appearance"
-            className="mt-6 flex items-center justify-between rounded-2xl border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            className="nexus-settings-appearance mt-6 flex items-center justify-between rounded-2xl border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div>
               <p className="text-sm font-semibold text-primary">
@@ -458,7 +458,7 @@ export default function SettingsPage() {
 
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
 
-          <aside className="h-fit rounded-2xl border bg-card p-2 lg:sticky lg:top-4">
+          <aside className="nexus-settings-tabs h-fit rounded-2xl border bg-card p-2 lg:sticky lg:top-4">
 
             <div className="flex gap-2 overflow-x-auto lg:block lg:space-y-1">
 
@@ -518,7 +518,7 @@ export default function SettingsPage() {
 
           {
             activeSection && (
-              <section>
+              <section className="nexus-settings-section">
 
                 <div className="mb-5">
 
@@ -570,7 +570,7 @@ export default function SettingsPage() {
                               card.href
                             )
                           }
-                          className="group rounded-2xl border bg-card p-5 text-left transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm"
+                          className="nexus-settings-card group rounded-2xl border bg-card p-5 text-left transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm"
                         >
 
                           <div className="flex items-start justify-between gap-3">
