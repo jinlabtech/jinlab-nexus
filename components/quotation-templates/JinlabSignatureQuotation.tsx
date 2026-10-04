@@ -113,7 +113,7 @@ export default function JinlabSignatureQuotation({
         }
       `}</style>
 
-      <article className="jinlab-a4-quotation mx-auto flex min-h-[297mm] w-[210mm] flex-col bg-white p-[10mm] text-black shadow-sm print:shadow-none">
+      <article className="nexus-document jinlab-a4-quotation mx-auto flex min-h-[297mm] w-[210mm] flex-col bg-white p-[10mm] text-black shadow-sm print:shadow-none">
         <header className="avoid-break border-b border-black pb-[5mm]">
           {isJinlabCompany ? (
             <>

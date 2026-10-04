@@ -345,7 +345,7 @@ export default function AccountingPage() {
           }
         />
 
-        <main className="mx-auto max-w-7xl p-6 lg:p-8">
+        <main className="nexus-module-screen mx-auto max-w-7xl p-3 md:p-6 lg:p-8">
           <p className="text-sm text-muted-foreground">
             Loading accounting...
           </p>
@@ -368,7 +368,7 @@ export default function AccountingPage() {
           }
         />
 
-        <main className="mx-auto max-w-5xl p-6 lg:p-8">
+        <main className="nexus-module-screen mx-auto max-w-5xl p-3 md:p-6 lg:p-8">
           <div className="rounded-xl border bg-card p-6">
             <h1 className="text-xl font-bold">
               Accounting Restricted
@@ -417,6 +417,34 @@ export default function AccountingPage() {
     );
 
 
+  const mobileAccountingActions = [
+    {
+      label: "Bank",
+      href: "/accounting/bank-reconciliation",
+    },
+    {
+      label: "Expenses",
+      href: "/accounting/expenses",
+    },
+    {
+      label: "Debtors",
+      href: "/accounting/debtors",
+    },
+    {
+      label: "Payables",
+      href: "/accounting/payables",
+    },
+    {
+      label: "Journals",
+      href: "/accounting/journals",
+    },
+    {
+      label: "Accounts",
+      href: "/accounting/chart-of-accounts",
+    },
+  ] as const;
+
+
   return (
     <DashboardLayout>
       <Navbar
@@ -431,8 +459,8 @@ export default function AccountingPage() {
 
       <main className="mx-auto max-w-7xl p-6 lg:p-8">
 
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-          <div>
+        <div className="mb-3 flex flex-wrap items-start justify-between gap-3 md:mb-8 md:gap-4">
+          <div className="hidden md:block">
             <p className="text-sm font-medium text-muted-foreground">
               Finance
             </p>
@@ -448,7 +476,7 @@ export default function AccountingPage() {
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex w-full gap-2 md:w-auto">
             <Button
               type="button"
               variant="outline"
@@ -481,9 +509,13 @@ export default function AccountingPage() {
         </div>
 
 
-        <AccountingNav />
+        <div className="hidden md:block">
+          <AccountingNav />
+        </div>
 
-        <BusinessPerformanceSummary />
+        <div className="hidden md:block">
+          <BusinessPerformanceSummary />
+        </div>
 
         <AccountingExceptionAlert />
 
@@ -515,7 +547,223 @@ export default function AccountingPage() {
 
         {overview && (
           <>
-            <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+
+            {/* MOBILE ACCOUNTING COMMAND CENTRE */}
+            <div className="space-y-4 md:hidden">
+
+              <section className="rounded-2xl border border-border/55 bg-card p-4 shadow-sm">
+
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                  Net profit
+                </p>
+
+                <p className="mt-1 text-3xl font-bold tracking-tight">
+                  {money(
+                    overview.balances
+                      .net_profit
+                  )}
+                </p>
+
+                <div className="mt-5 grid grid-cols-2 gap-3">
+
+                  <div className="rounded-xl bg-muted/45 p-3">
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+                      Revenue
+                    </p>
+
+                    <p className="mt-1 truncate text-sm font-bold">
+                      {money(
+                        overview.balances
+                          .revenue
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-muted/45 p-3">
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+                      Expenses
+                    </p>
+
+                    <p className="mt-1 truncate text-sm font-bold">
+                      {money(
+                        overview.balances
+                          .expenses
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-muted/45 p-3">
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+                      Assets
+                    </p>
+
+                    <p className="mt-1 truncate text-sm font-bold">
+                      {money(
+                        overview.balances
+                          .assets
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-muted/45 p-3">
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+                      Liabilities
+                    </p>
+
+                    <p className="mt-1 truncate text-sm font-bold">
+                      {money(
+                        overview.balances
+                          .liabilities
+                      )}
+                    </p>
+                  </div>
+
+                </div>
+
+              </section>
+
+
+              <section>
+
+                <div className="mb-2 flex items-center justify-between">
+
+                  <p className="text-xs font-semibold">
+                    Accounting tools
+                  </p>
+
+                  <span className="text-[10px] text-muted-foreground">
+                    Quick access
+                  </span>
+
+                </div>
+
+
+                <div className="grid grid-cols-2 gap-2">
+
+                  {mobileAccountingActions.map(
+                    (action) => (
+
+                      <button
+                        key={
+                          action.href
+                        }
+                        type="button"
+                        onPointerEnter={() =>
+                          router.prefetch(
+                            action.href
+                          )
+                        }
+                        onTouchStart={() =>
+                          router.prefetch(
+                            action.href
+                          )
+                        }
+                        onClick={() =>
+                          router.push(
+                            action.href
+                          )
+                        }
+                        className="flex min-h-14 items-center justify-between rounded-2xl border border-border/55 bg-card px-4 py-3 text-left text-sm font-semibold shadow-sm transition active:scale-[0.98] active:bg-muted/50"
+                      >
+                        <span>
+                          {action.label}
+                        </span>
+
+                        <span
+                          aria-hidden="true"
+                          className="text-muted-foreground"
+                        >
+                          ›
+                        </span>
+                      </button>
+
+                    )
+                  )}
+
+                </div>
+
+              </section>
+
+
+              <section className="rounded-2xl border border-border/55 bg-card p-4">
+
+                <div className="flex items-start justify-between gap-4">
+
+                  <div>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                      Current period
+                    </p>
+
+                    <p className="mt-1 text-sm font-semibold">
+                      {overview.current_period
+                        ? overview.current_period
+                            .name
+                        : "Not available"}
+                    </p>
+                  </div>
+
+                  {overview.current_period ? (
+                    <span className="rounded-full border px-2.5 py-1 text-[10px] font-semibold">
+                      {statusLabel(
+                        overview.current_period
+                          .status
+                      )}
+                    </span>
+                  ) : null}
+
+                </div>
+
+
+                <div className="mt-4 grid grid-cols-3 gap-2 border-t border-border/40 pt-4">
+
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Posted
+                    </p>
+
+                    <p className="mt-1 text-lg font-bold">
+                      {
+                        overview.journals
+                          .posted
+                      }
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Draft
+                    </p>
+
+                    <p className="mt-1 text-lg font-bold">
+                      {
+                        overview.journals
+                          .draft
+                      }
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Approval
+                    </p>
+
+                    <p className="mt-1 text-lg font-bold">
+                      {
+                        overview.journals
+                          .pending_approval
+                      }
+                    </p>
+                  </div>
+
+                </div>
+
+              </section>
+
+            </div>
+
+
+            {/* DESKTOP ACCOUNTING OVERVIEW */}
+            <section className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
 
               <div className="rounded-xl border bg-card p-5">
                 <p className="text-sm text-muted-foreground">
@@ -603,7 +851,7 @@ export default function AccountingPage() {
             </section>
 
 
-            <section className="mt-8 grid gap-5 lg:grid-cols-2">
+            <section className="mt-8 hidden gap-5 md:grid lg:grid-cols-2">
 
               <div className="rounded-xl border bg-card p-5">
                 <h2 className="text-lg font-semibold">
@@ -724,72 +972,204 @@ export default function AccountingPage() {
         )}
 
 
-        <section className="mt-10">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold">
-              Recent Journals
-            </h2>
+        <section className="mt-6 md:mt-10">
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Latest accounting entries recorded
-              in the company ledger.
-            </p>
+          <div className="mb-3 flex items-center justify-between gap-3 md:mb-4">
+
+            <div>
+              <h2 className="text-base font-semibold md:text-xl">
+                Recent Journals
+              </h2>
+
+              <p className="mt-1 hidden text-sm text-muted-foreground md:block">
+                Latest accounting entries recorded
+                in the company ledger.
+              </p>
+            </div>
+
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-9 shrink-0 rounded-xl text-xs md:hidden"
+              onClick={() =>
+                router.push(
+                  "/accounting/journals"
+                )
+              }
+            >
+              View all
+            </Button>
+
           </div>
 
-          <DataTable
-            headers={[
-              "Journal",
-              "Date",
-              "Description",
-              "Source",
-              "Status",
-              "Amount",
-            ]}
-            rows={
+
+          {/* MOBILE RECENT JOURNALS */}
+          <div className="space-y-3 md:hidden">
+
+            {journals.length === 0 ? (
+
+              <div className="rounded-2xl border border-dashed bg-card/50 px-5 py-10 text-center">
+
+                <p className="text-sm font-semibold">
+                  No journal entries
+                </p>
+
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Financial activity will appear here
+                  as transactions are posted.
+                </p>
+
+              </div>
+
+            ) : (
+
               journals.map(
-                (journal) => [
-                  <span
-                    key="number"
-                    className="font-medium"
+                (journal) => (
+
+                  <article
+                    key={journal.entry_number}
+                    className="rounded-2xl border border-border/55 bg-card p-4 shadow-sm"
                   >
-                    {
-                      journal.entry_number
-                    }
-                  </span>,
 
-                  formatDate(
-                    journal.entry_date
-                  ),
+                    <div className="flex items-start justify-between gap-3">
 
-                  journal.description,
+                      <div className="min-w-0">
 
-                  statusLabel(
-                    journal.source_type
-                  ),
+                        <p className="truncate text-[14px] font-bold">
+                          {journal.entry_number}
+                        </p>
 
-                  statusLabel(
-                    journal.status
-                  ),
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {formatDate(
+                            journal.entry_date
+                          )}
+                        </p>
 
-                  <span
-                    key="amount"
-                    className="font-medium"
-                  >
-                    {money(
-                      Number(
-                        journal.total_debit
-                      )
-                    )}
-                  </span>,
-                ]
+                      </div>
+
+
+                      <span className="shrink-0 rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-semibold">
+                        {statusLabel(
+                          journal.status
+                        )}
+                      </span>
+
+                    </div>
+
+
+                    <p className="mt-3 line-clamp-2 text-[13px] leading-5">
+                      {journal.description ||
+                        "Journal entry"}
+                    </p>
+
+
+                    <div className="mt-4 flex items-end justify-between gap-4 border-t border-border/35 pt-3">
+
+                      <div>
+
+                        <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                          Source
+                        </p>
+
+                        <p className="mt-0.5 text-xs font-medium">
+                          {statusLabel(
+                            journal.source_type
+                          )}
+                        </p>
+
+                      </div>
+
+
+                      <div className="text-right">
+
+                        <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                          Amount
+                        </p>
+
+                        <p className="mt-0.5 text-base font-bold">
+                          {money(
+                            Number(
+                              journal.total_debit
+                            )
+                          )}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </article>
+
+                )
               )
-            }
-            emptyMessage="No journal entries yet. Financial activity will appear here as transactions are posted."
-          />
+
+            )}
+
+          </div>
+
+
+          {/* DESKTOP RECENT JOURNALS */}
+          <div className="hidden md:block">
+
+            <DataTable
+              headers={[
+                "Journal",
+                "Date",
+                "Description",
+                "Source",
+                "Status",
+                "Amount",
+              ]}
+              rows={
+                journals.map(
+                  (journal) => [
+                    <span
+                      key="number"
+                      className="font-medium"
+                    >
+                      {
+                        journal.entry_number
+                      }
+                    </span>,
+
+                    formatDate(
+                      journal.entry_date
+                    ),
+
+                    journal.description,
+
+                    statusLabel(
+                      journal.source_type
+                    ),
+
+                    statusLabel(
+                      journal.status
+                    ),
+
+                    <span
+                      key="amount"
+                      className="font-medium"
+                    >
+                      {money(
+                        Number(
+                          journal.total_debit
+                        )
+                      )}
+                    </span>,
+                  ]
+                )
+              }
+              emptyMessage="No journal entries yet. Financial activity will appear here as transactions are posted."
+            />
+
+          </div>
+
         </section>
 
 
-        <section className="mt-10">
+        <section className="mt-10 hidden md:block">
           <div className="mb-4">
             <h2 className="text-xl font-semibold">
               Chart of Accounts
@@ -849,7 +1229,7 @@ export default function AccountingPage() {
         </section>
 
 
-        <section className="mt-10">
+        <section className="mt-10 hidden md:block">
           <div className="mb-4">
             <h2 className="text-xl font-semibold">
               Accounting Periods

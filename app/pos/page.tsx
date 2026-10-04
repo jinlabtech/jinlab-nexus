@@ -7,6 +7,7 @@ import SearchableSelect from "@/components/ui/SearchableSelect";
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -48,6 +49,12 @@ import {
 import {
   supabase,
 } from "@/lib/supabase";
+
+import {
+  clearPosSessionDraft,
+  readPosSessionDraft,
+  savePosSessionDraft,
+} from "@/lib/nexus/pos-session-draft";
 
 
 type PosBranch = {
@@ -188,6 +195,12 @@ export default function PosPage() {
   const router =
     useRouter();
 
+  const [
+    mobileCartOpen,
+    setMobileCartOpen,
+  ] = useState(false);
+
+
 
   const {
     can,
@@ -274,6 +287,44 @@ export default function PosPage() {
     setSearch,
   ] =
     useState("");
+
+
+  const productSearchRef =
+    useRef<HTMLInputElement | null>(
+      null
+    );
+
+
+  const [
+    posDraftReady,
+    setPosDraftReady,
+  ] = useState(false);
+
+
+  const restoredDraftRef =
+    useRef(false);
+
+
+  const draftBranchLoadRef =
+    useRef<string | null>(
+      null
+    );
+
+
+  function focusProductSearch() {
+
+    window.requestAnimationFrame(
+      () => {
+
+        productSearchRef.current
+          ?.focus({
+            preventScroll: true,
+          });
+
+      }
+    );
+
+  }
 
 
   const [
@@ -840,6 +891,298 @@ export default function PosPage() {
   }
 
 
+  /*
+   * Restore unfinished POS basket only after
+   * the current POS workspace is available.
+   *
+   * Products, prices and stock always come
+   * from the freshly loaded workspace.
+   */
+  useEffect(
+    () => {
+
+      if (
+        !workspace ||
+        !selectedBranchId ||
+        restoredDraftRef.current
+      ) {
+        return;
+      }
+
+
+      const draft =
+        readPosSessionDraft();
+
+
+      if (!draft) {
+
+        restoredDraftRef.current =
+          true;
+
+        setPosDraftReady(
+          true
+        );
+
+        return;
+      }
+
+
+      if (
+        draft.branchId !==
+        selectedBranchId
+      ) {
+
+        const branchExists =
+          workspace.branches.some(
+            (branch) =>
+              branch.id ===
+              draft.branchId
+          );
+
+
+        if (!branchExists) {
+
+          clearPosSessionDraft();
+
+          restoredDraftRef.current =
+            true;
+
+          setPosDraftReady(
+            true
+          );
+
+          return;
+        }
+
+
+        if (
+          draftBranchLoadRef.current ===
+          draft.branchId
+        ) {
+          return;
+        }
+
+
+        draftBranchLoadRef.current =
+          draft.branchId;
+
+
+        queueMicrotask(
+          () => {
+            void loadWorkspace(
+              draft.branchId,
+              true
+            );
+          }
+        );
+
+        return;
+      }
+
+
+      const restoredCart:
+        CartItem[] =
+        draft.lines.flatMap(
+          (line) => {
+
+            const product =
+              workspace.products.find(
+                (item) =>
+                  item.id ===
+                  line.productId
+              );
+
+
+            if (
+              !product ||
+              product.quantity <= 0
+            ) {
+              return [];
+            }
+
+
+            const quantity =
+              Math.min(
+                product.quantity,
+                Math.max(
+                  1,
+                  Math.floor(
+                    Number(
+                      line.quantity
+                    ) || 1
+                  )
+                )
+              );
+
+
+            const discount =
+              Math.min(
+                100,
+                Math.max(
+                  0,
+                  Number(
+                    line.discountPercent
+                  ) || 0
+                )
+              );
+
+
+            const override =
+              line.overrideUnitPrice !==
+                null &&
+              Number(
+                line.overrideUnitPrice
+              ) > 0
+                ? Number(
+                    line.overrideUnitPrice
+                  )
+                : null;
+
+
+            return [
+              {
+                ...product,
+
+                cart_quantity:
+                  quantity,
+
+                discount_percent:
+                  discount,
+
+                override_unit_price:
+                  override,
+              },
+            ];
+          }
+        );
+
+
+      setCart(
+        restoredCart
+      );
+
+
+      const customerStillExists =
+        draft.customerId
+          ? workspace.customers.some(
+              (customer) =>
+                customer.id ===
+                draft.customerId
+            )
+          : false;
+
+
+      setSelectedCustomerId(
+        customerStillExists
+          ? draft.customerId ?? ""
+          : ""
+      );
+
+
+      /*
+       * Never restore an old approval.
+       * Approval must be validated again.
+       */
+      setActiveApprovalId(
+        null
+      );
+
+      setActiveApprovalStatus(
+        ""
+      );
+
+
+      restoredDraftRef.current =
+        true;
+
+      setPosDraftReady(
+        true
+      );
+
+    },
+    [
+      workspace,
+      selectedBranchId,
+    ]
+  );
+
+
+  /*
+   * Save only transaction structure.
+   * Payment details and approvals are deliberately
+   * excluded from recovery.
+   */
+  useEffect(
+    () => {
+
+      if (
+        !posDraftReady ||
+        !selectedBranchId
+      ) {
+        return;
+      }
+
+
+      const timer =
+        window.setTimeout(
+          () => {
+
+            if (
+              cart.length ===
+              0
+            ) {
+              clearPosSessionDraft();
+              return;
+            }
+
+
+            savePosSessionDraft({
+              branchId:
+                selectedBranchId,
+
+              customerId:
+                selectedCustomerId ||
+                null,
+
+              lines:
+                cart.map(
+                  (item) => ({
+                    productId:
+                      item.id,
+
+                    quantity:
+                      item.cart_quantity,
+
+                    discountPercent:
+                      item.discount_percent,
+
+                    overrideUnitPrice:
+                      item.override_unit_price ??
+                      null,
+                  })
+                ),
+            });
+
+          },
+          120
+        );
+
+
+      return () =>
+        window.clearTimeout(
+          timer
+        );
+
+    },
+    [
+      posDraftReady,
+      selectedBranchId,
+      selectedCustomerId,
+      cart,
+    ]
+  );
+
+
   const filteredProducts =
     useMemo(
       () => {
@@ -1392,6 +1735,8 @@ export default function PosPage() {
       );
 
       setSearch("");
+
+      focusProductSearch();
     }
   }
 
@@ -2007,6 +2352,13 @@ export default function PosPage() {
       );
 
 
+      /*
+       * Server confirmed the sale.
+       * This basket must never be resurrected.
+       */
+      clearPosSessionDraft();
+
+
       setCart([]);
 
       setAmountTendered("");
@@ -2038,9 +2390,26 @@ export default function PosPage() {
       );
 
 
-      router.push(
-          `/pos/receipt/${result.pos_sale_id}`
-        );
+      setSearch("");
+
+      setMobileCartOpen(
+        false
+      );
+
+
+      /*
+       * Keep the cashier inside POS.
+       * The success panel provides the receipt link,
+       * while the till is immediately ready for
+       * the next customer.
+       */
+      if (
+        window.matchMedia(
+          "(pointer: fine)"
+        ).matches
+      ) {
+        focusProductSearch();
+      }
 
     } catch (
       error
@@ -2153,7 +2522,7 @@ export default function PosPage() {
       />
 
 
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
+      <main className="nexus-pos-screen mx-auto max-w-[1600px] p-3 pb-32 md:p-6 md:pb-24 lg:p-8">
 
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
 
@@ -2394,11 +2763,11 @@ export default function PosPage() {
         }
 
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_430px]">
+        <div className="grid gap-4 xl:grid-cols-[1fr_430px] xl:gap-6">
 
           <section>
 
-            <div className="mb-5 grid items-start gap-3 md:grid-cols-[220px_1fr]">
+            <div className="mb-3 grid items-start gap-2 md:mb-5 md:grid-cols-[220px_1fr] md:gap-3">
 
               <label className="grid gap-2">
                 <span className="text-sm font-semibold">Branch</span>
@@ -2453,6 +2822,7 @@ export default function PosPage() {
 
 
                 <input
+                  ref={productSearchRef}
                   id="pos-product-search"
                   type="search"
                   aria-describedby="pos-product-search-help"
@@ -2482,7 +2852,7 @@ export default function PosPage() {
                     }
                   }
                   placeholder="Product name, SKU or barcode"
-                  className="w-full rounded-xl border bg-background py-3 pl-12 pr-12 [&::-webkit-search-cancel-button]:appearance-none"
+                  className="w-full rounded-xl border bg-background py-3 pl-12 pr-12 text-[16px] outline-none focus:ring-2 focus:ring-primary/15 md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
                 />
 
                 <Barcode aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -2507,7 +2877,7 @@ export default function PosPage() {
             </div>
 
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
 
               {
                 filteredProducts.map(
@@ -2524,12 +2894,12 @@ export default function PosPage() {
                           product
                         )
                       }
-                      className="group rounded-2xl border bg-card p-5 text-left transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
+                      className="group min-w-0 rounded-2xl border bg-card p-3 text-left transition active:scale-[0.985] active:bg-muted/40 md:p-5 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-md"
                     >
 
                       <div className="flex items-start justify-between gap-3">
 
-                        <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
+                        <div className="hidden rounded-xl bg-primary/10 p-2.5 text-primary sm:block">
                           <ShoppingCart className="h-5 w-5" />
                         </div>
 
@@ -2549,21 +2919,21 @@ export default function PosPage() {
                       </div>
 
 
-                      <h3 className="mt-5 font-bold">
+                      <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-5 md:mt-5 md:text-base">
                         {
                           product.name
                         }
                       </h3>
 
 
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className="mt-1 truncate text-[10px] text-muted-foreground md:text-xs">
                         {
                           product.sku
                         }
                       </p>
 
 
-                      <p className="mt-5 text-xl font-bold">
+                      <p className="mt-3 text-base font-bold md:mt-5 md:text-xl">
                         {
                           money(
                             product.selling_price
@@ -2599,7 +2969,98 @@ export default function PosPage() {
           </section>
 
 
-          <aside className="h-fit rounded-2xl border bg-card shadow-sm xl:sticky xl:top-4">
+          {/* MOBILE CART LAUNCHER */}
+          {!mobileCartOpen && (
+            <button
+              type="button"
+              onClick={() =>
+                setMobileCartOpen(
+                  true
+                )
+              }
+              className="fixed inset-x-3 bottom-[calc(78px+env(safe-area-inset-bottom))] z-[45] flex h-14 items-center justify-between rounded-2xl border border-primary/20 bg-primary px-4 text-white shadow-xl xl:hidden"
+              aria-label="Open current POS cart"
+            >
+
+              <div className="flex items-center gap-3">
+
+                <ShoppingCart className="h-5 w-5" />
+
+                <div className="text-left">
+
+                  <p className="text-xs font-semibold">
+                    Cart ·{" "}
+                    {
+                      cart.reduce(
+                        (
+                          total,
+                          item
+                        ) =>
+                          total +
+                          item.cart_quantity,
+                        0
+                      )
+                    }{" "}
+                    items
+                  </p>
+
+                  <p className="text-[10px] opacity-80">
+                    Tap to review sale
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <p className="text-base font-bold">
+                {money(
+                  cartTotal
+                )}
+              </p>
+
+            </button>
+          )}
+
+
+          {/* MOBILE CART BACKDROP */}
+          {mobileCartOpen && (
+            <button
+              type="button"
+              aria-label="Close POS cart"
+              onClick={() =>
+                setMobileCartOpen(
+                  false
+                )
+              }
+              className="fixed inset-0 z-[60] bg-black/35 backdrop-blur-[1px] xl:hidden"
+            />
+          )}
+
+
+          <aside
+            className={
+              mobileCartOpen
+                ? "fixed inset-x-2 top-[64px] bottom-[calc(76px+env(safe-area-inset-bottom))] z-[70] overflow-y-auto rounded-2xl border bg-card shadow-2xl xl:sticky xl:top-4 xl:block xl:h-fit xl:overflow-visible xl:shadow-sm"
+                : "hidden rounded-2xl border bg-card shadow-sm xl:sticky xl:top-4 xl:block xl:h-fit"
+            }
+          >
+
+            <div className="flex justify-end border-b px-3 py-2 xl:hidden">
+
+              <button
+                type="button"
+                onClick={() =>
+                  setMobileCartOpen(
+                    false
+                  )
+                }
+                className="rounded-lg px-3 py-2 text-xs font-semibold text-muted-foreground"
+              >
+                Continue shopping
+              </button>
+
+            </div>
 
             <div className="border-b p-5">
 
@@ -2654,7 +3115,7 @@ export default function PosPage() {
 
                 </div>
               ) : (
-                <div className="max-h-[430px] divide-y overflow-y-auto">
+                <div className="divide-y xl:max-h-[430px] xl:overflow-y-auto">
 
                   {
                     cart.map(
@@ -2786,7 +3247,7 @@ export default function PosPage() {
                                         )
                                       )
                                   }
-                                  className="w-20 rounded-md border bg-background px-2 py-1.5 text-right"
+                                  className="w-20 rounded-lg border bg-background px-2 py-2 text-right text-[16px] md:text-sm"
                                 />
 
                               </label>
@@ -2830,7 +3291,7 @@ export default function PosPage() {
                                       );
                                     }
                                   }
-                                  className="w-24 rounded-md border bg-background px-2 py-1.5 text-right"
+                                  className="w-24 rounded-lg border bg-background px-2 py-2 text-right text-[16px] md:text-sm"
                                 />
 
                               </label>
@@ -2847,7 +3308,7 @@ export default function PosPage() {
             }
 
 
-            <div className="space-y-4 border-t p-5">
+            <div className="space-y-4 border-t p-4 xl:p-5">
 
               <label className="block space-y-2 text-sm">
 
@@ -3017,7 +3478,7 @@ export default function PosPage() {
                               event.target.value
                             )
                         }
-                        className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-3"
+                        className="w-full rounded-xl border bg-background py-3 pl-10 pr-3 text-[16px] md:text-sm"
                         placeholder={
                           money(
                             cartTotal
@@ -3060,7 +3521,7 @@ export default function PosPage() {
                               event.target.value
                             )
                         }
-                        className="w-full rounded-lg border bg-background py-2.5 pl-10 pr-3"
+                        className="w-full rounded-xl border bg-background py-3 pl-10 pr-3 text-[16px] md:text-sm"
                         placeholder="Optional reference"
                       />
 

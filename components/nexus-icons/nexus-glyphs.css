@@ -721,3 +721,1463 @@ aside a:has(.nexus-icon--sm) {
   }
 
 }
+
+
+/* =========================================================
+   NEXUS ILLUSTRATED GLYPH SYSTEM
+   One illustration language across the entire platform.
+   ========================================================= */
+
+
+.nexus-glyph-art {
+  position: relative;
+  z-index: 3;
+
+  display: grid;
+  width: 61%;
+  height: 61%;
+
+  place-items: center;
+}
+
+
+.nexus-glyph-art > svg {
+  grid-area: 1 / 1;
+
+  width: 100%;
+  height: 100%;
+}
+
+
+/*
+  Soft underlying stroke.
+
+  This gives the symbol body/depth without turning it
+  into a filled cartoon or abandoning the semantic icon.
+*/
+
+.nexus-glyph-art__underlay {
+  color:
+    color-mix(
+      in srgb,
+      var(--ni-a) 62%,
+      white
+    );
+
+  opacity: .22;
+
+  transform:
+    translate(.45px, .65px)
+    scale(.985);
+
+  filter:
+    blur(.22px)
+    drop-shadow(
+      0 1px 2px
+      color-mix(
+        in srgb,
+        var(--ni-b) 25%,
+        transparent
+      )
+    );
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* Crisp visible illustration */
+
+.nexus-glyph-art__line {
+  width: 100% !important;
+  height: 100% !important;
+
+  color:
+    currentColor;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  filter:
+    drop-shadow(
+      0 1px 1px
+      rgb(0 0 0 / .20)
+    );
+}
+
+
+/* =========================================================
+   TITANIUM 2
+   Same material everywhere, but less mechanical/vector-like.
+   ========================================================= */
+
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon {
+  border-radius:
+    .78rem;
+
+  color:
+    rgb(247 250 253 / .97);
+
+  border:
+    1px solid
+    rgb(255 255 255 / .14);
+
+  background:
+    radial-gradient(
+      circle at 77% 84%,
+      color-mix(
+        in srgb,
+        var(--ni-a) 14%,
+        transparent
+      ),
+      transparent 46%
+    ),
+    radial-gradient(
+      circle at 24% 12%,
+      rgb(255 255 255 / .20),
+      transparent 29%
+    ),
+    linear-gradient(
+      148deg,
+      #626d79,
+      #343d48 48%,
+      color-mix(
+        in srgb,
+        #1d242d 91%,
+        var(--ni-b) 9%
+      )
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgb(255 255 255 / .20),
+    inset 0 -1px 0
+      rgb(0 0 0 / .34),
+    0 6px 14px
+      rgb(15 25 36 / .20);
+}
+
+
+/* Replace industrial stripes with soft illustrated light. */
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon::before {
+  display: block;
+
+  width: 130%;
+  height: 48%;
+
+  left: -15%;
+  top: -19%;
+
+  opacity: .34;
+
+  transform:
+    rotate(-8deg);
+
+  border-radius:
+    999px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / .36),
+      rgb(255 255 255 / .02)
+    );
+}
+
+
+/* Remove the tiny device-status dot from Titanium. */
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon::after {
+  display: none;
+}
+
+
+/* Titanium illustration underlay */
+
+html[data-nexus-icon-style="titanium"]
+.nexus-glyph-art__underlay {
+  opacity: .18;
+
+  color:
+    color-mix(
+      in srgb,
+      var(--ni-a) 67%,
+      white
+    );
+}
+
+
+/* =========================================================
+   OTHER ICON STYLES KEEP THEIR PERSONALITY
+   ========================================================= */
+
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-glyph-art__underlay {
+  opacity: .13;
+}
+
+
+html[data-nexus-icon-style="aurora"]
+.nexus-glyph-art__underlay {
+  opacity: .30;
+}
+
+
+html[data-nexus-icon-style="lumina"]
+.nexus-glyph-art__underlay {
+  opacity: .24;
+}
+
+
+/* Mono must remain intentionally minimal. */
+
+html[data-nexus-icon-style="mono"]
+.nexus-glyph-art__underlay {
+  display: none;
+}
+
+
+html[data-nexus-icon-style="mono"]
+.nexus-glyph-art__line {
+  filter: none;
+}
+
+
+/* Sidebar and dock use exactly the same illustration geometry. */
+
+aside
+.nexus-glyph-art,
+
+.nexus-dock-glass
+.nexus-glyph-art,
+
+.nexus-launcher-glass
+.nexus-glyph-art {
+  width: 62%;
+  height: 62%;
+}
+
+
+/* =========================================================
+   NEXUS OBJECT GLYPHS
+   Simple 2D illustrations with dimensional depth.
+   ========================================================= */
+
+.nexus-glyph-art {
+  position: relative;
+  z-index: 3;
+
+  display: grid;
+  place-items: center;
+
+  width: 70%;
+  height: 70%;
+
+  perspective: 70px;
+}
+
+
+.nexus-glyph-art__object {
+  --ig-front:
+    color-mix(
+      in srgb,
+      var(--ni-a) 72%,
+      white
+    );
+
+  --ig-mid:
+    color-mix(
+      in srgb,
+      var(--ni-a) 60%,
+      var(--ni-b)
+    );
+
+  --ig-side:
+    color-mix(
+      in srgb,
+      var(--ni-b) 86%,
+      black
+    );
+
+  position: absolute;
+
+  inset: 7%;
+
+  border:
+    1px solid
+    rgb(255 255 255 / .28);
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--ig-front),
+      var(--ig-mid) 48%,
+      var(--ig-side)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgb(255 255 255 / .42),
+    inset -2px -3px 4px
+      rgb(0 0 0 / .16),
+    0 3px 5px
+      rgb(0 0 0 / .18);
+
+  transform:
+    rotateX(5deg)
+    rotateY(-7deg);
+
+  transform-origin:
+    center;
+
+  overflow: visible;
+}
+
+
+.nexus-glyph-art__object::before,
+.nexus-glyph-art__object::after {
+  content: "";
+
+  position: absolute;
+
+  pointer-events: none;
+}
+
+
+.nexus-glyph-art__line {
+  position: relative;
+
+  z-index: 5;
+
+  width: 50% !important;
+  height: 50% !important;
+
+  color:
+    rgb(255 255 255 / .96);
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  filter:
+    drop-shadow(
+      0 1px 1px
+      rgb(0 0 0 / .28)
+    );
+}
+
+
+/* ---------------------------------------------------------
+   DASHBOARD — four raised tiles
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--dashboard
+.nexus-glyph-art__object {
+  inset: 4%;
+
+  border: 0;
+
+  background: transparent;
+
+  box-shadow: none;
+
+  transform:
+    rotate(-2deg);
+}
+
+
+.nexus-glyph-art--dashboard
+.nexus-glyph-art__object::before {
+  width: 35%;
+  height: 35%;
+
+  left: 7%;
+  top: 7%;
+
+  border-radius: 24%;
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--ig-front),
+      var(--ig-side)
+    );
+
+  box-shadow:
+    16px 0 0
+      color-mix(
+        in srgb,
+        var(--ig-front) 78%,
+        var(--ig-side)
+      ),
+    0 16px 0
+      color-mix(
+        in srgb,
+        var(--ig-mid) 88%,
+        black
+      ),
+    16px 16px 0
+      var(--ig-side),
+    0 3px 5px
+      rgb(0 0 0 / .18);
+}
+
+
+/* ---------------------------------------------------------
+   MAIL — dimensional envelope
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--mail
+.nexus-glyph-art__object {
+  inset:
+    18% 4% 15%;
+
+  border-radius:
+    18%;
+
+  transform:
+    rotate(-3deg)
+    skewY(-2deg);
+}
+
+
+.nexus-glyph-art--mail
+.nexus-glyph-art__object::before {
+  inset:
+    0 5% auto;
+
+  height: 62%;
+
+  clip-path:
+    polygon(
+      0 0,
+      50% 72%,
+      100% 0
+    );
+
+  background:
+    linear-gradient(
+      150deg,
+      rgb(255 255 255 / .62),
+      rgb(255 255 255 / .08)
+    );
+}
+
+
+.nexus-glyph-art--mail
+.nexus-glyph-art__line {
+  width: 42% !important;
+  height: 42% !important;
+}
+
+
+/* ---------------------------------------------------------
+   WHATSAPP — sculpted speech bubble
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--bubble
+.nexus-glyph-art__object {
+  inset: 3%;
+
+  border-radius:
+    47% 47% 47% 40%;
+
+  transform:
+    rotate(-4deg);
+}
+
+
+.nexus-glyph-art--bubble
+.nexus-glyph-art__object::after {
+  width: 31%;
+  height: 31%;
+
+  left: 5%;
+  bottom: -10%;
+
+  background:
+    var(--ig-side);
+
+  clip-path:
+    polygon(
+      100% 0,
+      15% 100%,
+      37% 18%
+    );
+}
+
+
+.nexus-glyph-art--bubble
+.nexus-glyph-art__line {
+  width: 44% !important;
+  height: 44% !important;
+}
+
+
+/* ---------------------------------------------------------
+   CLOCK — dimensional dial
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--clock
+.nexus-glyph-art__object {
+  inset: 1%;
+
+  border-radius: 50%;
+
+  box-shadow:
+    inset 0 2px 0
+      rgb(255 255 255 / .44),
+    inset -4px -4px 5px
+      rgb(0 0 0 / .16),
+    0 4px 6px
+      rgb(0 0 0 / .19);
+
+  transform:
+    rotateX(8deg)
+    rotateY(-6deg);
+}
+
+
+.nexus-glyph-art--clock
+.nexus-glyph-art__object::before {
+  inset: 12%;
+
+  border-radius: 50%;
+
+  border:
+    1px solid
+    rgb(255 255 255 / .20);
+
+  background:
+    rgb(0 0 0 / .08);
+}
+
+
+/* ---------------------------------------------------------
+   SHIPPING — cargo + cab + wheels
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--truck
+.nexus-glyph-art__object {
+  inset:
+    22% 20% 19% 0;
+
+  border-radius:
+    14% 7% 7% 14%;
+
+  transform:
+    rotate(-2deg);
+}
+
+
+.nexus-glyph-art--truck
+.nexus-glyph-art__object::before {
+  width: 37%;
+  height: 65%;
+
+  right: -29%;
+  bottom: -1%;
+
+  border-radius:
+    12% 28% 15% 8%;
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--ig-front),
+      var(--ig-side)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+      rgb(255 255 255 / .30);
+}
+
+
+.nexus-glyph-art--truck
+.nexus-glyph-art__object::after {
+  width: 18%;
+  height: 18%;
+
+  left: 16%;
+  bottom: -15%;
+
+  border-radius: 50%;
+
+  background:
+    #29323d;
+
+  box-shadow:
+    31px 0 0
+      #29323d,
+    inset 0 0 0 2px
+      rgb(255 255 255 / .24);
+}
+
+
+/* ---------------------------------------------------------
+   POS — miniature shop
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--store
+.nexus-glyph-art__object {
+  inset:
+    17% 7% 2%;
+
+  border-radius:
+    8% 8% 14% 14%;
+
+  transform:
+    rotateY(-6deg);
+}
+
+
+.nexus-glyph-art--store
+.nexus-glyph-art__object::before {
+  width: 112%;
+  height: 31%;
+
+  left: -6%;
+  top: -18%;
+
+  border-radius:
+    16% 16% 10% 10%;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--ig-front) 0 15%,
+      var(--ig-side) 15% 30%
+    );
+
+  box-shadow:
+    0 3px 4px
+      rgb(0 0 0 / .18);
+}
+
+
+/* ---------------------------------------------------------
+   DOCUMENT — layered page with folded corner
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--document
+.nexus-glyph-art__object {
+  inset:
+    0 13% 1% 9%;
+
+  border-radius:
+    10%;
+
+  clip-path:
+    polygon(
+      0 0,
+      72% 0,
+      100% 25%,
+      100% 100%,
+      0 100%
+    );
+
+  transform:
+    rotate(-4deg)
+    rotateY(-7deg);
+}
+
+
+.nexus-glyph-art--document
+.nexus-glyph-art__object::after {
+  width: 28%;
+  height: 26%;
+
+  right: 0;
+  top: 0;
+
+  clip-path:
+    polygon(
+      0 0,
+      100% 100%,
+      0 100%
+    );
+
+  background:
+    rgb(255 255 255 / .38);
+}
+
+
+/* ---------------------------------------------------------
+   INVENTORY / PURCHASING — 3D box
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--box
+.nexus-glyph-art__object {
+  inset:
+    9% 7% 5%;
+
+  border-radius:
+    9%;
+
+  clip-path:
+    polygon(
+      50% 0,
+      100% 22%,
+      100% 78%,
+      50% 100%,
+      0 78%,
+      0 22%
+    );
+
+  transform:
+    rotate(-2deg);
+}
+
+
+.nexus-glyph-art--box
+.nexus-glyph-art__object::before {
+  width: 50%;
+  height: 100%;
+
+  right: 0;
+  top: 0;
+
+  clip-path:
+    polygon(
+      0 22%,
+      100% 0,
+      100% 78%,
+      0 100%
+    );
+
+  background:
+    rgb(0 0 0 / .13);
+}
+
+
+.nexus-glyph-art--box
+.nexus-glyph-art__object::after {
+  width: 100%;
+  height: 44%;
+
+  top: 0;
+
+  clip-path:
+    polygon(
+      50% 0,
+      100% 50%,
+      50% 100%,
+      0 50%
+    );
+
+  background:
+    rgb(255 255 255 / .19);
+}
+
+
+/* ---------------------------------------------------------
+   SALES — raised shopping bag
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--bag
+.nexus-glyph-art__object {
+  inset:
+    15% 8% 1%;
+
+  border-radius:
+    12% 12% 20% 20%;
+
+  transform:
+    rotate(-3deg)
+    rotateY(-6deg);
+}
+
+
+.nexus-glyph-art--bag
+.nexus-glyph-art__object::before {
+  width: 46%;
+  height: 38%;
+
+  left: 27%;
+  top: -26%;
+
+  border:
+    3px solid
+    rgb(255 255 255 / .54);
+
+  border-bottom: 0;
+
+  border-radius:
+    999px 999px 0 0;
+}
+
+
+/* ---------------------------------------------------------
+   REPAIRS — raised tool plate
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--tool
+.nexus-glyph-art__object {
+  inset:
+    8% 22%;
+
+  border-radius: 999px;
+
+  transform:
+    rotate(42deg)
+    skewY(-4deg);
+
+  box-shadow:
+    inset 0 1px 0
+      rgb(255 255 255 / .40),
+    inset -3px -2px 3px
+      rgb(0 0 0 / .18),
+    3px 4px 5px
+      rgb(0 0 0 / .17);
+}
+
+
+/* ---------------------------------------------------------
+   ACCOUNTING — physical calculator
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--calculator
+.nexus-glyph-art__object {
+  inset:
+    0 13%;
+
+  border-radius: 15%;
+
+  transform:
+    rotate(-3deg)
+    rotateY(-7deg);
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--ig-front),
+      var(--ig-mid) 38%,
+      var(--ig-side)
+    );
+}
+
+
+.nexus-glyph-art--calculator
+.nexus-glyph-art__object::before {
+  width: 68%;
+  height: 18%;
+
+  left: 16%;
+  top: 12%;
+
+  border-radius: 20%;
+
+  background:
+    rgb(18 32 39 / .50);
+
+  box-shadow:
+    inset 0 1px 2px
+      rgb(0 0 0 / .22);
+}
+
+
+/* ---------------------------------------------------------
+   FINANCE / PAYROLL — layered wallet
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--wallet
+.nexus-glyph-art__object {
+  inset:
+    15% 1% 10%;
+
+  border-radius: 20%;
+
+  transform:
+    rotate(-3deg)
+    rotateY(-8deg);
+}
+
+
+.nexus-glyph-art--wallet
+.nexus-glyph-art__object::before {
+  width: 43%;
+  height: 51%;
+
+  right: -5%;
+  top: 25%;
+
+  border-radius: 22%;
+
+  background:
+    var(--ig-side);
+
+  box-shadow:
+    inset 1px 1px 0
+      rgb(255 255 255 / .18);
+}
+
+
+/* ---------------------------------------------------------
+   PEOPLE — sculpted identity badge
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--people
+.nexus-glyph-art__object {
+  inset: 2%;
+
+  border-radius: 46%;
+
+  background:
+    radial-gradient(
+      circle at 39% 32%,
+      rgb(255 255 255 / .28) 0 14%,
+      transparent 15%
+    ),
+    radial-gradient(
+      circle at 68% 37%,
+      rgb(255 255 255 / .19) 0 12%,
+      transparent 13%
+    ),
+    linear-gradient(
+      145deg,
+      var(--ig-front),
+      var(--ig-side)
+    );
+
+  transform:
+    rotate(-3deg)
+    rotateY(-7deg);
+}
+
+
+/* ---------------------------------------------------------
+   BUILDING — architectural block
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--building
+.nexus-glyph-art__object {
+  inset:
+    2% 13% 0;
+
+  border-radius:
+    7% 7% 10% 10%;
+
+  transform:
+    rotateY(-8deg);
+}
+
+
+.nexus-glyph-art--building
+.nexus-glyph-art__object::before {
+  inset:
+    20% 20%;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgb(255 255 255 / .37) 0 16%,
+      transparent 16% 36%
+    );
+
+  opacity: .7;
+}
+
+
+/* ---------------------------------------------------------
+   SECURITY — dimensional shield
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--shield
+.nexus-glyph-art__object {
+  inset:
+    0 9%;
+
+  clip-path:
+    polygon(
+      50% 0,
+      92% 16%,
+      85% 70%,
+      50% 100%,
+      15% 70%,
+      8% 16%
+    );
+
+  transform:
+    rotateY(-8deg);
+}
+
+
+/* ---------------------------------------------------------
+   SETTINGS — machined control disc
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--gear
+.nexus-glyph-art__object {
+  inset: 1%;
+
+  border-radius: 50%;
+
+  background:
+    conic-gradient(
+      from 15deg,
+      var(--ig-front),
+      var(--ig-side),
+      var(--ig-mid),
+      var(--ig-side),
+      var(--ig-front)
+    );
+
+  transform:
+    rotate(-8deg)
+    rotateY(-7deg);
+}
+
+
+.nexus-glyph-art--gear
+.nexus-glyph-art__object::before {
+  inset: 24%;
+
+  border-radius: 50%;
+
+  background:
+    rgb(10 20 30 / .20);
+
+  border:
+    1px solid
+    rgb(255 255 255 / .15);
+}
+
+
+/* ---------------------------------------------------------
+   RECYCLE — bin object
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--bin
+.nexus-glyph-art__object {
+  inset:
+    16% 18% 0;
+
+  border-radius:
+    8% 8% 17% 17%;
+
+  transform:
+    rotate(-2deg)
+    rotateY(-7deg);
+}
+
+
+.nexus-glyph-art--bin
+.nexus-glyph-art__object::before {
+  width: 118%;
+  height: 15%;
+
+  left: -9%;
+  top: -17%;
+
+  border-radius: 999px;
+
+  background:
+    var(--ig-front);
+
+  box-shadow:
+    0 2px 3px
+      rgb(0 0 0 / .15);
+}
+
+
+/* ---------------------------------------------------------
+   NEXUS CORE — small dimensional gem
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--spark
+.nexus-glyph-art__object {
+  inset: 4%;
+
+  clip-path:
+    polygon(
+      50% 0,
+      71% 28%,
+      100% 50%,
+      71% 72%,
+      50% 100%,
+      28% 72%,
+      0 50%,
+      28% 28%
+    );
+
+  background:
+    linear-gradient(
+      145deg,
+      rgb(255 255 255 / .48),
+      var(--ig-front) 28%,
+      var(--ig-mid) 58%,
+      var(--ig-side)
+    );
+
+  transform:
+    rotate(-5deg)
+    rotateY(-8deg);
+}
+
+
+/* ---------------------------------------------------------
+   GENERIC
+   --------------------------------------------------------- */
+
+.nexus-glyph-art--object
+.nexus-glyph-art__object {
+  border-radius: 27%;
+}
+
+
+/* Keep symbols legible at sidebar scale. */
+
+aside
+.nexus-glyph-art {
+  width: 69%;
+  height: 69%;
+}
+
+
+@media (max-width: 768px) {
+
+  .nexus-glyph-art {
+    width: 68%;
+    height: 68%;
+  }
+
+
+  .nexus-glyph-art__line {
+    width: 52% !important;
+    height: 52% !important;
+  }
+}
+
+
+/* =========================================================
+   NEXUS APP ILLUSTRATIONS 3.0
+
+   Distinct app objects.
+   Soft 2.5D construction.
+   Settings remains the only pure line symbol.
+   ========================================================= */
+
+
+.nexus-illustration {
+  position: relative;
+  z-index: 4;
+
+  display: grid;
+  place-items: center;
+
+  width: 78%;
+  height: 78%;
+}
+
+
+.nexus-app-art {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: visible;
+
+  filter:
+    drop-shadow(
+      0 1.5px 1.4px
+      rgb(0 0 0 / .22)
+    );
+}
+
+
+/* Main object material */
+
+.nexus-art-a {
+  fill:
+    color-mix(
+      in srgb,
+      var(--ni-a) 88%,
+      white
+    );
+
+  stroke:
+    rgb(255 255 255 / .18);
+
+  stroke-width: .7;
+}
+
+
+.nexus-art-b {
+  fill:
+    color-mix(
+      in srgb,
+      var(--ni-b) 88%,
+      #15202b
+    );
+
+  stroke:
+    rgb(255 255 255 / .12);
+
+  stroke-width: .7;
+}
+
+
+.nexus-art-light {
+  fill:
+    color-mix(
+      in srgb,
+      var(--ni-a) 30%,
+      white
+    );
+
+  stroke:
+    rgb(255 255 255 / .34);
+
+  stroke-width: .6;
+}
+
+
+.nexus-art-dark {
+  fill:
+    color-mix(
+      in srgb,
+      var(--ni-b) 45%,
+      #121820
+    );
+}
+
+
+.nexus-art-metal {
+  fill:
+    color-mix(
+      in srgb,
+      #dfe7ef 76%,
+      var(--ni-a)
+    );
+}
+
+
+.nexus-art-glass {
+  fill:
+    rgb(225 247 255 / .70);
+
+  stroke:
+    rgb(255 255 255 / .52);
+
+  stroke-width: .7;
+}
+
+
+.nexus-art-white {
+  fill:
+    rgb(255 255 255 / .92);
+}
+
+
+.nexus-art-accent {
+  fill:
+    color-mix(
+      in srgb,
+      var(--ni-a) 82%,
+      white
+    );
+}
+
+
+.nexus-art-shadow {
+  fill:
+    rgb(0 0 0 / .12);
+}
+
+
+.nexus-art-shine {
+  fill:
+    rgb(255 255 255 / .24);
+}
+
+
+/*
+  A touch of dimensionality without turning the artwork
+  into photorealistic icons.
+*/
+
+.nexus-app-art > * {
+  transform-box:
+    fill-box;
+
+  transform-origin:
+    center;
+
+  vector-effect:
+    non-scaling-stroke;
+}
+
+
+/* Settings is deliberately the one line-based symbol. */
+
+.nexus-settings-line {
+  width: 72%;
+  height: 72%;
+
+  color:
+    rgb(255 255 255 / .94);
+
+  filter:
+    drop-shadow(
+      0 1px 1px
+      rgb(0 0 0 / .28)
+    );
+}
+
+
+/* Ceramic needs darker artwork for visibility. */
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-app-art {
+  filter:
+    drop-shadow(
+      0 1px 1px
+      rgb(30 50 70 / .14)
+    );
+}
+
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-settings-line {
+  color:
+    var(--ni-b);
+}
+
+
+/*
+  Mono removes colour but preserves every unique illustration.
+  Shape, not colour, identifies the application.
+*/
+
+html[data-nexus-icon-style="mono"]
+.nexus-app-art {
+  filter: none;
+}
+
+
+html[data-nexus-icon-style="mono"]
+.nexus-art-a {
+  fill:
+    color-mix(
+      in srgb,
+      var(--foreground) 84%,
+      transparent
+    );
+}
+
+
+html[data-nexus-icon-style="mono"]
+.nexus-art-b,
+html[data-nexus-icon-style="mono"]
+.nexus-art-dark {
+  fill:
+    color-mix(
+      in srgb,
+      var(--foreground) 56%,
+      transparent
+    );
+}
+
+
+html[data-nexus-icon-style="mono"]
+.nexus-art-light,
+html[data-nexus-icon-style="mono"]
+.nexus-art-metal {
+  fill:
+    color-mix(
+      in srgb,
+      var(--foreground) 20%,
+      white
+    );
+}
+
+
+/* No generic status dot competing with the artwork. */
+
+.nexus-icon::after {
+  display: none !important;
+}
+
+
+/* Slightly more artwork presence in large application icons. */
+
+.nexus-icon--lg
+.nexus-illustration {
+  width: 82%;
+  height: 82%;
+}
+
+
+.nexus-icon--sidebar
+.nexus-illustration {
+  width: 76%;
+  height: 76%;
+}
+
+
+.nexus-icon--sm
+.nexus-illustration {
+  width: 74%;
+  height: 74%;
+}
+
+
+@media (hover: hover) and (pointer: fine) {
+
+  :is(a, button):hover
+  .nexus-app-art {
+    transform:
+      translateY(-.4px)
+      scale(1.025);
+
+    transition:
+      transform 170ms ease;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nexus-app-art {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   NEXUS ARTWORK FAIL-SAFE
+   Studio MUST render when no artwork preference exists.
+   ========================================================= */
+
+.nexus-real-artwork__studio {
+  display: grid;
+  place-items: center;
+}
+
+html[data-nexus-icon-art="sculpted"]
+.nexus-real-artwork__studio,
+html[data-nexus-icon-art="prism"]
+.nexus-real-artwork__studio {
+  display: none;
+}
+
+html[data-nexus-icon-art="sculpted"]
+.nexus-real-artwork__sculpted {
+  display: grid;
+  place-items: center;
+}
+
+html[data-nexus-icon-art="prism"]
+.nexus-real-artwork__prism {
+  display: grid;
+  place-items: center;
+}

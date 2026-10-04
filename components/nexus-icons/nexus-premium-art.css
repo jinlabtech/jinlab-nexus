@@ -1,0 +1,1242 @@
+/* =========================================================
+   NEXUS STUDIO — CLEAN PREMIUM ICON SYSTEM
+   Simple silhouettes. Restrained depth. Consistent proportion.
+   ========================================================= */
+
+.nexus-icon {
+  background:
+    linear-gradient(
+      145deg,
+      rgb(250 252 255 / .96),
+      rgb(224 232 241 / .92)
+    ) !important;
+
+  border:
+    1px solid
+    rgb(255 255 255 / .82)
+    !important;
+
+  box-shadow:
+    inset 0 1px 0
+      rgb(255 255 255 / .95),
+    inset 0 -1px 1px
+      rgb(50 70 90 / .08),
+    0 5px 12px
+      rgb(25 45 65 / .12)
+    !important;
+}
+
+
+html[data-nexus-icon-style="titanium"]
+.nexus-icon {
+  background:
+    linear-gradient(
+      145deg,
+      #56616d,
+      #303944 52%,
+      #202731
+    ) !important;
+
+  border-color:
+    rgb(255 255 255 / .13)
+    !important;
+}
+
+
+html[data-nexus-icon-style="aurora"]
+.nexus-icon {
+  background:
+    linear-gradient(
+      145deg,
+      #f0f2ff,
+      #d5ddef 55%,
+      #d9d2ee
+    ) !important;
+}
+
+
+html[data-nexus-icon-style="ceramic"]
+.nexus-icon {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #e7edf3
+    ) !important;
+}
+
+
+html[data-nexus-icon-style="mono"]
+.nexus-icon {
+  background:
+    color-mix(
+      in srgb,
+      var(--card) 86%,
+      transparent
+    ) !important;
+}
+
+
+.nexus-icon::before,
+.nexus-icon::after {
+  display:
+    none !important;
+}
+
+
+/* Artwork owns the identity. */
+
+.nexus-real-artwork {
+  width:
+    72% !important;
+
+  height:
+    72% !important;
+}
+
+
+.nexus-icon--sidebar
+.nexus-real-artwork {
+  width:
+    70% !important;
+
+  height:
+    70% !important;
+}
+
+
+.nexus-icon--sm
+.nexus-real-artwork {
+  width:
+    68% !important;
+
+  height:
+    68% !important;
+}
+
+
+.nexus-icon--lg
+.nexus-real-artwork {
+  width:
+    74% !important;
+
+  height:
+    74% !important;
+}
+
+
+.nexus-studio-art {
+  width:
+    100%;
+
+  height:
+    100%;
+
+  overflow:
+    visible;
+
+  filter:
+    drop-shadow(
+      0 1.5px 1.2px
+      rgb(0 0 0 / .17)
+    );
+}
+
+
+/* Default Nexus blue */
+
+[data-nexus-icon] {
+  --ns-primary:
+    #1882d1;
+
+  --ns-secondary:
+    #145d9c;
+
+  --ns-accent:
+    #69b7eb;
+}
+
+
+/* Communication */
+
+[data-nexus-icon="email"] {
+  --ns-primary:
+    #1688d4;
+
+  --ns-secondary:
+    #075d9e;
+
+  --ns-accent:
+    #75c4f0;
+}
+
+
+[data-nexus-icon="whatsapp"] {
+  --ns-primary:
+    #259b76;
+
+  --ns-secondary:
+    #14654f;
+
+  --ns-accent:
+    #79c8ac;
+}
+
+
+/* Logistics */
+
+[data-nexus-icon^="shipping"] {
+  --ns-primary:
+    #278ec5;
+
+  --ns-secondary:
+    #185f89;
+
+  --ns-accent:
+    #7ac4e6;
+}
+
+
+/* Sales */
+
+[data-nexus-icon="sales"],
+[data-nexus-icon="quotations"],
+[data-nexus-icon="invoices"],
+[data-nexus-icon^="pos"] {
+  --ns-primary:
+    #4e70cb;
+
+  --ns-secondary:
+    #344c91;
+
+  --ns-accent:
+    #9aafe4;
+}
+
+
+/* Repairs */
+
+[data-nexus-icon="repairs"] {
+  --ns-primary:
+    #d9823b;
+
+  --ns-secondary:
+    #8f4d1f;
+
+  --ns-accent:
+    #efbb88;
+}
+
+
+/* Stock */
+
+[data-nexus-icon="inventory"],
+[data-nexus-icon^="inventory-"],
+[data-nexus-icon="purchasing"] {
+  --ns-primary:
+    #269993;
+
+  --ns-secondary:
+    #176b70;
+
+  --ns-accent:
+    #75c5c0;
+}
+
+
+/* Finance */
+
+[data-nexus-icon="accounting"],
+[data-nexus-icon="finance"],
+[data-nexus-icon^="payroll"] {
+  --ns-primary:
+    #7064b7;
+
+  --ns-secondary:
+    #4b4285;
+
+  --ns-accent:
+    #aaa1d9;
+}
+
+
+/* People */
+
+[data-nexus-icon="customers"],
+[data-nexus-icon="hr"],
+[data-nexus-icon="users"] {
+  --ns-primary:
+    #398fb3;
+
+  --ns-secondary:
+    #25647e;
+
+  --ns-accent:
+    #88c4dc;
+}
+
+
+/* Core */
+
+[data-nexus-icon="core"],
+[data-nexus-icon="ai"] {
+  --ns-primary:
+    #7752c4;
+
+  --ns-secondary:
+    #50358f;
+
+  --ns-accent:
+    #b9a5e9;
+}
+
+
+/* Studio paint */
+
+.ns-primary {
+  fill:
+    var(--ns-primary);
+}
+
+
+.ns-secondary {
+  fill:
+    var(--ns-secondary);
+}
+
+
+.ns-accent {
+  fill:
+    var(--ns-accent);
+}
+
+
+.ns-light {
+  fill:
+    color-mix(
+      in srgb,
+      white 80%,
+      var(--ns-accent)
+    );
+}
+
+
+.ns-soft {
+  fill:
+    rgb(255 255 255 / .68);
+}
+
+
+.ns-shadow {
+  fill:
+    color-mix(
+      in srgb,
+      var(--ns-secondary) 75%,
+      #17202a
+    );
+}
+
+
+.ns-paper {
+  fill:
+    color-mix(
+      in srgb,
+      white 91%,
+      var(--ns-accent)
+    );
+}
+
+
+.ns-metal {
+  fill:
+    #dce5ed;
+}
+
+
+.ns-glass {
+  fill:
+    #d5f1fb;
+
+  stroke:
+    rgb(255 255 255 / .72);
+
+  stroke-width:
+    .6;
+}
+
+
+.ns-ink {
+  fill:
+    #26313c;
+}
+
+
+/* Settings stays deliberately line-based. */
+
+.nexus-settings-line {
+  width:
+    66%;
+
+  height:
+    66%;
+
+  color:
+    var(--foreground);
+}
+
+
+/* Mono removes colour but keeps shape. */
+
+html[data-nexus-icon-style="mono"]
+.ns-primary {
+  fill:
+    color-mix(
+      in srgb,
+      var(--foreground) 78%,
+      transparent
+    );
+}
+
+
+html[data-nexus-icon-style="mono"]
+.ns-secondary,
+html[data-nexus-icon-style="mono"]
+.ns-shadow {
+  fill:
+    color-mix(
+      in srgb,
+      var(--foreground) 52%,
+      transparent
+    );
+}
+
+
+html[data-nexus-icon-style="mono"]
+.ns-accent {
+  fill:
+    color-mix(
+      in srgb,
+      var(--foreground) 33%,
+      transparent
+    );
+}
+
+
+/* Touch and pointer both remain stable. */
+
+@media
+(hover: hover)
+and
+(pointer: fine) {
+
+  :is(a, button):hover
+  .nexus-studio-art {
+    transform:
+      translateY(-.6px);
+
+    transition:
+      transform 150ms ease;
+  }
+}
+
+
+@media
+(prefers-reduced-motion: reduce) {
+
+  .nexus-studio-art {
+    transform:
+      none !important;
+
+    transition:
+      none !important;
+  }
+}
+
+/* =========================================================
+   NEXUS INDIVIDUAL APP SIGNATURES
+   Each application gets its own restrained colour identity.
+   ========================================================= */
+
+[data-nexus-icon="dashboard"] {
+  --ns-primary: #1688d4;
+  --ns-secondary: #0c5f9e;
+  --ns-accent: #74c4f2;
+}
+
+[data-nexus-icon="email"] {
+  --ns-primary: #2b8fe0;
+  --ns-secondary: #155d9b;
+  --ns-accent: #93cdf4;
+}
+
+[data-nexus-icon="whatsapp"] {
+  --ns-primary: #2ba77e;
+  --ns-secondary: #16684f;
+  --ns-accent: #8fd6bd;
+}
+
+[data-nexus-icon^="shipping"] {
+  --ns-primary: #3397c8;
+  --ns-secondary: #1b668f;
+  --ns-accent: #8bcbe9;
+}
+
+[data-nexus-icon="sales"] {
+  --ns-primary: #5d73d9;
+  --ns-secondary: #3d4e9c;
+  --ns-accent: #abb8ef;
+}
+
+[data-nexus-icon="quotations"] {
+  --ns-primary: #637fd5;
+  --ns-secondary: #445aa2;
+  --ns-accent: #b1bce9;
+}
+
+[data-nexus-icon="invoices"] {
+  --ns-primary: #466ed0;
+  --ns-secondary: #314c97;
+  --ns-accent: #9bafe8;
+}
+
+[data-nexus-icon^="pos"] {
+  --ns-primary: #4f63c9;
+  --ns-secondary: #36448d;
+  --ns-accent: #aab4e5;
+}
+
+[data-nexus-icon="repairs"] {
+  --ns-primary: #dd8c42;
+  --ns-secondary: #925124;
+  --ns-accent: #f1c28f;
+}
+
+[data-nexus-icon="inventory"],
+[data-nexus-icon^="inventory-"] {
+  --ns-primary: #269c95;
+  --ns-secondary: #176b70;
+  --ns-accent: #86d0cb;
+}
+
+[data-nexus-icon="purchasing"] {
+  --ns-primary: #3c9d82;
+  --ns-secondary: #266b58;
+  --ns-accent: #9ad4c2;
+}
+
+[data-nexus-icon="accounting"] {
+  --ns-primary: #7464ba;
+  --ns-secondary: #50438a;
+  --ns-accent: #b6ace0;
+}
+
+[data-nexus-icon="finance"] {
+  --ns-primary: #685ab2;
+  --ns-secondary: #473c7f;
+  --ns-accent: #aaa0d6;
+}
+
+[data-nexus-icon^="payroll"] {
+  --ns-primary: #8a63b8;
+  --ns-secondary: #60427f;
+  --ns-accent: #c1a7df;
+}
+
+[data-nexus-icon="customers"] {
+  --ns-primary: #3e93bd;
+  --ns-secondary: #286484;
+  --ns-accent: #91cade;
+}
+
+[data-nexus-icon="hr"] {
+  --ns-primary: #3298b8;
+  --ns-secondary: #246a80;
+  --ns-accent: #8fcbdc;
+}
+
+[data-nexus-icon="settings"] {
+  --ns-primary: #68798d;
+  --ns-secondary: #465566;
+  --ns-accent: #aebbc8;
+}
+
+[data-nexus-icon="core"],
+[data-nexus-icon="ai"] {
+  --ns-primary: #7954c8;
+  --ns-secondary: #51358f;
+  --ns-accent: #baa6e8;
+}
+
+/* Final proportion pass */
+
+.nexus-real-artwork {
+  width: 78% !important;
+  height: 78% !important;
+}
+
+.nexus-icon--lg
+.nexus-real-artwork {
+  width: 80% !important;
+  height: 80% !important;
+}
+
+.nexus-icon--sidebar
+.nexus-real-artwork {
+  width: 76% !important;
+  height: 76% !important;
+}
+
+.nexus-icon--sm
+.nexus-real-artwork {
+  width: 72% !important;
+  height: 72% !important;
+}
+
+/* =========================================================
+   NEXUS EMAIL — SIGNATURE BLUE
+   ========================================================= */
+
+[data-nexus-icon="email"],
+[data-nexus-icon="email-sent"] {
+  --ns-primary: #087fe8;
+  --ns-secondary: #0755a8;
+  --ns-accent: #35a7ff;
+}
+
+/* Email artwork presence */
+
+[data-nexus-icon="email"] .nexus-real-artwork,
+[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  width: 88% !important;
+  height: 88% !important;
+}
+
+.nexus-icon--lg[data-nexus-icon="email"] .nexus-real-artwork,
+.nexus-icon--lg[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  width: 91% !important;
+  height: 91% !important;
+}
+
+.nexus-icon--sidebar[data-nexus-icon="email"] .nexus-real-artwork,
+.nexus-icon--sidebar[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  width: 86% !important;
+  height: 86% !important;
+}
+
+.nexus-icon--sm[data-nexus-icon="email"] .nexus-real-artwork,
+.nexus-icon--sm[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  width: 84% !important;
+  height: 84% !important;
+}
+
+/* =========================================================
+   NEXUS ARTWORK SCALE — LARGE INTERNAL ART
+   Outer icon size stays unchanged.
+   ========================================================= */
+
+.nexus-real-artwork {
+  width: 88% !important;
+  height: 88% !important;
+}
+
+.nexus-icon--lg .nexus-real-artwork {
+  width: 91% !important;
+  height: 91% !important;
+}
+
+.nexus-icon--sidebar .nexus-real-artwork {
+  width: 88% !important;
+  height: 88% !important;
+}
+
+.nexus-icon--md .nexus-real-artwork {
+  width: 89% !important;
+  height: 89% !important;
+}
+
+.nexus-icon--sm .nexus-real-artwork {
+  width: 86% !important;
+  height: 86% !important;
+}
+
+.nexus-studio-art {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Email gets especially strong presence */
+
+[data-nexus-icon="email"] .nexus-real-artwork,
+[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  width: 94% !important;
+  height: 94% !important;
+}
+
+/* =========================================================
+   MAXIMUM INTERNAL ART PRESENCE
+   Outer Nexus tile stays unchanged.
+   ========================================================= */
+
+.nexus-real-artwork {
+  width: 96% !important;
+  height: 96% !important;
+}
+
+.nexus-icon--lg .nexus-real-artwork {
+  width: 98% !important;
+  height: 98% !important;
+}
+
+.nexus-icon--md .nexus-real-artwork {
+  width: 97% !important;
+  height: 97% !important;
+}
+
+.nexus-icon--sidebar .nexus-real-artwork {
+  width: 95% !important;
+  height: 95% !important;
+}
+
+.nexus-icon--sm .nexus-real-artwork {
+  width: 93% !important;
+  height: 93% !important;
+}
+
+/* Email can nearly fill the whole material tile */
+
+[data-nexus-icon="email"] .nexus-real-artwork,
+[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  width: 99% !important;
+  height: 99% !important;
+}
+
+/* =========================================================
+   SIDEBAR — LARGE INTERNAL ART
+   Outer tile remains unchanged.
+   ========================================================= */
+
+.nexus-icon--sidebar .nexus-real-artwork {
+  width: 112% !important;
+  height: 112% !important;
+  transform: scale(1.06);
+}
+
+/* Email gets maximum sidebar presence */
+.nexus-icon--sidebar[data-nexus-icon="email"] .nexus-real-artwork,
+.nexus-icon--sidebar[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  width: 118% !important;
+  height: 118% !important;
+  transform: scale(1.08);
+}
+
+/* =========================================================
+   SIDEBAR ARTWORK — PERFECT CENTRE
+   Keep current large artwork size.
+   ========================================================= */
+
+.nexus-icon--sidebar {
+  position: relative;
+}
+
+.nexus-icon--sidebar .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%) scale(1.06) !important;
+  transform-origin: center center;
+}
+
+/* Email keeps its larger approved size */
+.nexus-icon--sidebar[data-nexus-icon="email"] .nexus-real-artwork,
+.nexus-icon--sidebar[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  transform: translate(-50%, -50%) scale(1.08) !important;
+}
+
+/* =========================================================
+   NEXUS ICON SHELL — BORDERLESS PREMIUM FINISH
+   Shape is defined by material and lighting, not a stroke.
+   ========================================================= */
+
+.nexus-icon {
+  border: none !important;
+  outline: none !important;
+
+  box-shadow:
+    inset 0 8px 14px rgb(255 255 255 / 0.10),
+    inset 0 -6px 12px rgb(20 35 50 / 0.06),
+    0 4px 10px rgb(20 35 55 / 0.13),
+    0 1px 3px rgb(20 35 55 / 0.08)
+    !important;
+}
+
+/* Prevent individual materials from bringing the edge stroke back */
+
+html[data-nexus-icon-style="lumina"] .nexus-icon,
+html[data-nexus-icon-style="ceramic"] .nexus-icon,
+html[data-nexus-icon-style="titanium"] .nexus-icon,
+html[data-nexus-icon-style="aurora"] .nexus-icon,
+html[data-nexus-icon-style="mono"] .nexus-icon {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Email — optical centering */
+.nexus-icon--sidebar[data-nexus-icon="email"] .nexus-real-artwork,
+.nexus-icon--sidebar[data-nexus-icon="email-sent"] .nexus-real-artwork {
+  transform: translate(-50%, -54%) scale(1.08) !important;
+}
+
+/* =========================================================
+   WHATSAPP — BRAND ARTWORK
+   Large, clean and optically centred.
+   ========================================================= */
+
+[data-nexus-icon="whatsapp"] .nexus-real-artwork {
+  width: 99% !important;
+  height: 99% !important;
+}
+
+.nexus-whatsapp-official {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Sidebar — same strong presence as approved Email */
+
+.nexus-icon--sidebar[data-nexus-icon="whatsapp"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 118% !important;
+  height: 118% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) scale(1.08) !important;
+  transform-origin: center center;
+}
+
+/* =========================================================
+   WHATSAPP SIDEBAR — MATCH APPROVED DOCK PROPORTION
+   ========================================================= */
+
+.nexus-icon--sidebar[data-nexus-icon="whatsapp"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 98% !important;
+  height: 98% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) !important;
+  transform-origin: center center;
+}
+
+/* =========================================================
+   SHIPPING — SHORT COURIER BAKKIE
+   Same approved presence as Email / WhatsApp.
+   ========================================================= */
+
+[data-nexus-icon^="shipping"] .nexus-real-artwork {
+  width: 99% !important;
+  height: 99% !important;
+}
+
+.nexus-shipping-bakkie {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / .14));
+}
+
+.nexus-icon--sidebar[data-nexus-icon^="shipping"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 102% !important;
+  height: 102% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) !important;
+  transform-origin: center center;
+}
+
+/* =========================================================
+   JINLAB SHIPPING — LARGE PREMIUM VEHICLE
+   ========================================================= */
+
+[data-nexus-icon^="shipping"] .nexus-real-artwork {
+  width: 108% !important;
+  height: 108% !important;
+}
+
+.nexus-shipping-jinlab {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter:
+    drop-shadow(0 1px 1px rgb(0 0 0 / .16))
+    drop-shadow(0 2px 2px rgb(0 0 0 / .08));
+}
+
+/* Sidebar gets the strongest visual presence */
+
+.nexus-icon--sidebar[data-nexus-icon^="shipping"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 116% !important;
+  height: 116% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) !important;
+  transform-origin: center;
+}
+
+/* Dock / launcher */
+
+.nexus-icon--lg[data-nexus-icon^="shipping"] .nexus-real-artwork {
+  width: 110% !important;
+  height: 110% !important;
+}
+
+/* =========================================================
+   SALES — PREMIUM MONEY
+   Approved Nexus large-art proportion
+   ========================================================= */
+
+[data-nexus-icon="sales"] .nexus-real-artwork {
+  width: 104% !important;
+  height: 104% !important;
+}
+
+.nexus-sales-money {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter:
+    drop-shadow(0 1px 1px rgb(0 0 0 / .14))
+    drop-shadow(0 2px 2px rgb(0 0 0 / .07));
+}
+
+.nexus-icon--sidebar[data-nexus-icon="sales"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 112% !important;
+  height: 112% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) !important;
+  transform-origin: center;
+}
+
+.nexus-icon--lg[data-nexus-icon="sales"] .nexus-real-artwork {
+  width: 108% !important;
+  height: 108% !important;
+}
+
+/* =========================================================
+   REPAIRS — TECHNICIAN WORKSTATION
+   ========================================================= */
+
+[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 108% !important;
+  height: 108% !important;
+}
+
+.nexus-repairs-tech {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter:
+    drop-shadow(0 1px 1px rgb(0 0 0 / .14))
+    drop-shadow(0 2px 2px rgb(0 0 0 / .07));
+}
+
+.nexus-icon--sidebar[data-nexus-icon="repairs"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 118% !important;
+  height: 118% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) !important;
+}
+
+.nexus-icon--lg[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 112% !important;
+  height: 112% !important;
+}
+
+/* =========================================================
+   REPAIRS — ELECTRONICS SERVICE ART
+   ========================================================= */
+
+.nexus-repair-device {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  filter:
+    drop-shadow(0 1px 1px rgb(0 0 0 / .15))
+    drop-shadow(0 2px 2px rgb(0 0 0 / .08));
+}
+
+
+[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 108% !important;
+  height: 108% !important;
+}
+
+
+.nexus-icon--sidebar[data-nexus-icon="repairs"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 118% !important;
+  height: 118% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) !important;
+}
+
+
+.nexus-icon--lg[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 112% !important;
+  height: 112% !important;
+}
+
+/* Repairs — final optical centering */
+
+.nexus-icon--sidebar[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 116% !important;
+  height: 116% !important;
+  transform: translate(-50%, -51%) !important;
+}
+
+.nexus-icon--lg[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 111% !important;
+  height: 111% !important;
+}
+
+/* Repairs — gear + wrench */
+
+.nexus-repair-tools {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter:
+    drop-shadow(0 1px 1px rgb(0 0 0 / .14))
+    drop-shadow(0 2px 2px rgb(0 0 0 / .08));
+}
+
+[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 108% !important;
+  height: 108% !important;
+}
+
+.nexus-icon--sidebar[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 112% !important;
+  height: 112% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.nexus-icon--lg[data-nexus-icon="repairs"] .nexus-real-artwork {
+  width: 110% !important;
+  height: 110% !important;
+}
+
+/* =========================================================
+   INVENTORY — BARCODE SCANNER
+   ========================================================= */
+
+.nexus-inventory-scanner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter:
+    drop-shadow(0 1px 1px rgb(0 0 0 / .14))
+    drop-shadow(0 2px 2px rgb(0 0 0 / .07));
+}
+
+[data-nexus-icon="inventory"] .nexus-real-artwork,
+[data-nexus-icon^="inventory-"] .nexus-real-artwork {
+  width: 108% !important;
+  height: 108% !important;
+}
+
+.nexus-icon--sidebar[data-nexus-icon="inventory"] .nexus-real-artwork,
+.nexus-icon--sidebar[data-nexus-icon^="inventory-"] .nexus-real-artwork {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 116% !important;
+  height: 116% !important;
+  margin: 0;
+  transform: translate(-50%, -50%) !important;
+}
+
+.nexus-icon--lg[data-nexus-icon="inventory"] .nexus-real-artwork,
+.nexus-icon--lg[data-nexus-icon^="inventory-"] .nexus-real-artwork {
+  width: 112% !important;
+  height: 112% !important;
+}
+
+/* Inventory — barcode only */
+
+.nexus-inventory-barcode {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+[data-nexus-icon="inventory"] .nexus-real-artwork,
+[data-nexus-icon^="inventory-"] .nexus-real-artwork {
+  width: 110% !important;
+  height: 110% !important;
+}
+
+.nexus-icon--sidebar[data-nexus-icon="inventory"] .nexus-real-artwork,
+.nexus-icon--sidebar[data-nexus-icon^="inventory-"] .nexus-real-artwork {
+  width: 118% !important;
+  height: 118% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.nexus-icon--lg[data-nexus-icon="inventory"] .nexus-real-artwork,
+.nexus-icon--lg[data-nexus-icon^="inventory-"] .nexus-real-artwork {
+  width: 114% !important;
+  height: 114% !important;
+}
+
+/* =========================================================
+   NEXUS CORE — SIGNATURE MARK
+   ========================================================= */
+
+.nexus-core-signature {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  filter:
+    drop-shadow(0 1px 1px rgb(0 0 0 / .14))
+    drop-shadow(0 3px 4px rgb(0 70 120 / .12));
+}
+
+[data-nexus-icon="core"] .nexus-real-artwork,
+[data-nexus-icon="ai"] .nexus-real-artwork {
+  width: 105% !important;
+  height: 105% !important;
+}
+
+.nexus-icon--sidebar[data-nexus-icon="core"] .nexus-real-artwork,
+.nexus-icon--sidebar[data-nexus-icon="ai"] .nexus-real-artwork {
+  width: 112% !important;
+  height: 112% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.nexus-icon--lg[data-nexus-icon="core"] .nexus-real-artwork,
+.nexus-icon--lg[data-nexus-icon="ai"] .nexus-real-artwork {
+  width: 110% !important;
+  height: 110% !important;
+}
+
+/* =========================================================
+   MINIMAL — DEFAULT NEXUS MATERIAL
+   Neutral material. Artwork colours remain untouched.
+   ========================================================= */
+
+html[data-nexus-icon-style="mono"] .nexus-icon {
+  background:
+    radial-gradient(
+      circle at 23% 13%,
+      rgb(255 255 255 / .96),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      rgb(250 252 254 / .96),
+      rgb(222 229 236 / .92)
+    )
+    !important;
+
+  border: none !important;
+  outline: none !important;
+
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .95),
+    inset 0 -1px 2px rgb(25 45 60 / .07),
+    0 4px 10px rgb(15 30 45 / .13),
+    0 1px 2px rgb(15 30 45 / .07)
+    !important;
+
+  backdrop-filter: blur(10px);
+}
+
+
+/* Dark UI — keep the material luminous enough for black artwork */
+
+html.dark[data-nexus-icon-style="mono"] .nexus-icon,
+html[data-theme="dark"][data-nexus-icon-style="mono"] .nexus-icon {
+  background:
+    radial-gradient(
+      circle at 22% 12%,
+      rgb(255 255 255 / .88),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      rgb(241 246 250 / .96),
+      rgb(194 205 216 / .92)
+    )
+    !important;
+
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .88),
+    0 5px 14px rgb(0 0 0 / .28)
+    !important;
+}
+
+
+/* Minimal must NEVER repaint application artwork */
+
+html[data-nexus-icon-style="mono"] .ns-primary {
+  fill: var(--ns-primary) !important;
+}
+
+html[data-nexus-icon-style="mono"] .ns-secondary {
+  fill: var(--ns-secondary) !important;
+}
+
+html[data-nexus-icon-style="mono"] .ns-accent {
+  fill: var(--ns-accent) !important;
+}
+
+html[data-nexus-icon-style="mono"] .ns-shadow {
+  fill:
+    color-mix(
+      in srgb,
+      var(--ns-secondary) 75%,
+      #17202a
+    )
+    !important;
+}
+
+html[data-nexus-icon-style="mono"] .nexus-settings-line {
+  color: #24313c !important;
+}
+
+
+/* Black artwork such as Inventory remains crisp */
+
+html[data-nexus-icon-style="mono"] .nexus-inventory-barcode {
+  opacity: 1 !important;
+  filter: none !important;
+}

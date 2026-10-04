@@ -1,0 +1,1161 @@
+/* =========================================================
+   NEXUS DOCK
+   The dock owns glass, spacing and interaction only.
+
+   IMPORTANT:
+   It does NOT restyle Nexus icons.
+   Icons must use the same global appearance everywhere.
+   ========================================================= */
+
+
+.nexus-dock-glass {
+  position: relative;
+  isolation: isolate;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(248 252 255 / .48),
+      rgb(226 238 249 / .30)
+    );
+
+  border:
+    1px solid
+    rgb(255 255 255 / .58);
+
+  -webkit-backdrop-filter:
+    blur(32px)
+    saturate(155%);
+
+  backdrop-filter:
+    blur(32px)
+    saturate(155%);
+
+  box-shadow:
+    0 24px 64px -28px
+      rgb(25 45 70 / .34),
+    inset 0 1px 0
+      rgb(255 255 255 / .68);
+}
+
+
+.dark .nexus-dock-glass,
+[data-nexus-theme="jinlab_blue_dark"]
+.nexus-dock-glass {
+  background:
+    linear-gradient(
+      180deg,
+      rgb(35 40 48 / .60),
+      rgb(17 22 29 / .46)
+    );
+
+  border-color:
+    rgb(255 255 255 / .12);
+}
+
+
+.nexus-launcher-glass {
+  position: relative;
+  isolation: isolate;
+
+  background:
+    linear-gradient(
+      150deg,
+      rgb(250 252 255 / .53),
+      rgb(230 239 248 / .36)
+    );
+
+  border:
+    1px solid
+    rgb(255 255 255 / .60);
+
+  -webkit-backdrop-filter:
+    blur(40px)
+    saturate(150%);
+
+  backdrop-filter:
+    blur(40px)
+    saturate(150%);
+
+  box-shadow:
+    0 32px 90px -34px
+      rgb(20 40 65 / .34),
+    inset 0 1px 0
+      rgb(255 255 255 / .70);
+}
+
+
+.dark .nexus-launcher-glass,
+[data-nexus-theme="jinlab_blue_dark"]
+.nexus-launcher-glass {
+  background:
+    linear-gradient(
+      150deg,
+      rgb(32 37 45 / .66),
+      rgb(17 22 29 / .52)
+    );
+
+  border-color:
+    rgb(255 255 255 / .12);
+}
+
+
+/* Launcher apps are not cards inside cards. */
+
+.nexus-launcher-tile {
+  background: transparent;
+
+  border:
+    1px solid transparent;
+
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+
+.nexus-launcher-tile-active {
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 7%,
+      transparent
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 18%,
+      transparent
+    );
+}
+
+
+/* Dock movement only. Icon material remains global. */
+
+.nexus-dock-app {
+  border:
+    1px solid transparent;
+
+  transition:
+    transform 170ms
+      cubic-bezier(.2,.8,.2,1),
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+
+.nexus-dock-app-active {
+  background:
+    rgb(255 255 255 / .24);
+
+  border-color:
+    rgb(255 255 255 / .28);
+}
+
+
+.dark .nexus-dock-app-active {
+  background:
+    rgb(255 255 255 / .07);
+
+  border-color:
+    rgb(255 255 255 / .10);
+}
+
+
+.nexus-launcher-glass
+input[type="search"] {
+  background:
+    rgb(255 255 255 / .38);
+
+  border-color:
+    rgb(255 255 255 / .52);
+
+  box-shadow:
+    inset 0 1px 0
+      rgb(255 255 255 / .48);
+}
+
+
+.dark
+.nexus-launcher-glass
+input[type="search"] {
+  background:
+    rgb(0 0 0 / .17);
+
+  border-color:
+    rgb(255 255 255 / .10);
+}
+
+
+@media (hover: hover) and (pointer: fine) {
+
+  .nexus-dock-app:hover {
+    transform:
+      translateY(-5px)
+      scale(1.045);
+  }
+
+
+  .nexus-launcher-tile:hover {
+    transform:
+      translateY(-1px);
+
+    background:
+      rgb(255 255 255 / .28);
+
+    border-color:
+      rgb(255 255 255 / .34);
+  }
+
+
+  .dark
+  .nexus-launcher-tile:hover {
+    background:
+      rgb(255 255 255 / .06);
+
+    border-color:
+      rgb(255 255 255 / .09);
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nexus-dock-app,
+  .nexus-launcher-tile {
+    transition: none;
+  }
+
+
+  .nexus-dock-app:hover,
+  .nexus-launcher-tile:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   NEXUS MOBILE APP EXPERIENCE
+   Desktop remains unchanged.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  /*
+   * Permanent mobile navigation.
+   * Full width, safe-area aware, no horizontal dock scrolling.
+   */
+  .nexus-dock-shell {
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    justify-content: stretch !important;
+
+    padding:
+      0
+      0
+      env(safe-area-inset-bottom)
+      0 !important;
+  }
+
+
+  .nexus-dock-shell .nexus-dock-glass {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr));
+
+    width: 100% !important;
+    max-width: none !important;
+
+    gap: 0 !important;
+
+    overflow: hidden !important;
+
+    border-radius:
+      22px
+      22px
+      0
+      0 !important;
+
+    padding:
+      6px
+      5px
+      7px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 90%,
+        transparent
+      ) !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 58%,
+        transparent
+      ) !important;
+
+    border-bottom:
+      0 !important;
+
+    box-shadow:
+      0 -10px 34px
+      rgb(0 0 0 / .12)
+      !important;
+
+    backdrop-filter:
+      blur(24px)
+      saturate(145%) !important;
+
+    -webkit-backdrop-filter:
+      blur(24px)
+      saturate(145%) !important;
+  }
+
+
+  /*
+   * Four pinned applications on phone.
+   * Search + Nexus launcher occupy the final two positions.
+   */
+  .nexus-dock-shell
+  .nexus-dock-glass
+  > a:nth-of-type(n+5) {
+    display: none !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app {
+    min-width: 0 !important;
+
+    width: 100% !important;
+
+    padding:
+      5px
+      2px !important;
+
+    gap:
+      2px !important;
+
+    border-radius:
+      14px !important;
+
+    overflow:
+      hidden;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app
+  > span:last-child {
+    max-width:
+      100% !important;
+  }
+
+
+  /*
+   * Active module feels like mobile navigation,
+   * not a desktop dock selection.
+   */
+  .nexus-dock-shell
+  .nexus-dock-app-active {
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 10%,
+        transparent
+      ) !important;
+  }
+
+
+  /*
+   * Launcher becomes a real phone bottom sheet.
+   */
+  .nexus-launcher-shell {
+    position:
+      fixed !important;
+
+    inset:
+      0 !important;
+
+    bottom:
+      0 !important;
+
+    align-items:
+      flex-end !important;
+
+    justify-content:
+      stretch !important;
+
+    padding:
+      0 !important;
+
+    background:
+      rgb(0 0 0 / .24);
+
+    backdrop-filter:
+      blur(2px);
+
+    -webkit-backdrop-filter:
+      blur(2px);
+  }
+
+
+  .nexus-launcher-shell
+  .nexus-launcher-glass {
+    width:
+      100% !important;
+
+    max-width:
+      none !important;
+
+    max-height:
+      82dvh !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      16px
+      14px
+      calc(
+        18px +
+        env(safe-area-inset-bottom)
+      )
+      !important;
+
+    border-radius:
+      28px
+      28px
+      0
+      0 !important;
+
+    border-bottom:
+      0 !important;
+
+    box-shadow:
+      0 -18px 48px
+      rgb(0 0 0 / .24)
+      !important;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  /*
+   * Mobile launcher tiles stay finger-friendly.
+   */
+  .nexus-launcher-tile {
+    min-height:
+      54px;
+
+    border-radius:
+      16px !important;
+  }
+
+
+  /*
+   * Inputs must never zoom the page on iPhone.
+   */
+  .nexus-launcher-glass
+  input[type="search"] {
+    font-size:
+      16px !important;
+  }
+
+}
+
+
+/* Very small phones */
+
+@media (max-width: 390px) {
+
+  .nexus-dock-shell
+  .nexus-dock-glass {
+    padding-left:
+      3px !important;
+
+    padding-right:
+      3px !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app {
+    padding-left:
+      1px !important;
+
+    padding-right:
+      1px !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app
+  span {
+    font-size:
+      8px !important;
+  }
+
+}
+
+/* =========================================================
+   NEXUS PHONE INTERACTION
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  html,
+  body {
+    overscroll-behavior-x:
+      none;
+
+    -webkit-tap-highlight-color:
+      transparent;
+  }
+
+
+  /* Sidebar feels physically connected to the gesture */
+
+  .nexus-mobile-sidebar {
+    will-change:
+      transform;
+
+    box-shadow:
+      18px 0 50px
+      rgb(0 0 0 / .18);
+  }
+
+
+  /*
+   * Stable mobile bottom navigation.
+   */
+
+  .nexus-dock-shell
+  .nexus-dock-glass {
+    min-height:
+      72px;
+
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+
+    will-change:
+      transform;
+  }
+
+
+  /*
+   * Every app behaves like a proper touch target.
+   */
+
+  .nexus-dock-shell
+  .nexus-dock-app {
+    position:
+      relative;
+
+    touch-action:
+      manipulation;
+
+    transition:
+      transform 140ms ease,
+      background-color 160ms ease,
+      color 160ms ease,
+      opacity 160ms ease;
+
+    will-change:
+      transform;
+  }
+
+
+  /*
+   * Physical press feedback.
+   */
+
+  .nexus-dock-shell
+  .nexus-dock-app:active {
+    transform:
+      scale(.91);
+  }
+
+
+  /*
+   * Current module lifts gently above the bar.
+   */
+
+  .nexus-dock-shell
+  .nexus-dock-app-active {
+    transform:
+      translateY(-2px);
+
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 11%,
+        transparent
+      )
+      !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app-active
+  .nexus-icon {
+    transform:
+      scale(1.07);
+
+    transition:
+      transform 180ms
+      cubic-bezier(
+        .2,
+        .8,
+        .2,
+        1
+      );
+  }
+
+
+  /*
+   * Tiny active indicator like a native mobile tab bar.
+   */
+
+  .nexus-dock-shell
+  .nexus-dock-app-active::after {
+    content:
+      "";
+
+    position:
+      absolute;
+
+    bottom:
+      1px;
+
+    left:
+      50%;
+
+    width:
+      18px;
+
+    height:
+      3px;
+
+    border-radius:
+      999px;
+
+    background:
+      var(--primary);
+
+    transform:
+      translateX(-50%);
+  }
+
+
+  /*
+   * Launcher rises from bottom rather than appearing.
+   */
+
+  .nexus-launcher-shell
+  .nexus-launcher-glass {
+    animation:
+      nexusMobileSheetIn
+      220ms
+      cubic-bezier(
+        .22,
+        .8,
+        .26,
+        1
+      )
+      both;
+  }
+
+
+  /*
+   * Clicking an application now feels like
+   * entering another workspace.
+   */
+
+  .nexus-page-enter {
+    min-height:
+      100%;
+
+    animation:
+      nexusMobilePageEnter
+      210ms
+      cubic-bezier(
+        .2,
+        .8,
+        .2,
+        1
+      )
+      both;
+
+    transform-origin:
+      center center;
+  }
+
+}
+
+
+@keyframes nexusMobileSheetIn {
+
+  from {
+    opacity:
+      .55;
+
+    transform:
+      translateY(32px);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+
+@keyframes nexusMobilePageEnter {
+
+  from {
+    opacity:
+      .45;
+
+    transform:
+      translateX(14px)
+      scale(.992);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateX(0)
+      scale(1);
+  }
+
+}
+
+
+@media
+(prefers-reduced-motion: reduce) {
+
+  .nexus-mobile-sidebar,
+  .nexus-dock-app,
+  .nexus-page-enter,
+  .nexus-launcher-glass {
+    animation:
+      none !important;
+
+    transition:
+      none !important;
+  }
+
+}
+
+/* =========================================================
+   MOBILE STABILITY / SMOOTHNESS
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .nexus-dock-shell {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: layout paint;
+  }
+
+  .nexus-dock-shell
+  .nexus-dock-glass {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+
+    /*
+     * Slightly less blur performs noticeably better on phones
+     * while keeping the translucent Nexus look.
+     */
+    backdrop-filter:
+      blur(16px)
+      saturate(135%) !important;
+
+    -webkit-backdrop-filter:
+      blur(16px)
+      saturate(135%) !important;
+  }
+
+  .nexus-mobile-sidebar {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .nexus-launcher-shell
+  .nexus-launcher-glass {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  /*
+   * Touch should feel immediate.
+   */
+
+  a,
+  button {
+    touch-action: manipulation;
+  }
+
+}
+
+/* =========================================================
+   NEXUS MOBILE TAB BAR — SOCIAL APP FEEL
+   Facebook / WhatsApp style interaction
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  /* Stable fixed tab bar */
+  .nexus-dock-shell {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 100 !important;
+
+    padding: 0 !important;
+    pointer-events: none;
+
+    transform: translate3d(0,0,0);
+  }
+
+
+  .nexus-dock-shell .nexus-dock-glass {
+    pointer-events: auto;
+
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+
+    width: 100% !important;
+    max-width: none !important;
+
+    min-height: 64px !important;
+
+    padding:
+      5px
+      6px
+      calc(5px + env(safe-area-inset-bottom))
+      !important;
+
+    gap: 0 !important;
+
+    overflow: hidden !important;
+
+    border-radius: 20px 20px 0 0 !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 42%,
+        transparent
+      )
+      !important;
+
+    border-bottom: 0 !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 94%,
+        transparent
+      )
+      !important;
+
+    box-shadow:
+      0 -5px 22px
+      rgb(0 0 0 / .10)
+      !important;
+
+    backdrop-filter:
+      blur(14px)
+      saturate(125%)
+      !important;
+
+    -webkit-backdrop-filter:
+      blur(14px)
+      saturate(125%)
+      !important;
+  }
+
+
+  /*
+   * Phone shows only THREE pinned applications.
+   * Search and Nexus become slots 4 and 5.
+   */
+  .nexus-dock-shell
+  .nexus-dock-glass
+  > a:nth-of-type(n+4) {
+    display: none !important;
+  }
+
+
+  /* Every tab gets equal space */
+  .nexus-dock-shell .nexus-dock-app {
+    position: relative;
+
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 54px !important;
+
+    padding: 4px 2px !important;
+    margin: 0 !important;
+
+    gap: 2px !important;
+
+    border-radius: 13px !important;
+
+    background: transparent !important;
+
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+      transform 120ms cubic-bezier(.2,.8,.2,1),
+      opacity 120ms ease,
+      color 160ms ease !important;
+  }
+
+
+  /* Smooth physical press */
+  .nexus-dock-shell .nexus-dock-app:active {
+    transform: scale(.88) !important;
+    opacity: .75;
+  }
+
+
+  /*
+   * Do not raise the whole active tile.
+   * Facebook-like nav remains geometrically stable.
+   */
+  .nexus-dock-shell .nexus-dock-app-active {
+    transform: none !important;
+    background: transparent !important;
+    color: var(--primary) !important;
+  }
+
+
+  /* Artwork grows slightly when selected */
+  .nexus-dock-shell
+  .nexus-dock-app
+  .nexus-icon {
+    transition:
+      transform 170ms
+      cubic-bezier(.22,.8,.3,1),
+      filter 170ms ease
+      !important;
+  }
+
+
+  .nexus-dock-shell
+  .nexus-dock-app-active
+  .nexus-icon {
+    transform: scale(1.08) !important;
+  }
+
+
+  /*
+   * Active tab indicator.
+   * Thin and clean like a native social app.
+   */
+  .nexus-dock-shell
+  .nexus-dock-app-active::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+
+    left: 50%;
+
+    width: 22px;
+    height: 3px;
+
+    border-radius: 0 0 999px 999px;
+
+    background: var(--primary);
+
+    transform: translateX(-50%);
+
+    animation:
+      nexusTabIndicatorIn
+      170ms
+      ease-out
+      both;
+  }
+
+
+  /*
+   * Remove the older bottom indicator.
+   */
+  .nexus-dock-shell
+  .nexus-dock-app-active::after {
+    display: none !important;
+  }
+
+
+  /* Compact labels */
+  .nexus-dock-shell
+  .nexus-dock-app
+  span {
+    max-width: 100% !important;
+
+    font-size: 9px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+
+  /*
+   * Search / Nexus controls match application tabs.
+   */
+  .nexus-dock-shell button {
+    min-width: 0 !important;
+    min-height: 54px !important;
+  }
+
+}
+
+
+@keyframes nexusTabIndicatorIn {
+
+  from {
+    opacity: 0;
+    transform:
+      translateX(-50%)
+      scaleX(.4);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateX(-50%)
+      scaleX(1);
+  }
+
+}
+
+
+@media
+(prefers-reduced-motion: reduce) {
+
+  .nexus-dock-shell .nexus-dock-app,
+  .nexus-dock-shell .nexus-icon {
+    transition: none !important;
+  }
+
+  .nexus-dock-shell
+  .nexus-dock-app-active::before {
+    animation: none !important;
+  }
+
+}
+
+/* =========================================================
+   MOBILE TAB BAR — FINAL GEOMETRY
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  /* Desktop collapse controls have no purpose on phone. */
+  [aria-label="Collapse Nexus Dock"],
+  [aria-label="Expand Nexus Dock"] {
+    display: none !important;
+  }
+
+  .nexus-dock-shell {
+    height: auto !important;
+  }
+
+  .nexus-dock-shell .nexus-dock-glass {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+
+    height: calc(68px + env(safe-area-inset-bottom)) !important;
+    min-height: 0 !important;
+
+    padding:
+      4px
+      6px
+      calc(4px + env(safe-area-inset-bottom))
+      !important;
+
+    align-items: stretch !important;
+  }
+
+  .nexus-dock-shell .nexus-dock-app,
+  .nexus-dock-shell button {
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+  }
+
+  .nexus-dock-shell .nexus-icon {
+    flex-shrink: 0;
+  }
+
+  /* No child is allowed to wrap underneath the tab bar. */
+  .nexus-dock-shell .nexus-dock-glass > * {
+    grid-row: 1 !important;
+  }
+
+}
+
+/* =========================================================
+   SEARCH vs NEXUS
+   Search = search.
+   Nexus = app library / dock management.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  /*
+   * Nexus application library is icon-driven.
+   * It does not show the search field.
+   */
+  .nexus-launcher-glass[data-launcher-view="apps"]
+  .nexus-launcher-search {
+    display: none !important;
+  }
+
+
+  /*
+   * Search opens directly into its search field.
+   */
+  .nexus-launcher-glass[data-launcher-view="search"]
+  .nexus-launcher-search {
+    display: block !important;
+    margin-top: 8px;
+  }
+
+
+  .nexus-launcher-glass[data-launcher-view="apps"] {
+    padding-top: 18px !important;
+  }
+
+}

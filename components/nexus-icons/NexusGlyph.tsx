@@ -1,194 +1,61 @@
-import {
-  BadgeCheck,
-  Banknote,
-  Barcode,
-  Boxes,
-  Building2,
-  Calculator,
-  Cable,
-  CircleDollarSign,
-  ClipboardCheck,
-  Clock3,
-  FileCheck2,
-  FileText,
-  LayoutDashboard,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Package,
-  PackageCheck,
-  PackagePlus,
-  ReceiptText,
-  RotateCcw,
-  ScanLine,
-  Settings,
-  ShieldCheck,
-  ShoppingBag,
-  Store,
-  Trash2,
-  Truck,
-  UserRoundCog,
-  UsersRound,
-  WalletCards,
-  Wrench,
-  Sparkles,
-  type LucideIcon,
-} from "lucide-react";
+import NexusIllustration from "@/components/nexus-icons/NexusIllustration";
 
 
-const icons:
-  Record<string, LucideIcon> = {
+const names = new Set([
+  "dashboard",
+  "email",
+  "email-sent",
+  "whatsapp",
+  "timebook",
 
-  dashboard:
-    LayoutDashboard,
+  "shipping",
+  "shipping-shipments",
+  "shipping-history",
+  "shipping-new",
+  "shipping-tracking",
+  "shipping-connections",
 
-  email:
-    Mail,
+  "sales",
+  "customers",
+  "quotations",
+  "sales-orders",
+  "invoices",
 
-  "email-sent":
-    Mail,
+  "pos",
+  "pos-approvals",
+  "pos-receipts",
+  "pos-cash-up",
+  "pos-pricing",
+  "pos-returns",
 
-  whatsapp:
-    MessageCircle,
+  "repairs",
 
+  "inventory",
+  "inventory-scanner",
+  "inventory-barcodes",
+  "purchasing",
 
-  /* SHIPPING */
+  "finance",
+  "accounting",
+  "payroll",
+  "payroll-runs",
+  "payroll-compliance",
 
-  shipping:
-    Truck,
+  "hr",
+  "users",
 
-  "shipping-shipments":
-    Package,
+  "companies",
+  "branches",
+  "reports",
+  "administration",
+  "security",
 
-  "shipping-history":
-    Clock3,
+  "settings",
+  "recycle",
 
-  "shipping-new":
-    PackagePlus,
-
-  "shipping-tracking":
-    MapPin,
-
-  "shipping-connections":
-    Cable,
-
-
-  /* SALES */
-
-  sales:
-    ShoppingBag,
-
-  customers:
-    UsersRound,
-
-  quotations:
-    FileText,
-
-  "sales-orders":
-    ClipboardCheck,
-
-  invoices:
-    ReceiptText,
-
-
-  /* POS */
-
-  pos:
-    Store,
-
-  "pos-approvals":
-    BadgeCheck,
-
-  "pos-receipts":
-    ReceiptText,
-
-  "pos-cash-up":
-    Banknote,
-
-  "pos-pricing":
-    CircleDollarSign,
-
-  "pos-returns":
-    RotateCcw,
-
-
-  /* REPAIRS */
-
-  repairs:
-    Wrench,
-
-
-  /* INVENTORY */
-
-  inventory:
-    Boxes,
-
-  "inventory-scanner":
-    ScanLine,
-
-  "inventory-barcodes":
-    Barcode,
-
-  purchasing:
-    PackageCheck,
-
-
-  /* FINANCE */
-
-  finance:
-    WalletCards,
-
-  accounting:
-    Calculator,
-
-  payroll:
-    Banknote,
-
-  "payroll-runs":
-    Banknote,
-
-  "payroll-compliance":
-    FileCheck2,
-
-
-  /* PEOPLE */
-
-  hr:
-    UsersRound,
-
-  users:
-    UserRoundCog,
-
-
-  /* ADMIN */
-
-  companies:
-    Building2,
-
-  branches:
-    Building2,
-
-  reports:
-    FileText,
-
-  administration:
-    ShieldCheck,
-
-  security:
-    ShieldCheck,
-
-  settings:
-    Settings,
-
-  recycle:
-    Trash2,
-
-  ai:
-    Sparkles,
-
-  core:
-    Sparkles,
-};
+  "ai",
+  "core",
+]);
 
 
 export function canonicalNexusIconName(
@@ -204,16 +71,12 @@ export function canonicalNexusIconName(
       );
 
 
-  if (
-    icons[name]
-  ) {
+  if (names.has(name)) {
     return name;
   }
 
 
-  if (
-    name.includes("shipping")
-  ) {
+  if (name.includes("shipping")) {
     return "shipping";
   }
 
@@ -234,9 +97,7 @@ export function canonicalNexusIconName(
   }
 
 
-  if (
-    name.includes("finance")
-  ) {
+  if (name.includes("finance")) {
     return "finance";
   }
 
@@ -250,16 +111,12 @@ export function canonicalNexusIconName(
   }
 
 
-  if (
-    name.includes("admin")
-  ) {
+  if (name.includes("admin")) {
     return "administration";
   }
 
 
-  if (
-    name.includes("sale")
-  ) {
+  if (name.includes("sale")) {
     return "sales";
   }
 
@@ -273,9 +130,7 @@ export function canonicalNexusIconName(
   }
 
 
-  if (
-    name.includes("setting")
-  ) {
+  if (name.includes("setting")) {
     return "settings";
   }
 
@@ -296,19 +151,18 @@ export default function NexusGlyph({
       name
     );
 
-  const Glyph =
-    icons[resolved] ??
-    Sparkles;
-
 
   return (
-    <Glyph
+    <span
       className={[
-        "nexus-icon__glyph",
-        "nexus-semantic-glyph",
+        "nexus-illustration",
         className,
       ].join(" ")}
-      strokeWidth={1.8}
-    />
+      aria-hidden="true"
+    >
+      <NexusIllustration
+        name={resolved}
+      />
+    </span>
   );
 }

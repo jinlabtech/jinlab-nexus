@@ -1,0 +1,52 @@
+/* Keep decorative materials in the workspace, outside customer documents. */
+.nexus-document {
+  color-scheme: light;
+  --background: #fff;
+  --foreground: #111;
+  --card: #fff;
+  --card-foreground: #111;
+  --muted: #f0f1f2;
+  --muted-foreground: #555;
+  --border: #aaa;
+  --input: #aaa;
+  --popover: #fff;
+  --popover-foreground: #111;
+}
+
+/* Opaque reading surfaces remain legible over every theme background. */
+html[data-nexus-theme] main [class*="bg-card"]:not(:where(.nexus-document, .nexus-document *)) {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 1px 3px rgb(0 0 0 / .06);
+  backdrop-filter: none;
+}
+html[data-nexus-theme="jinlab_glass"] {
+  --card: #fff;
+  --popover: #fff;
+}
+html[data-nexus-theme] :is([role="dialog"], [data-slot="dialog-content"], [data-slot="popover-content"], [data-slot="dropdown-menu-content"], [data-slot="select-content"]):not(:where(.nexus-document, .nexus-document *)) {
+  background: var(--popover) !important;
+  color: var(--popover-foreground);
+  border-color: var(--border);
+  backdrop-filter: none;
+}
+html[data-nexus-theme] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="hidden"]), textarea, select):not(:where(.nexus-document, .nexus-document *)) {
+  background: var(--card) !important;
+  color: var(--foreground) !important;
+  border-color: var(--input) !important;
+  color-scheme: inherit;
+}
+html[data-nexus-theme] :is(input, textarea):not(:where(.nexus-document, .nexus-document *))::placeholder {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+html[data-nexus-theme] :is(main, [role="dialog"]) :is(.bg-white, .bg-gray-50, .bg-gray-100, .bg-slate-50):not(:where(.nexus-document, .nexus-document *)) {
+  background-color: var(--card);
+  color: var(--card-foreground);
+}
+html[data-nexus-theme] :is(main, [role="dialog"]) :is(.text-black, .text-gray-900, .text-gray-800, .text-gray-700, .text-slate-900, .text-slate-800):not(:where(.nexus-document, .nexus-document *)) {
+  color: var(--foreground);
+}
+html[data-nexus-theme] :is(main, [role="dialog"]) :is(.text-gray-500, .text-gray-600, .text-slate-500, .text-slate-600):not(:where(.nexus-document, .nexus-document *)) {
+  color: var(--muted-foreground);
+}

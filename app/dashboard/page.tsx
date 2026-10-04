@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import NexusMobileHome from "@/components/layout/NexusMobileHome";
 import { useRouter } from "next/navigation";
 import { Activity, ArrowDownToLine, CircleCheck, Clock3, RefreshCw, ShieldCheck } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -11,6 +12,7 @@ import CoreFindingCard, { CORE_MODULE_LABELS } from "@/components/intelligence/C
 import CoreQuestionPanel from "@/components/intelligence/CoreQuestionPanel";
 import NexusControlDeck from "@/components/dashboard/NexusControlDeck";
 import { supabase } from "@/lib/supabase";
+import { getDocumentLogoUrl } from "@/lib/services/settingsService";
 import { coreAborted, coreError, coreIntelligenceService, downloadCoreReport, waitForCoreSignal } from "@/lib/services/coreIntelligenceService";
 import type { CoreAnalysis, CoreModule } from "@/lib/intelligence/types";
 
@@ -20,6 +22,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [companyName, setCompanyName] = useState("");
+  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState("");
   const [analysis, setAnalysis] = useState<CoreAnalysis | null>(null);
@@ -55,9 +58,41 @@ export default function DashboardPage() {
         if (profileError || !profileData) throw new Error("Your Nexus profile could not be loaded. Refresh this page to try again.");
         setProfile(profileData);
         if (profileData.company_id) {
-          const { data: company } = await supabase.from("company").select("company_name")
-            .eq("id", profileData.company_id).abortSignal(controller.signal).single();
-          if (!controller.signal.aborted) setCompanyName(company?.company_name ?? "");
+          const [
+            { data: company },
+            { data: documentSettings },
+          ] = await Promise.all([
+            supabase
+              .from("company")
+              .select("company_name")
+              .eq("id", profileData.company_id)
+              .abortSignal(controller.signal)
+              .single(),
+
+            supabase
+              .from("company_document_settings")
+              .select("logo_path")
+              .eq("company_id", profileData.company_id)
+              .abortSignal(controller.signal)
+              .maybeSingle(),
+          ]);
+
+          if (!controller.signal.aborted) {
+            setCompanyName(
+              company?.company_name ?? ""
+            );
+
+            const logoUrl =
+              await getDocumentLogoUrl(
+                documentSettings?.logo_path ?? null
+              );
+
+            if (!controller.signal.aborted) {
+              setCompanyLogoUrl(
+                logoUrl
+              );
+            }
+          }
         }
       } catch (error) {
         if (timedOut) setAuthError("Your profile took too long to load. Refresh this page to try again.");
@@ -122,8 +157,16 @@ export default function DashboardPage() {
   }
 
   return <DashboardLayout>
-    <Navbar companyName={analysis?.companyName || companyName || "JINLAB Nexus"} userName={profile?.full_name ?? ""} onLogout={logout} />
-    <main className="mx-auto w-full max-w-[1600px] space-y-6 p-4 pb-24 sm:p-6 sm:pb-24 lg:p-8 lg:pb-24">
+    <Navbar
+      companyName={analysis?.companyName || companyName || "JINLAB Nexus"}
+      companyLogoUrl={companyLogoUrl}
+      userName={profile?.full_name ?? ""}
+      onLogout={logout}
+    />
+
+    <NexusMobileHome />
+
+    <main className="mx-auto hidden w-full max-w-[1600px] space-y-6 p-4 pb-24 md:block sm:p-6 sm:pb-24 lg:p-8 lg:pb-24">
       {loading ? <div role="status" className="flex min-h-64 items-center justify-center gap-3 rounded-2xl border bg-card text-sm text-muted-foreground"><RefreshCw className="size-4 animate-spin" />Loading your Nexus workspace…</div> : authError ? <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">{authError}</div> : !isOwner ? <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border bg-card p-8 text-center"><ShieldCheck className="size-9 text-muted-foreground" /><h1 className="mt-4 text-xl font-semibold">Nexus Intelligence</h1><p className="mt-2 text-sm text-muted-foreground">This business review is available to the company owner.</p></div> : <>
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div><div className="flex items-center gap-2 text-xs font-semibold text-primary"><span className="flex size-6 items-center justify-center rounded-md bg-primary/10"><Activity className="size-3.5" /></span>Nexus Core</div><h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Nexus Intelligence</h1><p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">Know what needs attention, see the evidence and take the next step in Nexus.</p></div>
@@ -136,6 +179,7 @@ export default function DashboardPage() {
             0
           }
           intelligenceFindings={analysis?.findings ?? []}
+          intelligenceMetrics={analysis?.metrics ?? []}
           urgent={
             urgent
           }

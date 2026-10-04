@@ -1,0 +1,1107 @@
+/* =========================================================
+   JINLAB NEXUS — MOBILE STABILITY LAYER
+   Final phone behaviour overrides.
+   Desktop is intentionally untouched.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  html {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+
+    overflow-x: hidden;
+
+    /*
+     * Prevent layout width changing when the browser UI moves.
+     */
+    scrollbar-gutter: auto;
+
+    -webkit-text-size-adjust: 100%;
+  }
+
+
+  body {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+
+    min-height: 100dvh;
+
+    overflow-x: hidden;
+
+    overscroll-behavior-x: none;
+
+    /*
+     * Native-feeling scrolling.
+     */
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  /*
+   * Main application shell.
+   */
+  body > div,
+  main,
+  .nexus-page-enter {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+
+    overflow-x: clip;
+  }
+
+
+  /*
+   * Every direct module surface must respect the phone.
+   */
+  .nexus-page-enter > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+
+  /*
+   * Never allow common desktop widths to expand the viewport.
+   */
+  .nexus-page-enter :is(
+    [class*="min-w-["],
+    [class*="w-screen"],
+    [class*="max-w-"]
+  ) {
+    max-width: 100%;
+  }
+
+
+  /*
+   * Responsive media.
+   */
+  .nexus-page-enter :is(
+    img,
+    svg,
+    video,
+    canvas
+  ) {
+    max-width: 100%;
+  }
+
+
+  /*
+   * Forms stay inside the screen and avoid Safari zoom.
+   */
+  .nexus-page-enter :is(
+    input,
+    textarea,
+    select
+  ) {
+    min-width: 0;
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+
+  /*
+   * Long values must wrap rather than resize the page.
+   */
+  .nexus-page-enter :is(
+    p,
+    span,
+    a,
+    td,
+    th,
+    code
+  ) {
+    overflow-wrap: anywhere;
+  }
+
+
+  /*
+   * Cards remain stable.
+   */
+  .nexus-page-enter [data-slot="card"] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+
+  /*
+   * Horizontal data belongs inside its own scroll region.
+   */
+  .nexus-page-enter :has(> table) {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    overscroll-behavior-x: contain;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  .nexus-page-enter table {
+    min-width: 100%;
+  }
+
+
+  /*
+   * Dialogs behave like phone surfaces.
+   */
+  [data-slot="dialog-content"] {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+
+    max-height: 88dvh;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    overscroll-behavior: contain;
+  }
+
+
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="sheet-content"] {
+    max-width: calc(100vw - 12px) !important;
+  }
+
+
+  /* =======================================================
+     FIXED MOBILE NAVIGATION
+     ======================================================= */
+
+  .nexus-dock-shell {
+    position: fixed !important;
+
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+
+    transform: translate3d(0,0,0);
+
+    backface-visibility: hidden;
+
+    /*
+     * Keep this layer independent from scrolling content.
+     */
+    isolation: isolate;
+
+    contain: layout paint;
+  }
+
+
+  .nexus-dock-shell .nexus-dock-glass {
+    width: 100% !important;
+
+    transform: translate3d(0,0,0);
+
+    backface-visibility: hidden;
+
+    /*
+     * Heavy blur is one of the biggest causes of phone
+     * navigation flicker.
+     */
+    backdrop-filter:
+      blur(12px)
+      saturate(120%)
+      !important;
+
+    -webkit-backdrop-filter:
+      blur(12px)
+      saturate(120%)
+      !important;
+  }
+
+
+  /*
+   * Every bottom navigation position remains geometrically
+   * stable while changing routes.
+   */
+  .nexus-dock-shell .nexus-dock-app {
+    transform-origin: center;
+
+    backface-visibility: hidden;
+
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+  }
+
+
+  /*
+   * Press feedback without moving neighbouring tabs.
+   */
+  .nexus-dock-shell .nexus-dock-app:active {
+    transform: scale(.92) !important;
+  }
+
+
+  /*
+   * Active app must not change bar height/width.
+   */
+  .nexus-dock-shell .nexus-dock-app-active {
+    margin: 0 !important;
+  }
+
+
+  /* =======================================================
+     SIDEBAR
+     ======================================================= */
+
+  .nexus-mobile-sidebar {
+    height: 100dvh;
+
+    transform-style: preserve-3d;
+
+    backface-visibility: hidden;
+
+    overscroll-behavior: contain;
+
+    will-change: transform;
+  }
+
+
+  .nexus-mobile-sidebar aside {
+    height: 100dvh;
+    max-height: 100dvh;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  /* =======================================================
+     APPLICATION LAUNCHER
+     ======================================================= */
+
+  .nexus-launcher-shell {
+    height: 100dvh;
+
+    transform: translate3d(0,0,0);
+
+    backface-visibility: hidden;
+  }
+
+
+  .nexus-launcher-shell .nexus-launcher-glass {
+    max-height: 82dvh !important;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior: contain;
+
+    -webkit-overflow-scrolling: touch;
+
+    backface-visibility: hidden;
+  }
+
+
+  /* =======================================================
+     ROUTE TRANSITIONS
+     ======================================================= */
+
+  /*
+   * Keep module transitions subtle.
+   * Large translations cause visible instability on phones.
+   */
+  .nexus-page-enter {
+    animation:
+      nexusStablePhoneEnter
+      150ms
+      cubic-bezier(.2,.75,.25,1)
+      both
+      !important;
+
+    transform-origin: center top;
+
+    backface-visibility: hidden;
+  }
+
+
+  /*
+   * Leave enough room for the permanent bottom bar.
+   */
+  main {
+    padding-bottom:
+      calc(
+        5.75rem +
+        env(safe-area-inset-bottom)
+      )
+      !important;
+  }
+
+}
+
+
+@keyframes nexusStablePhoneEnter {
+
+  from {
+    opacity: .78;
+    transform: scale(.993);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+
+
+@media
+(max-width: 767px)
+and
+(prefers-reduced-motion: reduce) {
+
+  .nexus-page-enter {
+    animation: none !important;
+  }
+
+  .nexus-dock-app,
+  .nexus-mobile-sidebar,
+  .nexus-launcher-glass {
+    transition-duration: 0ms !important;
+  }
+
+}
+
+/* =========================================================
+   NEXUS PHONE CONTENT SCALE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  /*
+   * Tailwind desktop display sizes are too large on phones.
+   */
+  .nexus-page-enter [class*="text-6xl"],
+  .nexus-page-enter [class*="text-5xl"] {
+    font-size: 2rem !important;
+    line-height: 1.05 !important;
+    letter-spacing: -.025em !important;
+  }
+
+  .nexus-page-enter [class*="text-4xl"] {
+    font-size: 1.75rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .nexus-page-enter [class*="text-3xl"] {
+    font-size: 1.45rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .nexus-page-enter [class*="text-2xl"] {
+    font-size: 1.25rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /*
+   * Desktop page padding becomes phone padding.
+   */
+  .nexus-page-enter :is(
+    [class*="px-10"],
+    [class*="px-8"],
+    [class*="px-7"],
+    [class*="px-6"]
+  ) {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .nexus-page-enter :is(
+    [class*="py-10"],
+    [class*="py-8"]
+  ) {
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+  }
+
+  /*
+   * Hero/banner areas should not consume half the phone.
+   */
+  .nexus-page-enter section {
+    max-width: 100%;
+  }
+
+  /*
+   * Buttons should fit the viewport.
+   */
+  .nexus-page-enter button {
+    max-width: 100%;
+  }
+
+  /*
+   * Reserve only the real mobile navigation height.
+   */
+  main {
+    padding-bottom:
+      calc(76px + env(safe-area-inset-bottom))
+      !important;
+  }
+
+}
+
+@media (max-width: 767px) {
+
+  /*
+   * System bar should behave like a compact app navigation bar.
+   */
+  header:first-of-type {
+    min-width: 0;
+  }
+
+  /*
+   * Breadcrumb text must never collide with right-side controls.
+   */
+  header:first-of-type nav,
+  header:first-of-type [aria-label*="breadcrumb" i] {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  header:first-of-type nav span,
+  header:first-of-type nav a {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+}
+
+/* =========================================================
+   NEXUS PHONE HOME
+   OS-style application launcher
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .nexus-phone-home {
+    width: 100%;
+    min-height:
+      calc(
+        100dvh -
+        56px -
+        76px -
+        env(safe-area-inset-bottom)
+      );
+
+    padding-bottom: 28px;
+  }
+
+
+  .nexus-phone-app-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      );
+
+    width: 100%;
+
+    gap:
+      22px 8px;
+
+    padding:
+      8px 12px
+      28px;
+  }
+
+
+  .nexus-phone-app {
+    display: flex;
+
+    min-width: 0;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    gap: 7px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    -webkit-tap-highlight-color:
+      transparent;
+
+    touch-action:
+      manipulation;
+  }
+
+
+  .nexus-phone-app-icon {
+    display: flex;
+
+    width: 64px;
+    height: 64px;
+
+    align-items: center;
+    justify-content: center;
+
+    transform: translateZ(0);
+
+    transition:
+      transform
+      120ms
+      cubic-bezier(.2,.8,.2,1);
+  }
+
+
+  .nexus-phone-app:active
+  .nexus-phone-app-icon {
+    transform:
+      scale(.88);
+  }
+
+
+  .nexus-phone-app-icon
+  .nexus-icon {
+    width: 60px !important;
+    height: 60px !important;
+
+    border-radius: 17px !important;
+  }
+
+
+  .nexus-phone-app-label {
+    width: 100%;
+
+    overflow: hidden;
+
+    text-align: center;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    line-height: 1.15;
+  }
+
+}
+
+
+@media (max-width: 390px) {
+
+  .nexus-phone-app-grid {
+    gap:
+      20px 5px;
+
+    padding-left:
+      8px;
+
+    padding-right:
+      8px;
+  }
+
+
+  .nexus-phone-app-icon {
+    width: 58px;
+    height: 58px;
+  }
+
+
+  .nexus-phone-app-icon
+  .nexus-icon {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+}
+
+/* =========================================================
+   NEXUS MOBILE HOME — APPLICATION ENVIRONMENT
+   No sidebar. No desktop dashboard.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .nexus-phone-home {
+    position: relative;
+
+    width: 100%;
+    max-width: 100%;
+
+    min-height:
+      calc(
+        100dvh -
+        56px -
+        68px -
+        env(safe-area-inset-bottom)
+      );
+
+    overflow-x: hidden;
+
+    background:
+      radial-gradient(
+        circle at 85% 0%,
+        color-mix(
+          in srgb,
+          var(--primary) 8%,
+          transparent
+        ),
+        transparent 35%
+      );
+  }
+
+
+  .nexus-phone-home > div:first-child {
+    padding:
+      20px
+      18px
+      12px;
+  }
+
+
+  /*
+   * Applications occupy the workspace like a phone OS.
+   */
+  .nexus-phone-app-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    width: 100%;
+
+    gap:
+      24px
+      6px;
+
+    padding:
+      12px
+      10px
+      30px;
+  }
+
+
+  .nexus-phone-app {
+    display: flex;
+
+    min-width: 0;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    gap: 8px;
+
+    color: inherit;
+
+    text-decoration: none;
+
+    -webkit-tap-highlight-color:
+      transparent;
+
+    touch-action:
+      manipulation;
+  }
+
+
+  .nexus-phone-app-icon {
+    display: flex;
+
+    width: 68px;
+    height: 68px;
+
+    align-items: center;
+    justify-content: center;
+
+    transform:
+      translate3d(0,0,0);
+
+    transition:
+      transform
+      125ms
+      cubic-bezier(.2,.8,.2,1);
+  }
+
+
+  .nexus-phone-app-icon
+  .nexus-icon {
+    width: 64px !important;
+    height: 64px !important;
+
+    border-radius:
+      18px !important;
+  }
+
+
+  .nexus-phone-app:active
+  .nexus-phone-app-icon {
+    transform:
+      scale(.86);
+  }
+
+
+  .nexus-phone-app-label {
+    width: 100%;
+
+    min-height: 24px;
+
+    overflow: hidden;
+
+    padding:
+      0 2px;
+
+    text-align: center;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    line-height: 1.15;
+  }
+
+
+  /*
+   * Compact persistent app header.
+   */
+  .nexus-mobile-app-header {
+    box-shadow:
+      0 1px 0
+      rgb(0 0 0 / .04);
+
+    transform:
+      translateZ(0);
+
+    backface-visibility:
+      hidden;
+  }
+
+}
+
+
+@media (max-width: 370px) {
+
+  .nexus-phone-app-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap:
+      22px
+      8px;
+  }
+
+}
+
+/* =========================================================
+   NEXUS MOBILE — NATIVE APP VIEWPORT
+   Header + taskbar stay still. Workspace alone scrolls.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+
+    overflow: hidden !important;
+
+    overscroll-behavior: none;
+  }
+
+
+  .nexus-shell {
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100%;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+
+    overflow: hidden !important;
+  }
+
+
+  .nexus-shell-workspace {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+
+  .nexus-mobile-app-header {
+    position: relative !important;
+
+    top: auto !important;
+
+    flex: 0 0 56px;
+
+    width: 100%;
+    height: 56px;
+
+    z-index: 70;
+  }
+
+
+  .nexus-app-workspace {
+    position: relative;
+
+    flex: 1 1 auto;
+
+    width: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    padding-bottom:
+      calc(
+        76px +
+        env(safe-area-inset-bottom)
+      );
+
+    overscroll-behavior-y: contain;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: none;
+  }
+
+
+  .nexus-app-workspace::-webkit-scrollbar {
+    display: none;
+  }
+
+
+  .nexus-app-workspace
+  > .nexus-page-enter {
+    width: 100%;
+    min-width: 0;
+
+    min-height: 100%;
+  }
+
+
+  /*
+   * Route changes move only the app workspace.
+   * The shell itself never jumps.
+   */
+  .nexus-page-enter {
+    animation:
+      nexusAppOpen
+      150ms
+      cubic-bezier(.2,.75,.25,1)
+      both
+      !important;
+  }
+
+}
+
+
+@keyframes nexusAppOpen {
+
+  from {
+    opacity: .72;
+    transform: translateY(4px) scale(.995);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+}
+
+/* =========================================================
+   MOBILE HOME — ICONS DRIVE THE EXPERIENCE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .nexus-phone-app-grid {
+    gap:
+      26px
+      6px !important;
+  }
+
+
+  .nexus-phone-app-icon {
+    width:
+      74px !important;
+
+    height:
+      74px !important;
+  }
+
+
+  .nexus-phone-app-icon
+  .nexus-icon {
+    width:
+      70px !important;
+
+    height:
+      70px !important;
+
+    border-radius:
+      20px !important;
+  }
+
+
+  .nexus-phone-app-label {
+    font-size:
+      10.5px !important;
+
+    font-weight:
+      500 !important;
+
+    opacity:
+      .86;
+  }
+
+
+  /*
+   * No card behind the application.
+   * The artwork itself is the interaction target.
+   */
+  .nexus-phone-app {
+    background:
+      transparent !important;
+
+    box-shadow:
+      none !important;
+  }
+
+}
+
+/* =========================================================
+   NEXUS MOBILE — GESTURE DRAWER
+   Invisible until left-edge swipe.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .nexus-mobile-sidebar {
+    height: 100dvh;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior:
+      contain;
+
+    transform:
+      translate3d(-100%,0,0);
+
+    will-change:
+      transform;
+
+    backface-visibility:
+      hidden;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
+
+  .nexus-mobile-sidebar.translate-x-0 {
+    transform:
+      translate3d(0,0,0)
+      !important;
+  }
+
+
+  /*
+   * Sidebar is secondary navigation.
+   * It never occupies normal mobile layout space.
+   */
+  .nexus-shell-workspace {
+    margin-left:
+      0 !important;
+  }
+
+}
+
+/* =========================================================
+   NEXUS MOBILE DRAWER
+   Gesture-only secondary navigation
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .nexus-mobile-drawer {
+    width: 100%;
+    height: 100dvh;
+
+    overflow: hidden;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  .nexus-mobile-drawer nav {
+    min-height: 0;
+
+    -webkit-overflow-scrolling:
+      touch;
+
+    scrollbar-width:
+      none;
+  }
+
+
+  .nexus-mobile-drawer nav::-webkit-scrollbar {
+    display: none;
+  }
+
+
+  .nexus-mobile-sidebar {
+    box-shadow:
+      16px 0 40px
+      rgb(0 0 0 / .16);
+  }
+
+}
+
+/* =========================================================
+   NEXUS SCREEN MEMORY
+   Workspace owns mobile scrolling.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .nexus-app-workspace {
+    scroll-behavior:
+      auto !important;
+
+    overflow-anchor:
+      none;
+  }
+
+}

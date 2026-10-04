@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 
+import { useNexusUiState } from "@/hooks/useNexusUiState";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -66,7 +68,10 @@ export default function SalesPage() {
   const [
     searchTerm,
     setSearchTerm,
-  ] = useState("");
+  ] = useNexusUiState(
+    "sales:orders:search",
+    ""
+  );
 
   const [
     pageError,
@@ -298,9 +303,9 @@ export default function SalesPage() {
         onLogout={logout}
       />
 
-      <main className="p-4 sm:p-6 lg:p-8">
-        <section className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+      <main className="nexus-module-screen p-3 md:p-6 lg:p-8">
+        <section className="mb-3 flex items-center justify-between gap-2 md:mb-8 md:items-start">
+          <div className="hidden md:block">
             <p className="text-sm font-medium text-primary">
               Sales
             </p>
@@ -314,10 +319,10 @@ export default function SalesPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full gap-2 md:w-auto md:flex-wrap md:gap-3">
             <Link
               href="/quotations"
-              className="inline-flex h-9 items-center justify-center rounded-md border bg-background px-4 text-sm font-medium"
+              className="inline-flex h-10 flex-1 items-center justify-center rounded-xl border bg-background px-3 text-xs font-medium md:h-9 md:flex-none md:rounded-md md:px-4 md:text-sm"
             >
               Quotations
             </Link>
@@ -345,7 +350,7 @@ export default function SalesPage() {
           </div>
         )}
 
-        <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="mb-6 hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-xl border bg-card p-5">
             <p className="text-sm text-muted-foreground">
               Total Orders
@@ -408,8 +413,8 @@ export default function SalesPage() {
           </div>
         </section>
 
-        <section className="mb-5 flex flex-col gap-4 rounded-xl border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+        <section className="sticky top-0 z-20 mb-3 flex flex-col gap-3 border-b border-border/40 bg-background/95 px-0 py-3 backdrop-blur-xl md:static md:mb-5 md:flex-row md:items-center md:justify-between md:rounded-xl md:border md:bg-card md:p-4 md:backdrop-blur-none">
+          <div className="hidden md:block">
             <p className="font-semibold">
               Sales Order Register
             </p>
@@ -435,29 +440,182 @@ export default function SalesPage() {
               )
             }
             placeholder="Search sales orders..."
-            className="h-10 w-full rounded-md border bg-background px-3 text-sm sm:max-w-sm"
+            className="h-11 w-full rounded-xl border bg-background px-4 text-[16px] outline-none focus:ring-2 focus:ring-primary/15 md:h-10 md:max-w-sm md:rounded-md md:px-3 md:text-sm"
           />
         </section>
 
         {loading ||
         permissionsLoading ? (
-          <div className="rounded-xl border p-10 text-center text-sm text-muted-foreground">
-            Loading sales orders...
-          </div>
+          <>
+            {/* MOBILE LOADING */}
+            <div className="space-y-3 md:hidden">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="animate-pulse rounded-2xl border bg-card p-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="h-4 w-28 rounded bg-muted" />
+                      <div className="h-3 w-36 rounded bg-muted" />
+                    </div>
+
+                    <div className="h-6 w-20 rounded-full bg-muted" />
+                  </div>
+
+                  <div className="mt-5 h-5 w-24 rounded bg-muted" />
+                </div>
+              ))}
+            </div>
+
+            {/* DESKTOP LOADING */}
+            <div className="hidden rounded-xl border p-10 text-center text-sm text-muted-foreground md:block">
+              Loading sales orders...
+            </div>
+          </>
         ) : (
-          <DataTable
-            headers={[
-              "Sales Order",
-              "Customer",
-              "Status",
-              "Order Date",
-              "Expected",
-              "Total",
-              "Actions",
-            ]}
-            rows={rows}
-            emptyMessage="No sales orders yet."
-          />
+          <>
+            {/* MOBILE SALES ORDERS */}
+            <div className="space-y-3 md:hidden">
+
+              {filteredSalesOrders.length === 0 ? (
+                <div className="rounded-2xl border border-dashed bg-card/50 px-5 py-10 text-center">
+                  <p className="text-sm font-semibold">
+                    No sales orders
+                  </p>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    No orders match your current search.
+                  </p>
+                </div>
+              ) : (
+                filteredSalesOrders.map((order) => {
+
+                  const href =
+                    `/sales/${order.id}`;
+
+                  const customer =
+                    customerMap.get(
+                      order.customer_id
+                    ) ?? "Customer";
+
+                  return (
+                    <Link
+                      key={order.id}
+                      href={href}
+                      prefetch={false}
+                      onPointerEnter={() =>
+                        router.prefetch(
+                          href
+                        )
+                      }
+                      onTouchStart={() =>
+                        router.prefetch(
+                          href
+                        )
+                      }
+                      className="group block rounded-2xl border border-border/55 bg-card p-4 shadow-sm transition active:scale-[0.985] active:bg-muted/40"
+                    >
+
+                      <div className="flex items-start justify-between gap-3">
+
+                        <div className="min-w-0">
+
+                          <p className="truncate text-[15px] font-bold tracking-tight">
+                            {order.sales_order_number}
+                          </p>
+
+                          <p className="mt-1 truncate text-[13px] text-muted-foreground">
+                            {customer}
+                          </p>
+
+                        </div>
+
+
+                        <span className="shrink-0 rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-semibold">
+                          {formatStatus(
+                            order.status
+                          )}
+                        </span>
+
+                      </div>
+
+
+                      <div className="mt-4 flex items-end justify-between gap-4">
+
+                        <div>
+
+                          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                            Total
+                          </p>
+
+                          <p className="mt-0.5 text-lg font-bold tracking-tight">
+                            {formatCurrency(
+                              Number(
+                                order.total_amount
+                              )
+                            )}
+                          </p>
+
+                        </div>
+
+
+                        <div className="text-right">
+
+                          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                            Order date
+                          </p>
+
+                          <p className="mt-0.5 text-xs font-medium">
+                            {order.order_date}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+
+                      {order.expected_delivery ? (
+                        <div className="mt-3 border-t border-border/35 pt-3">
+
+                          <p className="text-[11px] text-muted-foreground">
+                            Expected delivery{" "}
+                            <span className="font-medium text-foreground">
+                              {order.expected_delivery}
+                            </span>
+                          </p>
+
+                        </div>
+                      ) : null}
+
+                    </Link>
+                  );
+
+                })
+              )}
+
+            </div>
+
+
+            {/* DESKTOP SALES TABLE */}
+            <div className="hidden md:block">
+
+              <DataTable
+                headers={[
+                  "Sales Order",
+                  "Customer",
+                  "Status",
+                  "Order Date",
+                  "Expected",
+                  "Total",
+                  "Actions",
+                ]}
+                rows={rows}
+                emptyMessage="No sales orders yet."
+              />
+
+            </div>
+          </>
         )}
       </main>
     </DashboardLayout>

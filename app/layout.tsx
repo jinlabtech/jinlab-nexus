@@ -3,6 +3,7 @@ import type {
 } from "next";
 
 import NexusThemeProvider from "@/components/theme/NexusThemeProvider";
+import NexusPersistentShell from "@/components/layout/NexusPersistentShell";
 
 import "./globals.css";
 
@@ -38,9 +39,11 @@ export default function RootLayout({
       >
 
         <NexusThemeProvider>
-          {
-            children
-          }
+
+          <NexusPersistentShell>
+            {children}
+          </NexusPersistentShell>
+
         </NexusThemeProvider>
 
       </body>

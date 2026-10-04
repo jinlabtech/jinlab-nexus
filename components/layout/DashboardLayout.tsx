@@ -1,27 +1,28 @@
 "use client";
 
-import type { ReactNode } from "react";
-
-import Sidebar from "@/components/Sidebar";
-import NexusHelper from "@/components/NexusHelper";
-import NexusAppearanceBoot from "@/components/nexus-icons/NexusAppearanceBoot";
+/*
+ * Nexus Shell 2.0 compatibility boundary.
+ *
+ * Older Nexus modules still render <DashboardLayout>.
+ * The persistent application shell now lives in app/layout.tsx,
+ * so this component intentionally renders only its workspace.
+ *
+ * This allows us to migrate hundreds of existing pages safely
+ * without editing every module at once.
+ */
 
 type DashboardLayoutProps = {
-  children: ReactNode;
+  children: React.ReactNode;
 };
+
 
 export default function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
-  return (
-    <div className="min-h-screen bg-muted/30 md:flex md:h-screen md:overflow-hidden">
-      <Sidebar />
 
-      <div className="min-w-0 flex-1 md:h-screen md:overflow-y-auto">
-        {children}
-      </div>
-      <NexusAppearanceBoot />
-      <NexusHelper />
-    </div>
+  return (
+    <>
+      {children}
+    </>
   );
 }

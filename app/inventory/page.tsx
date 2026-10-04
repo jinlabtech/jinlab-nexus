@@ -9,6 +9,8 @@ import {
   useMemo,
   useState,
 } from "react";
+
+import { useNexusUiState } from "@/hooks/useNexusUiState";
 import { useRouter } from "next/navigation";
 
 import DataTable from "@/components/DataTable";
@@ -79,7 +81,10 @@ export default function InventoryPage() {
   const [
     searchTerm,
     setSearchTerm,
-  ] = useState("");
+  ] = useNexusUiState(
+    "inventory:items:search",
+    ""
+  );
 
   const [
     showItemForm,
@@ -1067,7 +1072,7 @@ export default function InventoryPage() {
           }
         />
 
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className="nexus-module-screen p-3 md:p-6 lg:p-8">
           <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6">
             <h1 className="text-xl font-semibold">
               Access denied
@@ -1097,9 +1102,9 @@ export default function InventoryPage() {
         onLogout={logout}
       />
 
-      <main className="p-4 sm:p-6 lg:p-8">
-        <section className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+      <main className="nexus-module-screen p-3 md:p-6 lg:p-8">
+        <section className="mb-3 flex items-center justify-between gap-2 md:mb-8 md:items-start">
+          <div className="hidden md:block">
             <p className="text-sm font-medium text-primary">
               Stock management
             </p>
@@ -1334,8 +1339,8 @@ export default function InventoryPage() {
           </div>
         </section>
 
-        <section className="mt-8 mb-5 flex flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <div>
+        <section className="sticky top-0 z-20 mb-3 flex flex-col gap-3 border-b border-border/40 bg-background/95 py-3 backdrop-blur-xl md:static md:mt-8 md:mb-5 md:flex-row md:items-center md:justify-between md:rounded-xl md:border md:bg-card md:p-4 md:shadow-sm md:backdrop-blur-none">
+          <div className="hidden md:block">
             <p className="font-semibold">
               Inventory items
             </p>
@@ -1365,33 +1370,263 @@ export default function InventoryPage() {
               )
             }
             placeholder="Search inventory..."
-            className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring sm:max-w-sm"
+            className="h-11 w-full rounded-xl border bg-background px-4 text-[16px] outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring md:h-10 md:max-w-sm md:rounded-md md:px-3 md:text-sm"
           />
         </section>
 
         {loading ||
         branchesLoading ||
         permissionsLoading ? (
-          <div className="rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground">
-            Loading
-            inventory...
-          </div>
+          <>
+            {/* MOBILE LOADING */}
+            <div className="space-y-3 md:hidden">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="animate-pulse rounded-2xl border bg-card p-4"
+                >
+                  <div className="flex justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="h-4 w-36 rounded bg-muted" />
+                      <div className="h-3 w-24 rounded bg-muted" />
+                    </div>
+
+                    <div className="h-6 w-16 rounded-full bg-muted" />
+                  </div>
+
+                  <div className="mt-5 h-6 w-28 rounded bg-muted" />
+                </div>
+              ))}
+            </div>
+
+            {/* DESKTOP LOADING */}
+            <div className="hidden rounded-xl border bg-card p-10 text-center text-sm text-muted-foreground md:block">
+              Loading inventory...
+            </div>
+          </>
         ) : (
-          <DataTable
-            headers={[
-              "Item",
-              "Category",
-              "Supplier",
-              "Stock",
-              "Cost",
-              "Selling Price",
-              "Margin",
-              "Barcode",
-              "Actions",
-            ]}
-            rows={rows}
-            emptyMessage="No inventory items match your search."
-          />
+          <>
+            {/* MOBILE INVENTORY */}
+            <div className="space-y-3 md:hidden">
+
+              {filteredItems.length === 0 ? (
+                <div className="rounded-2xl border border-dashed bg-card/50 px-5 py-10 text-center">
+                  <p className="text-sm font-semibold">
+                    No inventory items
+                  </p>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Nothing matches your current search.
+                  </p>
+                </div>
+              ) : (
+                filteredItems.map((item) => {
+
+                  const quantity =
+                    stockByItem.get(
+                      item.id
+                    ) ?? 0;
+
+                  const isLowStock =
+                    quantity <=
+                    item.minimum_stock;
+
+                  const category =
+                    item.category_id
+                      ? categoryMap.get(
+                          item.category_id
+                        ) ?? "Uncategorised"
+                      : "Uncategorised";
+
+                  const supplier =
+                    item.supplier_id
+                      ? supplierMap.get(
+                          item.supplier_id
+                        ) ?? "No supplier"
+                      : "No supplier";
+
+                  return (
+                    <article
+                      key={item.id}
+                      className="rounded-2xl border border-border/55 bg-card p-4 shadow-sm"
+                    >
+
+                      <div className="flex items-start justify-between gap-3">
+
+                        <div className="min-w-0">
+                          <p className="truncate text-[15px] font-bold tracking-tight">
+                            {item.item_name}
+                          </p>
+
+                          <p className="mt-1 truncate text-[11px] text-muted-foreground">
+                            SKU: {item.sku || "-"}
+                          </p>
+                        </div>
+
+                        <span
+                          className={
+                            isLowStock
+                              ? "shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-semibold text-amber-700"
+                              : "shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-semibold text-emerald-700"
+                          }
+                        >
+                          {isLowStock
+                            ? `Low · ${quantity}`
+                            : `Stock · ${quantity}`}
+                        </span>
+
+                      </div>
+
+
+                      <div className="mt-4 flex items-end justify-between gap-4">
+
+                        <div>
+                          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                            Selling price
+                          </p>
+
+                          <p className="mt-0.5 text-lg font-bold tracking-tight">
+                            {formatCurrency(
+                              Number(
+                                item.selling_price
+                              )
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                            Cost
+                          </p>
+
+                          <p className="mt-0.5 text-xs font-semibold">
+                            {formatCurrency(
+                              Number(
+                                item.cost_price
+                              )
+                            )}
+                          </p>
+                        </div>
+
+                      </div>
+
+
+                      <div className="mt-3 border-t border-border/35 pt-3">
+
+                        <p className="truncate text-[11px] text-muted-foreground">
+                          {category} · {supplier}
+                        </p>
+
+                        {item.barcode ? (
+                          <p className="mt-1 truncate text-[10px] text-muted-foreground">
+                            Barcode: {item.barcode}
+                          </p>
+                        ) : null}
+
+                      </div>
+
+
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+
+                        {can(
+                          "inventory.update"
+                        ) && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="rounded-xl"
+                            onClick={() =>
+                              openEditItem(
+                                item
+                              )
+                            }
+                          >
+                            Edit
+                          </Button>
+                        )}
+
+                        {can(
+                          "inventory.stock.adjust"
+                        ) && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="rounded-xl"
+                            onClick={() =>
+                              openStockAdjustment(
+                                item
+                              )
+                            }
+                          >
+                            Stock
+                          </Button>
+                        )}
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="rounded-xl border"
+                          onClick={() =>
+                            openBreakdown(
+                              item
+                            )
+                          }
+                        >
+                          Breakdown
+                        </Button>
+
+                        {can(
+                          "inventory.delete"
+                        ) && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="rounded-xl"
+                            onClick={() =>
+                              archiveItem(
+                                item
+                              )
+                            }
+                          >
+                            Archive
+                          </Button>
+                        )}
+
+                      </div>
+
+                    </article>
+                  );
+
+                })
+              )}
+
+            </div>
+
+
+            {/* DESKTOP INVENTORY TABLE */}
+            <div className="hidden md:block">
+
+              <DataTable
+                headers={[
+                  "Item",
+                  "Category",
+                  "Supplier",
+                  "Stock",
+                  "Cost",
+                  "Selling Price",
+                  "Margin",
+                  "Barcode",
+                  "Actions",
+                ]}
+                rows={rows}
+                emptyMessage="No inventory items match your search."
+              />
+
+            </div>
+          </>
         )}
       </main>
     </DashboardLayout>

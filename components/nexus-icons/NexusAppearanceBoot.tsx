@@ -16,6 +16,20 @@ export const NEXUS_ICON_STYLES = [
 export type NexusIconStyle =
   (typeof NEXUS_ICON_STYLES)[number];
 
+
+export const NEXUS_ICON_ART_KEY =
+  "jinlab-nexus-icon-art";
+
+export const NEXUS_ICON_ART_STYLES = [
+  "studio",
+  "sculpted",
+  "prism",
+] as const;
+
+export type NexusIconArtStyle =
+  (typeof NEXUS_ICON_ART_STYLES)[number];
+
+
 export function isNexusIconStyle(
   value: string | null
 ): value is NexusIconStyle {
@@ -23,6 +37,16 @@ export function isNexusIconStyle(
     value as NexusIconStyle
   );
 }
+
+
+export function isNexusIconArtStyle(
+  value: string | null
+): value is NexusIconArtStyle {
+  return NEXUS_ICON_ART_STYLES.includes(
+    value as NexusIconArtStyle
+  );
+}
+
 
 export function applyNexusIconStyle(
   style: NexusIconStyle
@@ -45,20 +69,62 @@ export function applyNexusIconStyle(
   );
 }
 
+
+export function applyNexusIconArtStyle(
+  style: NexusIconArtStyle
+) {
+  document.documentElement.dataset.nexusIconArt =
+    style;
+
+  window.localStorage.setItem(
+    NEXUS_ICON_ART_KEY,
+    style
+  );
+
+  window.dispatchEvent(
+    new CustomEvent(
+      "nexus-icon-art-change",
+      {
+        detail: style,
+      }
+    )
+  );
+}
+
+
 export default function NexusAppearanceBoot() {
   useEffect(() => {
-    const stored =
+    const storedMaterial =
       window.localStorage.getItem(
         NEXUS_ICON_STYLE_KEY
       );
 
-    const resolved =
-      isNexusIconStyle(stored)
-        ? stored
+    const material =
+      isNexusIconStyle(
+        storedMaterial
+      )
+        ? storedMaterial
         : "lumina";
 
+
+    const storedArt =
+      window.localStorage.getItem(
+        NEXUS_ICON_ART_KEY
+      );
+
+    const art =
+      isNexusIconArtStyle(
+        storedArt
+      )
+        ? storedArt
+        : "studio";
+
+
     document.documentElement.dataset.nexusIconStyle =
-      resolved;
+      material;
+
+    document.documentElement.dataset.nexusIconArt =
+      art;
   }, []);
 
   return null;

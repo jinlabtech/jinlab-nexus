@@ -5,8 +5,19 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
     const actor = await authenticate(request);
-    const search = new URL(request.url).searchParams.get("search")?.trim().slice(0, 120) ?? "";
+    const params = new URL(request.url).searchParams;
+    const search = params.get("search")?.trim().slice(0, 120) ?? "";
+    const filter = params.get("filter") || "all";
+    const salesStage = params.get("salesStage") || "";
+    if (!["all", "unread", "follow_up", "unassigned", "waiting", "won"].includes(filter)) throw new WhatsAppError("Invalid inbox filter.");
+    if (salesStage && !["enquiry", "qualified", "quoted", "negotiating", "won", "paid", "lost"].includes(salesStage)) throw new WhatsAppError("Invalid sales stage.");
     let query = actor.db.from("whatsapp_conversation").select(CONVERSATION_COLUMNS).eq("company_id", actor.companyId).order("last_message_at", { ascending: false }).order("id").limit(100);
+    if (salesStage) query = query.eq("sales_stage", salesStage);
+    if (filter === "unassigned") query = query.is("assigned_to", null);
+    if (filter === "unread") query = query.gt("unread_count", 0);
+    if (filter === "waiting") query = query.eq("attention_state", "waiting_customer");
+    if (filter === "won") query = query.eq("sales_stage", "won");
+    if (filter === "follow_up") query = query.or(`attention_state.eq.follow_up_due,follow_up_at.lte.${new Date().toISOString()}`);
     if (search) {
       const term = search.replace(/[^\p{L}\p{N} +@._-]/gu, "").replace(/[%_]/g, "");
       if (term) query = query.or(`contact_name.ilike.%${term}%,wa_id.ilike.%${term}%`);

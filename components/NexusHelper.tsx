@@ -22,6 +22,24 @@ export default function NexusHelper() {
   const closeButton = useRef<HTMLButtonElement | null>(null);
   const wasOpen = useRef(false);
   useEffect(() => {
+    function openFromNexusAction() {
+      setOpen(true);
+    }
+
+    window.addEventListener(
+      "nexus:helper-open",
+      openFromNexusAction
+    );
+
+    return () => {
+      window.removeEventListener(
+        "nexus:helper-open",
+        openFromNexusAction
+      );
+    };
+  }, []);
+
+  useEffect(() => {
     if (!open) { if (wasOpen.current) opener.current?.focus(); wasOpen.current = false; return; }
     wasOpen.current = true;
     closeButton.current?.focus();

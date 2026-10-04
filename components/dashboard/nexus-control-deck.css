@@ -2174,3 +2174,62 @@ html[
     transform: none;
   }
 }
+
+.nexus-whatsapp-rail {
+  position: relative;
+  z-index: 6;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: .7rem 1.25rem;
+
+  margin-top: .9rem;
+  padding: .7rem 1rem;
+
+  border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+
+  color: var(--muted-foreground);
+  text-align: left;
+
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.nexus-whatsapp-rail:hover {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+}
+
+.nexus-whatsapp-rail > span:first-child {
+  margin-right: .5rem;
+}
+
+.nexus-whatsapp-rail strong,
+.nexus-whatsapp-rail small {
+  display: block;
+}
+
+.nexus-whatsapp-rail strong {
+  font-size: .76rem;
+  color: var(--foreground);
+}
+
+.nexus-whatsapp-rail small {
+  margin-top: .08rem;
+  font-size: .6rem;
+}
+
+.nexus-whatsapp-rail > span:not(:first-child) {
+  font-size: .65rem;
+}
+
+.nexus-whatsapp-rail b {
+  margin-right: .2rem;
+  color: var(--foreground);
+  font-size: .78rem;
+}

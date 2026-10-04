@@ -178,6 +178,14 @@ export function changeNexusTheme(
 }
 
 
+export function getNexusThemePreference():
+  NexusThemeKey |
+  null {
+
+  return getCachedTheme();
+}
+
+
 export default function NexusThemeProvider({
   children,
 }: {
@@ -189,14 +197,15 @@ export default function NexusThemeProvider({
     () => {
 
       const cached =
-        getCachedTheme() ??
-        "jinlab_blue";
+        getCachedTheme();
 
 
-      applyTheme(
-        cached,
-        false
-      );
+      if (cached) {
+        applyTheme(
+          cached,
+          false
+        );
+      }
 
 
       let cancelled =
@@ -204,6 +213,24 @@ export default function NexusThemeProvider({
 
 
       async function loadCompanyTheme() {
+
+        /*
+         * Personal appearance always wins.
+         * Company appearance is only the fallback for a user
+         * who has never chosen a personal Nexus theme.
+         */
+        const personalTheme =
+          getCachedTheme();
+
+        if (personalTheme) {
+          applyTheme(
+            personalTheme,
+            false
+          );
+
+          return;
+        }
+
 
         const {
           data: {
@@ -249,9 +276,13 @@ export default function NexusThemeProvider({
           )
         ) {
 
+          /*
+           * Company default is a fallback only.
+           * Do NOT save it as the user's personal preference.
+           */
           applyTheme(
             theme,
-            true
+            false
           );
         }
       }
@@ -379,6 +410,48 @@ export default function NexusThemeProvider({
     },
     []
   );
+
+
+  useEffect(() => {
+
+    const nexusSystemAppearanceListener =
+      window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      );
+
+
+    const handleSystemAppearanceChange =
+      () => {
+
+        if (
+          getCachedTheme() ===
+          "system"
+        ) {
+          applyTheme(
+            "system",
+            false
+          );
+        }
+      };
+
+
+    nexusSystemAppearanceListener
+      .addEventListener(
+        "change",
+        handleSystemAppearanceChange
+      );
+
+
+    return () => {
+      nexusSystemAppearanceListener
+        .removeEventListener(
+          "change",
+          handleSystemAppearanceChange
+        );
+    };
+
+  }, []);
+
 
 
   return (

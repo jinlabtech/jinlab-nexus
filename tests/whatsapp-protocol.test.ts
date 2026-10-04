@@ -3,11 +3,13 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import test from "node:test";
 
-// Node 24 strips TypeScript directly; a dynamic path keeps Next's TS config unchanged.
-const protocolPath = "../lib/whatsapp/protocol.ts";
-const {
-  normalizePhone, verifySignature, isReplyWindowOpen, parseWebhook, buildWhatsAppUrl,
-}: typeof import("../lib/whatsapp/protocol") = await import(protocolPath);
+import {
+  normalizePhone,
+  verifySignature,
+  isReplyWindowOpen,
+  parseWebhook,
+  buildWhatsAppUrl,
+} from "../lib/whatsapp/protocol";
 
 const PHONE = "27821234567";
 const REQUEST_ID = "88f30c46-242c-4d41-b064-c7bf8a2c44dd";

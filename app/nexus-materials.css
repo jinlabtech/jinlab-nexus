@@ -4,17 +4,17 @@
    Premium OS-style material, depth, motion and reflections
    ========================================================= */
 
-html[data-nexus-theme] {
+html[data-nexus-theme]:not(:where(.nexus-document, .nexus-document *)) {
   --nexus-ease: cubic-bezier(.22,.8,.22,1);
 }
 
-html[data-nexus-theme] body {
+html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *)) {
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-html[data-nexus-theme] body::before,
-html[data-nexus-theme] body::after {
+html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *))::before,
+html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *))::after {
   content: "";
   position: fixed;
   pointer-events: none;
@@ -28,7 +28,7 @@ html[data-nexus-theme] body::after {
     transform 900ms var(--nexus-ease);
 }
 
-html[data-nexus-theme] body::before {
+html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *))::before {
   width: 34rem;
   height: 34rem;
   top: -12rem;
@@ -37,7 +37,7 @@ html[data-nexus-theme] body::before {
   animation: nexusAmbientOne 18s ease-in-out infinite alternate;
 }
 
-html[data-nexus-theme] body::after {
+html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *))::after {
   width: 32rem;
   height: 32rem;
   right: -10rem;
@@ -46,13 +46,13 @@ html[data-nexus-theme] body::after {
   animation: nexusAmbientTwo 22s ease-in-out infinite alternate;
 }
 
-html[data-nexus-theme] aside,
-html[data-nexus-theme] header,
-html[data-nexus-theme] [data-slot="card"],
-html[data-nexus-theme] [data-slot="dialog-content"],
-html[data-nexus-theme] [data-slot="popover-content"],
-html[data-nexus-theme] [data-slot="dropdown-menu-content"],
-html[data-nexus-theme] [data-slot="sheet-content"] {
+html[data-nexus-theme] aside:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] header:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] [data-slot="card"]:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] [data-slot="dialog-content"]:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] [data-slot="popover-content"]:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] [data-slot="dropdown-menu-content"]:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] [data-slot="sheet-content"]:not(:where(.nexus-document, .nexus-document *)) {
   -webkit-backdrop-filter:
     blur(var(--nexus-blur))
     saturate(145%);
@@ -61,9 +61,9 @@ html[data-nexus-theme] [data-slot="sheet-content"] {
     saturate(145%);
 }
 
-html[data-nexus-theme] [data-slot="card"],
-html[data-nexus-theme] [data-slot="dialog-content"],
-html[data-nexus-theme] [data-slot="popover-content"] {
+html[data-nexus-theme] [data-slot="card"]:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] [data-slot="dialog-content"]:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] [data-slot="popover-content"]:not(:where(.nexus-document, .nexus-document *)) {
   position: relative;
   background:
     linear-gradient(
@@ -82,7 +82,7 @@ html[data-nexus-theme] [data-slot="popover-content"] {
     border-color 220ms ease;
 }
 
-html[data-nexus-theme] [data-slot="card"]:hover {
+html[data-nexus-theme] [data-slot="card"]:hover:not(:where(.nexus-document, .nexus-document *)) {
   transform: translateY(-1px);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.40),
@@ -90,7 +90,7 @@ html[data-nexus-theme] [data-slot="card"]:hover {
     0 18px 42px var(--nexus-shadow);
 }
 
-html[data-nexus-theme] aside {
+html[data-nexus-theme] aside:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       160deg,
@@ -102,8 +102,8 @@ html[data-nexus-theme] aside {
     10px 0 30px var(--nexus-shadow);
 }
 
-html[data-nexus-theme] aside a,
-html[data-nexus-theme] aside button {
+html[data-nexus-theme] aside a:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] aside button:not(:where(.nexus-document, .nexus-document *)) {
   transition:
     transform 180ms var(--nexus-ease),
     background 180ms ease,
@@ -111,13 +111,13 @@ html[data-nexus-theme] aside button {
     box-shadow 180ms ease;
 }
 
-html[data-nexus-theme] aside a:hover,
-html[data-nexus-theme] aside button:hover {
+html[data-nexus-theme] aside a:hover:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] aside button:hover:not(:where(.nexus-document, .nexus-document *)) {
   transform: translateX(2px);
 }
 
-html[data-nexus-theme] aside a > span > svg:first-child,
-html[data-nexus-theme] aside button > span > svg:first-child {
+html[data-nexus-theme] aside a > span > svg:first-child:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] aside button > span > svg:first-child:not(:where(.nexus-document, .nexus-document *)) {
   width: 2rem;
   height: 2rem;
   padding: .42rem;
@@ -139,7 +139,7 @@ html[data-nexus-theme] aside button > span > svg:first-child {
     filter 180ms ease;
 }
 
-html[data-nexus-theme] aside :is(a,button):hover > span > svg:first-child {
+html[data-nexus-theme] aside :is(a,button):hover > span > svg:first-child:not(:where(.nexus-document, .nexus-document *)) {
   transform: translateY(-1px) scale(1.06);
   filter: saturate(1.08) brightness(1.03);
   box-shadow:
@@ -147,9 +147,9 @@ html[data-nexus-theme] aside :is(a,button):hover > span > svg:first-child {
     0 8px 18px rgba(0,90,190,.25);
 }
 
-html[data-nexus-theme] input,
-html[data-nexus-theme] select,
-html[data-nexus-theme] textarea {
+html[data-nexus-theme] input:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] select:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] textarea:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       180deg,
@@ -166,21 +166,21 @@ html[data-nexus-theme] textarea {
     background 200ms ease;
 }
 
-html[data-nexus-theme] input:focus,
-html[data-nexus-theme] select:focus,
-html[data-nexus-theme] textarea:focus {
+html[data-nexus-theme] input:focus:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] select:focus:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme] textarea:focus:not(:where(.nexus-document, .nexus-document *)) {
   transform: translateY(-1px);
   box-shadow:
     0 0 0 3px color-mix(in srgb,var(--primary) 16%,transparent),
     0 7px 18px color-mix(in srgb,var(--primary) 9%,transparent);
 }
 
-html[data-nexus-theme] button {
+html[data-nexus-theme] button:not(:where(.nexus-document, .nexus-document *)) {
   position: relative;
   overflow: hidden;
 }
 
-html[data-nexus-theme] button::after {
+html[data-nexus-theme] button:not(:where(.nexus-document, .nexus-document *))::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -196,21 +196,21 @@ html[data-nexus-theme] button::after {
   transition: transform 420ms var(--nexus-ease);
 }
 
-html[data-nexus-theme] button:hover::after {
+html[data-nexus-theme] button:hover:not(:where(.nexus-document, .nexus-document *))::after {
   transform: translateX(140%);
 }
 
-html[data-nexus-theme] button:active:not(:disabled) {
+html[data-nexus-theme] button:active:not(:disabled):not(:where(.nexus-document, .nexus-document *)) {
   transform: scale(.985);
 }
 
-html[data-nexus-theme] table tbody tr {
+html[data-nexus-theme] table tbody tr:not(:where(.nexus-document, .nexus-document *)) {
   transition:
     background-color 160ms ease,
     transform 160ms var(--nexus-ease);
 }
 
-html[data-nexus-theme] table tbody tr:hover {
+html[data-nexus-theme] table tbody tr:hover:not(:where(.nexus-document, .nexus-document *)) {
   background:
     color-mix(
       in srgb,
@@ -219,16 +219,16 @@ html[data-nexus-theme] table tbody tr:hover {
     );
 }
 
-html[data-nexus-theme] ::-webkit-scrollbar {
+html[data-nexus-theme] :not(:where(.nexus-document, .nexus-document *))::-webkit-scrollbar {
   width: 11px;
   height: 11px;
 }
 
-html[data-nexus-theme] ::-webkit-scrollbar-track {
+html[data-nexus-theme] :not(:where(.nexus-document, .nexus-document *))::-webkit-scrollbar-track {
   background: transparent;
 }
 
-html[data-nexus-theme] ::-webkit-scrollbar-thumb {
+html[data-nexus-theme] :not(:where(.nexus-document, .nexus-document *))::-webkit-scrollbar-thumb {
   background:
     color-mix(
       in srgb,
@@ -240,7 +240,7 @@ html[data-nexus-theme] ::-webkit-scrollbar-thumb {
   border-radius: 999px;
 }
 
-html[data-nexus-theme] ::-webkit-scrollbar-thumb:hover {
+html[data-nexus-theme] :not(:where(.nexus-document, .nexus-document *))::-webkit-scrollbar-thumb:hover {
   background:
     color-mix(
       in srgb,
@@ -251,7 +251,7 @@ html[data-nexus-theme] ::-webkit-scrollbar-thumb:hover {
   background-clip: padding-box;
 }
 
-html.nexus-theme-transition body {
+html.nexus-theme-transition body:not(:where(.nexus-document, .nexus-document *)) {
   animation:
     nexusThemeReveal
     360ms
@@ -280,15 +280,15 @@ html.nexus-theme-transition body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-nexus-theme] body::before,
-  html[data-nexus-theme] body::after,
-  html.nexus-theme-transition body {
+  html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *))::before,
+  html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *))::after,
+  html.nexus-theme-transition body:not(:where(.nexus-document, .nexus-document *)) {
     animation: none !important;
   }
 }
 
 
-[data-nexus-theme="jinlab_blue"] {
+[data-nexus-theme="jinlab_blue"]:not(:where(.nexus-document, .nexus-document *)) {
   --nexus-ambient-1: rgba(0,103,192,.16);
   --nexus-ambient-2: rgba(80,170,255,.12);
   --nexus-surface: rgba(255,255,255,.88);
@@ -300,7 +300,7 @@ html.nexus-theme-transition body {
 }
 
 
-[data-nexus-theme="jinlab_blue_dark"] {
+[data-nexus-theme="jinlab_blue_dark"]:not(:where(.nexus-document, .nexus-document *)) {
   --nexus-ambient-1: rgba(0,110,255,.18);
   --nexus-ambient-2: rgba(90,170,255,.10);
   --nexus-surface: rgba(30,37,47,.88);
@@ -312,7 +312,7 @@ html.nexus-theme-transition body {
 }
 
 
-[data-nexus-theme="jinlab_frost"] {
+[data-nexus-theme="jinlab_frost"]:not(:where(.nexus-document, .nexus-document *)) {
   --nexus-ambient-1: rgba(255,255,255,.60);
   --nexus-ambient-2: rgba(100,180,255,.18);
   --nexus-surface: rgba(255,255,255,.78);
@@ -324,7 +324,7 @@ html.nexus-theme-transition body {
 }
 
 
-[data-nexus-theme="jinlab_graphite"] {
+[data-nexus-theme="jinlab_graphite"]:not(:where(.nexus-document, .nexus-document *)) {
   --nexus-ambient-1: rgba(70,110,150,.14);
   --nexus-ambient-2: rgba(0,95,200,.10);
   --nexus-surface: rgba(31,38,48,.90);
@@ -336,7 +336,7 @@ html.nexus-theme-transition body {
 }
 
 
-[data-nexus-theme="jinlab_glass"] {
+[data-nexus-theme="jinlab_glass"]:not(:where(.nexus-document, .nexus-document *)) {
   --nexus-ambient-1: rgba(60,155,255,.30);
   --nexus-ambient-2: rgba(155,205,255,.26);
   --nexus-surface: rgba(255,255,255,.55);

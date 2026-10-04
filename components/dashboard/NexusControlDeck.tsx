@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import { useRouter } from "next/navigation";
-import type { CoreFinding } from "@/lib/intelligence/types";
+import type { CoreFinding, CoreMetric, CoreModule } from "@/lib/intelligence/types";
 
 import {
   Activity,
@@ -37,6 +37,7 @@ type SelectedSurface =
 type Props = {
   findings: number;
   intelligenceFindings: CoreFinding[];
+  intelligenceMetrics: CoreMetric[];
   urgent: number;
 
   metricCount: number;
@@ -74,6 +75,7 @@ type PulseItem = {
 export default function NexusControlDeck({
   findings,
   intelligenceFindings,
+  intelligenceMetrics,
   urgent,
   metricCount,
   readyCoverage,
@@ -148,10 +150,51 @@ export default function NexusControlDeck({
 
   const whatsappFindings = useMemo(() => intelligenceFindings.filter((item) => item.module === "whatsapp").slice(0, 4), [intelligenceFindings]);
 
-  const canvasFindings = useMemo(
-    () => intelligenceFindings.slice(0, 5),
-    [intelligenceFindings],
-  );
+  const canvasFindings = useMemo(() => {
+    const severities = ["high", "medium", "low"] as const;
+    const moduleOrder: CoreModule[] = [
+      "receivables",
+      "whatsapp",
+      "repairs",
+      "inventory",
+      "purchasing",
+      "quotations",
+      "controls",
+    ];
+
+    const ordered: CoreFinding[] = [];
+
+    for (const severity of severities) {
+      const group = intelligenceFindings
+        .filter((item) => item.severity === severity)
+        .sort(
+          (a, b) =>
+            moduleOrder.indexOf(a.module) -
+              moduleOrder.indexOf(b.module) ||
+            a.id.localeCompare(b.id),
+        );
+
+      const seen = new Set<CoreModule>();
+
+      for (const finding of group) {
+        if (!seen.has(finding.module)) {
+          ordered.push(finding);
+          seen.add(finding.module);
+        }
+      }
+
+      for (const finding of group) {
+        if (!ordered.some((item) => item.id === finding.id)) {
+          ordered.push(finding);
+        }
+      }
+    }
+
+    return ordered.slice(0, 5);
+  }, [intelligenceFindings]);
+
+  const whatsappMetric = (id: string) =>
+    intelligenceMetrics.find((metric) => metric.id === id)?.value ?? "—";
 
 
   const pulseItems =
@@ -724,6 +767,22 @@ export default function NexusControlDeck({
             </span>
           </button>
         </div>
+
+        <button
+          type="button"
+          className="nexus-whatsapp-rail"
+          onClick={() => router.push("/whatsapp")}
+        >
+          <span>
+            <strong>WhatsApp Sales</strong>
+            <small>Live conversation intelligence</small>
+          </span>
+
+          <span><b>{whatsappMetric("whatsapp.open")}</b> open</span>
+          <span><b>{whatsappMetric("whatsapp.followup")}</b> follow-up</span>
+          <span><b>{whatsappMetric("whatsapp.unassigned")}</b> unassigned</span>
+          <span><b>{whatsappMetric("whatsapp.waiting")}</b> waiting</span>
+        </button>
       </div>
 
     </section>

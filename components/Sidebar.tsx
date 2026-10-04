@@ -23,6 +23,7 @@ import {
   CircleDollarSign,
   Mail,
   MessageCircle,
+  MoreHorizontal,
   Package,
   ShoppingCart,
   Wrench,
@@ -428,7 +429,13 @@ function routeIsActive(
 }
 
 
-export default function Sidebar() {
+type SidebarProps = {
+  onToggleSidebar?: () => void;
+};
+
+export default function Sidebar({
+  onToggleSidebar,
+}: SidebarProps) {
 
   const pathname =
     usePathname();
@@ -577,22 +584,34 @@ export default function Sidebar() {
 
 
   return (
-    <aside className="flex w-full flex-col border-b bg-sidebar text-sidebar-foreground md:h-screen md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-r">
+    <aside className="flex h-full w-full flex-col border-b bg-sidebar text-sidebar-foreground md:h-screen md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-r">
 
-      <div className="flex h-20 shrink-0 items-center border-b px-6">
+      <div className="flex h-20 shrink-0 items-center justify-between gap-3 border-b px-4">
 
-        <div>
+        <div className="min-w-0">
 
-          <h2 className="text-xl font-bold tracking-tight">
+          <h2 className="truncate text-xl font-bold tracking-tight">
             JINLAB Nexus
           </h2>
 
-
-          <p className="text-xs text-muted-foreground">
+          <p className="truncate text-xs text-muted-foreground">
             Business operating system
           </p>
 
         </div>
+
+        {
+          onToggleSidebar && (
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="flex size-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              aria-label="Hide sidebar"
+            >
+              <MoreHorizontal className="size-5" />
+            </button>
+          )
+        }
 
       </div>
 

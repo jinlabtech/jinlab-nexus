@@ -9,7 +9,9 @@
 @import "../components/nexus-icons/nexus-icons.css";
 @import "../components/nexus-icons/nexus-icon-styles.css";
 @import "./nexus-theme-signatures.css";
+@import "./nexus-readability.css";
 @import "../components/nexus-icons/nexus-glyphs.css";
+@import "../components/nexus-icons/nexus-premium-art.css";
 @import "../components/dashboard/nexus-control-deck.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -203,3 +205,296 @@
       color 120ms ease;
   }
 }
+
+/* =========================================================
+   JINLAB NEXUS — NATIVE MOBILE WORKSPACE
+   Phone presentation, not scaled desktop presentation.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /*
+   * Main Nexus workspace
+   */
+
+  main {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  .nexus-page-enter {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+
+  /*
+   * Desktop page wrappers often have large horizontal padding.
+   * On a phone the screen itself becomes the workspace.
+   */
+
+  .nexus-page-enter
+  > :first-child {
+    width: 100%;
+    max-width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+  /*
+   * Common page containers
+   */
+
+  .nexus-page-enter
+  :is(
+    [class*="max-w-5xl"],
+    [class*="max-w-6xl"],
+    [class*="max-w-7xl"],
+    [class*="max-w-screen"]
+  ) {
+    max-width: 100% !important;
+  }
+
+
+  /*
+   * Large desktop spacing becomes mobile spacing.
+   */
+
+  .nexus-page-enter
+  :is(
+    [class*="px-8"],
+    [class*="px-10"],
+    [class*="px-12"]
+  ) {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .nexus-page-enter
+  :is(
+    [class*="p-8"],
+    [class*="p-10"],
+    [class*="p-12"]
+  ) {
+    padding: 14px !important;
+  }
+
+
+  /*
+   * Desktop multi-column workspaces become proper phone stacks.
+   */
+
+  .nexus-page-enter
+  :is(
+    [class~="grid-cols-3"],
+    [class~="grid-cols-4"],
+    [class~="grid-cols-5"],
+    [class~="grid-cols-6"],
+    [class~="grid-cols-7"],
+    [class~="grid-cols-8"],
+    [class~="grid-cols-9"],
+    [class~="grid-cols-10"],
+    [class~="grid-cols-11"],
+    [class~="grid-cols-12"]
+  ) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+
+  /*
+   * Two-column layouts become single-column when the content
+   * is clearly a desktop workspace.
+   */
+
+  .nexus-page-enter
+  [class~="grid-cols-2"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+
+  /*
+   * Forms become finger-friendly.
+   */
+
+  .nexus-page-enter
+  :is(
+    input,
+    select,
+    textarea
+  ) {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  .nexus-page-enter
+  textarea {
+    min-height: 110px;
+  }
+
+
+  /*
+   * Buttons no longer look like tiny desktop controls.
+   */
+
+  .nexus-page-enter
+  button:not(.nexus-dock-app) {
+    min-height: 42px;
+  }
+
+
+  /*
+   * Cards should read as mobile panels, not compressed
+   * desktop rectangles.
+   */
+
+  .nexus-page-enter
+  [data-slot="card"] {
+    width: 100%;
+    min-width: 0;
+    border-radius: 18px;
+  }
+
+
+  /*
+   * Flex toolbars wrap naturally.
+   */
+
+  .nexus-page-enter
+  .flex {
+    min-width: 0;
+  }
+
+  .nexus-page-enter
+  :is(
+    [class*="justify-between"],
+    [class*="items-center"]
+  ) {
+    row-gap: 8px;
+  }
+
+
+  /*
+   * Tables keep their real data structure but scroll INSIDE
+   * their own region instead of widening the whole phone.
+   */
+
+  .nexus-page-enter
+  table {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .nexus-page-enter
+  :has(> table) {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  /*
+   * Large desktop titles scale properly.
+   */
+
+  .nexus-page-enter
+  h1 {
+    font-size: clamp(1.55rem, 7vw, 2rem) !important;
+    line-height: 1.1 !important;
+  }
+
+  .nexus-page-enter
+  h2 {
+    line-height: 1.2;
+  }
+
+
+  /*
+   * Prevent long IDs, emails, customer names and references
+   * from breaking the phone viewport.
+   */
+
+  .nexus-page-enter
+  :is(
+    p,
+    span,
+    div,
+    td,
+    th
+  ) {
+    overflow-wrap: anywhere;
+  }
+
+
+  /*
+   * Modals become phone sheets rather than small desktop
+   * windows floating awkwardly in the middle.
+   */
+
+  .nexus-page-enter
+  [data-slot="dialog-content"] {
+    width: calc(100vw - 16px) !important;
+    max-width: none !important;
+    max-height: 88dvh;
+    overflow-y: auto;
+
+    border-radius: 24px !important;
+  }
+
+
+  /*
+   * Dropdowns and popovers never exceed the screen.
+   */
+
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"] {
+    max-width: calc(100vw - 20px) !important;
+  }
+
+
+  /*
+   * Keep page navigation smooth.
+   * No exaggerated desktop slide animations.
+   */
+
+  .nexus-page-enter {
+    animation:
+      nexusPhoneEnter
+      165ms
+      cubic-bezier(.2,.75,.25,1)
+      both !important;
+  }
+
+}
+
+
+@keyframes nexusPhoneEnter {
+
+  from {
+    opacity: .72;
+    transform: scale(.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+
+@import "./nexus-mobile-stability.css";

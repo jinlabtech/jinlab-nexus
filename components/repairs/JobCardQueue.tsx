@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type JobCardQueueRow = {
@@ -23,7 +23,7 @@ type JobCardQueueRow = {
 };
 
 const statuses = [
-  ["", "All jobs"],
+  ["", "All statuses"],
   ["received", "Received"],
   ["diagnosing", "Diagnosing"],
   ["awaiting_approval", "Awaiting approval"],
@@ -64,6 +64,8 @@ export default function JobCardQueue({
   const [rows, setRows] = useState<JobCardQueueRow[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [view, setView] = useState<"active" | "archived">("active");
+  const requestId = useRef(0);
   const [sortOrder, setSortOrder] = useState<
     "newest" | "oldest" | "workflow"
   >("newest");
@@ -72,13 +74,16 @@ export default function JobCardQueue({
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadQueue = useCallback(async () => {
+    const currentRequest = ++requestId.current;
     setLoading(true);
     setError("");
     const { data, error: rpcError } = await supabase.rpc("get_service_job_queue", {
       p_search: search.trim() || null,
-      p_status: status || null,
+      p_status: status || view,
       p_limit: 150,
     });
+
+    if (currentRequest !== requestId.current) return;
 
     if (rpcError) {
       setRows([]);
@@ -87,11 +92,14 @@ export default function JobCardQueue({
       setRows((data ?? []) as JobCardQueueRow[]);
     }
     setLoading(false);
-  }, [search, status]);
+  }, [search, status, view]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => void loadQueue(), 250);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      requestId.current += 1;
+    };
   }, [loadQueue]);
 
 
@@ -144,11 +152,26 @@ export default function JobCardQueue({
   return (
     <section className="mb-6 rounded-2xl border bg-background shadow-sm">
       <div className="border-b p-4 sm:p-5">
+        <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Job Card views">
+          {([['active', 'Active jobs'], ['archived', 'Completed & cancelled']] as const).map(([value, label]) => (
+            <button key={value} type="button" aria-pressed={view === value}
+              onClick={() => {
+                requestId.current += 1;
+                setRows([]);
+                setLoading(true);
+                setStatus("");
+                setView(value);
+              }}
+              disabled={view === value}
+              className={`rounded-lg border px-4 py-2 text-sm font-semibold ${view === value ? "bg-primary text-primary-foreground" : "bg-background text-foreground hover:bg-muted"}`}
+            >{label}</button>
+          ))}
+        </div>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h2 className="text-lg font-bold">Job Card Queue</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Search by Job Card, customer, device, serial number, IMEI or fault.
+              {view === "active" ? "Current repairs and devices waiting for collection." : "Collected, closed and cancelled jobs. Search and open any card to view its history."}
             </p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1fr)_180px_170px_auto]">
@@ -156,15 +179,17 @@ export default function JobCardQueue({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Job Card or customer..."
-              className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Search Job Cards"
+              className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             />
 
             <select
               value={status}
+              aria-label="Job Card status"
               onChange={(e) => setStatus(e.target.value)}
-              className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             >
-              {statuses.map(([value, label]) => (
+              {statuses.filter(([value]) => !value || (["collected", "closed", "cancelled"].includes(value) === (view === "archived"))).map(([value, label]) => (
                 <option key={value || "all"} value={value}>
                   {label}
                 </option>
@@ -181,7 +206,7 @@ export default function JobCardQueue({
                     | "workflow"
                 )
               }
-              className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
               aria-label="Job Card order"
             >
               <option value="newest">Newest first</option>
@@ -202,7 +227,7 @@ export default function JobCardQueue({
 
       <div className="p-4 sm:p-5">
         <p className="mb-3 text-sm font-semibold">
-          {loading ? "Loading Job Cards..." : `${rows.length} Job Card${rows.length === 1 ? "" : "s"}`}
+          {loading ? "Loading Job Cards..." : `${rows.length}${rows.length === 150 ? "+" : ""} Job Card${rows.length === 1 ? "" : "s"}${rows.length === 150 ? " — narrow your search to find older records" : ""}`}
         </p>
 
         {error && (
@@ -217,18 +242,18 @@ export default function JobCardQueue({
           </div>
         )}
 
-        {!error && rows.length > 0 && (
+        {!error && !loading && rows.length > 0 && (
           <div className="space-y-3">
             {displayRows.map((job) => (
               <div
                 key={job.id}
                 onClick={() => onOpen(job.job_number)}
-                className="w-full cursor-pointer rounded-xl border p-4 text-left transition hover:border-blue-300 hover:bg-blue-50/40"
+                className="w-full cursor-pointer rounded-xl border p-4 text-left transition hover:border-primary/40 hover:bg-muted/50"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-base font-bold text-blue-700">
+                      <span className="text-base font-bold text-primary">
                         {job.job_number}
                       </span>
 
@@ -291,7 +316,7 @@ export default function JobCardQueue({
                         {deletingId === job.id ? "Deleting..." : "Delete Mistake"}
                       </button>
                     )}
-                    <span className="font-semibold text-blue-700">Open Job Card →</span>
+                    <button type="button" onClick={(event) => { event.stopPropagation(); onOpen(job.job_number); }} className="font-semibold text-primary hover:underline">Open Job Card →</button>
                   </div>
                 </div>
               </div>

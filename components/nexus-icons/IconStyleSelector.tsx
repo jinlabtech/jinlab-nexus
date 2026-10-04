@@ -78,9 +78,9 @@ const styles: IconStyleOption[] = [
   },
   {
     id: "mono",
-    name: "Mono",
+    name: "Minimal",
     description:
-      "Minimal monochrome symbols for maximum clarity and reduced visual noise.",
+      "Clean adaptive material designed to preserve every application artwork in light and dark environments.",
     personality:
       "Focused",
     badge:
@@ -159,14 +159,14 @@ export default function IconStyleSelector() {
           </div>
 
           <h2 className="text-2xl font-bold tracking-tight">
-            Icon Style
+            Icon Material
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Choose the visual character of
-            Nexus icons. Module identity stays
-            consistent while materials,
-            reflections and depth change.
+            Choose the physical surface used
+            around Nexus artwork. Application
+            illustrations remain unique while
+            material, reflection and finish change.
           </p>
         </div>
 

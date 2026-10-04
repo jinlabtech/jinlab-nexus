@@ -177,16 +177,18 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
     useState(false);
 
   const [
-    followUpAt,
+    followUpAtDraft,
     setFollowUpAt,
   ] =
-    useState("");
+    useState<string | null>(null);
 
   const [
-    followUpNote,
+    followUpNoteDraft,
     setFollowUpNote,
   ] =
-    useState("");
+    useState<string | null>(null);
+  const followUpAt = followUpAtDraft ?? toLocalDateTimeInput(detail?.conversation.follow_up_at ?? null);
+  const followUpNote = followUpNoteDraft ?? detail?.conversation.follow_up_note ?? "";
   const alive = useRef(true);
   const abort = useRef<AbortController | null>(null);
   const historyAbort = useRef<AbortController | null>(null);
@@ -234,13 +236,12 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
   useEffect(() => {
 
     if (!canSend) {
-      setAssignees([]);
       return;
     }
 
     let active = true;
 
-    setAssigneesLoading(true);
+    const loadingTimer = window.setTimeout(() => { if (active) setAssigneesLoading(true); }, 0);
 
     void whatsappService
       .assignableUsers()
@@ -261,6 +262,7 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
       .finally(() => {
 
         if (active) {
+          window.clearTimeout(loadingTimer);
           setAssigneesLoading(false);
         }
 
@@ -268,34 +270,10 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
 
     return () => {
       active = false;
+      window.clearTimeout(loadingTimer);
     };
 
   }, [canSend]);
-
-
-  useEffect(() => {
-
-    const current =
-      detail?.conversation;
-
-    if (!current) return;
-
-    setFollowUpAt(
-      toLocalDateTimeInput(
-        current.follow_up_at
-      )
-    );
-
-    setFollowUpNote(
-      current.follow_up_note ??
-      ""
-    );
-
-  }, [
-    detail?.conversation.id,
-    detail?.conversation.follow_up_at,
-    detail?.conversation.follow_up_note,
-  ]);
 
 
   // A transport failure is reconciled from the stored request ID; it is never retried automatically.
@@ -376,6 +354,10 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
             : current
       );
 
+      if (input.followUpAt !== undefined || input.clearFollowUp) {
+        setFollowUpAt(null);
+        setFollowUpNote(null);
+      }
       onUpdated(
         updatedConversation
       );
@@ -433,7 +415,7 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
         followUpNote.trim(),
 
       attentionState:
-        date.getTime() <= Date.now()
+        date.getTime() <= now
           ? "follow_up_due"
           : undefined,
     });
@@ -560,6 +542,14 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
         </div>}
         <div className={`flex items-start gap-2 text-xs ${windowOpen && !conversation.opted_out ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground"}`}><Clock3 className="mt-0.5 size-3.5 shrink-0" /><p>{conversation.opted_out ? "This customer has opted out. Replies and app handoffs are paused." : !ready ? "Connect WhatsApp Business to send replies from Nexus." : conversation.status === "closed" ? "Reopen this conversation to reply." : windowOpen ? `Free replies available for about ${Math.max(1, Math.ceil((closesAt - now) / 60_000))} more minutes. Nexus closes replies five minutes early to avoid a paid-window edge.` : "Ask the customer to message your business to reopen replies. Paid templates are disabled."}</p></div>
         <form onSubmit={send} className="space-y-2">
+          {canSend && <div className="flex flex-wrap items-center gap-2" aria-label="Sales reply starters">
+            <span className="text-xs text-muted-foreground">Draft a reply:</span>
+            {[
+              ["Product enquiry", "Thanks for contacting us. Which product or model are you looking for, and what is your budget?"],
+              ["Delivery details", "Would you prefer collection or delivery? For delivery, please confirm your suburb and postal code so we can prepare a quotation."],
+              ["Quotation follow-up", "Have you had a chance to review your quotation? Let us know if you have any questions or would like us to adjust it."],
+            ].map(([label, text]) => <Button key={label} type="button" size="sm" variant="outline" disabled={sending || pending !== null || preparingQuotation || conversation.opted_out || (draft.length + text.length + 2 > 4096)} onClick={() => setDraft(draft ? `${draft}\n\n${text}` : text)}>{label}</Button>)}
+          </div>}
           <label htmlFor={`draft-${conversationId}`} className="sr-only">Message draft</label>
           <textarea id={`draft-${conversationId}`} value={draft} onChange={(event) => setDraft(event.target.value)} rows={3} maxLength={4096} disabled={!canSend || sending || pending !== null || conversation.opted_out} placeholder={canSend ? "Write a reply or prepare a quotation link…" : "You have read-only access to this inbox."} className="w-full resize-y rounded-xl border bg-background p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60" />
           <div className="flex flex-wrap items-center justify-between gap-3"><span className="text-[11px] text-muted-foreground">{draft.length}/4096 · Review before sending</span><Button type="submit" disabled={!maySend || !draft.trim() || draft.length > 4096 || sending || busy || preparingQuotation || pending !== null}><Send />{sending ? "Submitting…" : preparingQuotation ? "Preparing quotation…" : "Send free reply"}</Button></div>
@@ -981,7 +971,7 @@ export default function WhatsAppThread({ conversationId, composer, onComposerCha
       <section><h3 className="flex items-center gap-2 text-sm font-semibold"><UserRound className="size-4" /> Customer context</h3><p className="mt-3 text-sm font-medium">{customer?.display_name || (conversation.customer_id ? "Linked Nexus customer" : "No customer linked")}</p><p className="mt-1 text-xs text-muted-foreground">{customer?.phone || "Link a record to see the customer’s business documents."}</p>
         {canSend && <div className="mt-3 space-y-2"><label htmlFor={`customer-${conversationId}`} className="text-xs font-medium">Nexus customer</label><SearchableSelect searchLabel="Records" id={`customer-${conversationId}`} value={customerId || conversation.customer_id || ""} onValueChange={(selectedValue) => setCustomerId(selectedValue)} className="h-9 w-full rounded-lg border bg-background px-2 text-xs"><option value="" disabled>Select a customer</option>{detail.customers.map((item) => <option key={item.id} value={item.id}>{item.display_name}{item.phone ? ` · ${item.phone}` : ""}</option>)}</SearchableSelect><Button variant="outline" size="sm" disabled={busy || !customerId || customerId === conversation.customer_id} onClick={() => void update({ customerId })}>Link customer</Button>{!detail.customers.length && <p className="text-xs text-muted-foreground">No customer records available to link.</p>}</div>}
       </section>
-      <section className="border-t pt-4"><h3 className="flex items-center gap-2 text-sm font-semibold"><FileText className="size-4" /> Quotations</h3><p className="mt-2 text-xs leading-relaxed text-muted-foreground">Prepare a customer share link in your draft.</p><div className="mt-3 space-y-3">{detail.documents.quotations.length ? detail.documents.quotations.map((quote) => <div key={quote.id} className="rounded-lg border bg-card p-3"><Link href={`/quotations/${quote.id}`} className="text-xs font-semibold text-primary hover:underline">{quote.quotation_number}</Link><p className="mt-1 text-[11px] capitalize text-muted-foreground">{quote.status}</p>{canSend && canShareQuotation && <Button variant="outline" size="sm" className="mt-2" disabled={busy || preparingQuotation || sending || pending !== null || conversation.opted_out || !["draft", "sent"].includes(quote.status)} onClick={() => void prepareQuotation(quote.id)}>Prepare link</Button>}</div>) : <p className="text-xs text-muted-foreground">{conversation.customer_id ? "No quotations available with your permissions." : "Link a customer to see quotations."}</p>}</div></section>
+      <section className="border-t pt-4"><h3 className="flex items-center gap-2 text-sm font-semibold"><FileText className="size-4" /> Quotations</h3><p className="mt-2 text-xs leading-relaxed text-muted-foreground">Prepare a customer share link in your draft. <Link href="/quotations" className="font-medium text-primary hover:underline">Open quotations</Link></p><div className="mt-3 space-y-3">{detail.documents.quotations.length ? detail.documents.quotations.map((quote) => <div key={quote.id} className="rounded-lg border bg-card p-3"><Link href={`/quotations/${quote.id}`} className="text-xs font-semibold text-primary hover:underline">{quote.quotation_number}</Link><p className="mt-1 text-[11px] capitalize text-muted-foreground">{quote.status}</p>{canSend && canShareQuotation && <Button variant="outline" size="sm" className="mt-2" disabled={busy || preparingQuotation || sending || pending !== null || conversation.opted_out || !["draft", "sent"].includes(quote.status)} onClick={() => void prepareQuotation(quote.id)}>Prepare link</Button>}</div>) : <p className="text-xs text-muted-foreground">{conversation.customer_id ? "No quotations available with your permissions." : "Link a customer to see quotations."}</p>}</div></section>
       <section className="border-t pt-4"><h3 className="text-sm font-semibold">Invoices</h3><p className="mt-2 text-xs text-muted-foreground">Internal Nexus records.</p><div className="mt-3 space-y-3">{detail.documents.invoices.length ? detail.documents.invoices.map((invoice) => <div key={invoice.id} className="rounded-lg border bg-card p-3"><Link href={`/invoices/${invoice.id}`} className="text-xs font-semibold text-primary hover:underline">{invoice.invoice_number}</Link><p className="mt-1 text-[11px] capitalize text-muted-foreground">{invoice.status}</p></div>) : <p className="text-xs text-muted-foreground">{conversation.customer_id ? "No invoices available with your permissions." : "Link a customer to see invoices."}</p>}</div></section>
       {canSend && <section className="border-t pt-4"><h3 className="text-sm font-semibold">Contact preferences</h3>{conversation.opted_out ? <><p className="mt-2 text-xs leading-relaxed text-muted-foreground">Replies are paused. Only restore them when the customer has given renewed consent.</p><label className="mt-3 flex items-start gap-2 text-xs"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} className="mt-0.5" />The customer has agreed to receive replies again.</label><Button className="mt-3" size="sm" variant="outline" disabled={busy || !consent} onClick={() => void update({ optedOut: false })}>Record renewed consent</Button></> : <><p className="mt-2 text-xs leading-relaxed text-muted-foreground">Respect the customer’s request to stop messages.</p><Button className="mt-3" size="sm" variant="outline" disabled={busy} onClick={() => void update({ optedOut: true })}>Record opt-out</Button></>}</section>}
     </aside>

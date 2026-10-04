@@ -7,26 +7,26 @@
   the selected Nexus environment.
 */
 
-html[data-nexus-theme] body {
+html[data-nexus-theme] body:not(:where(.nexus-document, .nexus-document *)) {
   transition:
     background 420ms ease,
     color 260ms ease;
 }
 
 html[data-nexus-theme]
-main {
+main:not(:where(.nexus-document, .nexus-document *)) {
   background:
     transparent !important;
 }
 
 html[data-nexus-theme]
-.nexus-workspace-scroll {
+.nexus-workspace-scroll:not(:where(.nexus-document, .nexus-document *)) {
   background:
     transparent !important;
 }
 
 html[data-nexus-theme]
-.bg-muted\/30 {
+.bg-muted\/30:not(:where(.nexus-document, .nexus-document *)) {
   background:
     transparent !important;
 }
@@ -38,7 +38,7 @@ html[data-nexus-theme]
    ========================================================= */
 
 html[data-nexus-theme="jinlab_blue"]
-body {
+body:not(:where(.nexus-document, .nexus-document *)) {
   background:
     radial-gradient(
       circle at 7% -8%,
@@ -59,7 +59,7 @@ body {
 }
 
 html[data-nexus-theme="jinlab_blue"]
-aside {
+aside:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       180deg,
@@ -81,7 +81,7 @@ aside {
    ========================================================= */
 
 html[data-nexus-theme="jinlab_blue_dark"]
-body {
+body:not(:where(.nexus-document, .nexus-document *)) {
   background:
     radial-gradient(
       circle at 8% -5%,
@@ -102,7 +102,7 @@ body {
 }
 
 html[data-nexus-theme="jinlab_blue_dark"]
-aside {
+aside:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       180deg,
@@ -124,7 +124,7 @@ aside {
    ========================================================= */
 
 html[data-nexus-theme="jinlab_frost"]
-body {
+body:not(:where(.nexus-document, .nexus-document *)) {
   background:
     radial-gradient(
       circle at 8% 4%,
@@ -150,7 +150,7 @@ body {
 }
 
 html[data-nexus-theme="jinlab_frost"]
-aside {
+aside:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       180deg,
@@ -169,7 +169,7 @@ aside {
 }
 
 html[data-nexus-theme="jinlab_frost"]
-[data-slot="card"] {
+[data-slot="card"]:not(:where(.nexus-document, .nexus-document *)) {
   border-radius:
     1.45rem !important;
 
@@ -190,7 +190,7 @@ html[data-nexus-theme="jinlab_frost"]
    ========================================================= */
 
 html[data-nexus-theme="jinlab_graphite"]
-body {
+body:not(:where(.nexus-document, .nexus-document *)) {
   background:
     repeating-linear-gradient(
       90deg,
@@ -213,7 +213,7 @@ body {
 }
 
 html[data-nexus-theme="jinlab_graphite"]
-aside {
+aside:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       180deg,
@@ -229,7 +229,7 @@ aside {
 }
 
 html[data-nexus-theme="jinlab_graphite"]
-[data-slot="card"] {
+[data-slot="card"]:not(:where(.nexus-document, .nexus-document *)) {
   border-radius:
     .72rem !important;
 
@@ -259,7 +259,7 @@ html[data-nexus-theme="jinlab_graphite"]
    ========================================================= */
 
 html[data-nexus-theme="jinlab_glass"]
-body {
+body:not(:where(.nexus-document, .nexus-document *)) {
   background:
     radial-gradient(
       circle at 5% 0%,
@@ -285,7 +285,7 @@ body {
 }
 
 html[data-nexus-theme="jinlab_glass"]
-aside {
+aside:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       180deg,
@@ -313,7 +313,7 @@ aside {
 }
 
 html[data-nexus-theme="jinlab_glass"]
-[data-slot="card"] {
+[data-slot="card"]:not(:where(.nexus-document, .nexus-document *)) {
   border-radius:
     1.6rem !important;
 
@@ -354,7 +354,7 @@ main
   section,
   article,
   [role="tabpanel"]
-) {
+):not(:where(.nexus-document, .nexus-document *)) {
   transition:
     background 260ms ease,
     border-color 220ms ease,
@@ -364,7 +364,7 @@ main
 
 html[data-nexus-theme]
 main
-[class*="bg-card"] {
+[class*="bg-card"]:not(:where(.nexus-document, .nexus-document *)) {
   background:
     linear-gradient(
       145deg,
@@ -387,35 +387,35 @@ main
 /* tables */
 
 html[data-nexus-theme="jinlab_blue"]
-thead {
+thead:not(:where(.nexus-document, .nexus-document *)) {
   background:
     rgba(218,238,255,.78)
     !important;
 }
 
 html[data-nexus-theme="jinlab_blue_dark"]
-thead {
+thead:not(:where(.nexus-document, .nexus-document *)) {
   background:
     rgba(31,48,68,.87)
     !important;
 }
 
 html[data-nexus-theme="jinlab_frost"]
-thead {
+thead:not(:where(.nexus-document, .nexus-document *)) {
   background:
     rgba(255,255,255,.58)
     !important;
 }
 
 html[data-nexus-theme="jinlab_graphite"]
-thead {
+thead:not(:where(.nexus-document, .nexus-document *)) {
   background:
     rgba(51,61,73,.96)
     !important;
 }
 
 html[data-nexus-theme="jinlab_glass"]
-thead {
+thead:not(:where(.nexus-document, .nexus-document *)) {
   background:
     rgba(255,255,255,.36)
     !important;
@@ -426,7 +426,7 @@ thead {
    LIVE THEME ACTION BAR
    ========================================================= */
 
-.nexus-live-theme-bar {
+.nexus-live-theme-bar:not(:where(.nexus-document, .nexus-document *)) {
   position: sticky;
   top: .75rem;
   z-index: 30;
@@ -468,8 +468,103 @@ thead {
 }
 
 @media (max-width: 640px) {
-  .nexus-live-theme-bar {
+  .nexus-live-theme-bar:not(:where(.nexus-document, .nexus-document *)) {
     align-items: stretch;
     flex-direction: column;
   }
+}
+
+/* =========================================================
+   COMPANY BRAND PROTECTION
+   Themes must never recolour, fade or visually overpower
+   a tenant's uploaded company logo.
+   ========================================================= */
+
+[data-nexus-company-logo="true"] {
+  opacity: 1 !important;
+  filter: none !important;
+  color: initial !important;
+  transform-origin: center !important;
+  isolation: isolate;
+}
+
+/*
+   Light surfaces can let the original logo blend naturally.
+*/
+html:not(.dark)
+[data-nexus-company-logo="true"] {
+  mix-blend-mode: multiply !important;
+}
+
+/*
+   Dark themes need a neutral brand field so black portions
+   of a company's original logo remain visible.
+*/
+html.dark
+[data-nexus-company-logo="true"],
+html[data-theme="dark"]
+[data-nexus-company-logo="true"],
+html[data-nexus-theme="jinlab_blue_dark"]
+[data-nexus-company-logo="true"],
+html[data-nexus-theme="jinlab_graphite"]
+[data-nexus-company-logo="true"] {
+  mix-blend-mode: normal !important;
+  background: rgb(255 255 255 / .94);
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+/* =========================================================
+   TENANT BRAND IMMUNITY
+   Nexus themes may style the workspace, never the company logo.
+   ========================================================= */
+
+[data-nexus-company-logo-frame="true"] {
+  isolation: isolate !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+[data-nexus-company-logo="true"] {
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none;
+  color: initial !important;
+}
+
+/* Light themes: logo blends naturally into the Navbar. */
+html:not(.dark)
+[data-nexus-company-logo-frame="true"] {
+  background: transparent !important;
+}
+
+html:not(.dark)
+[data-nexus-company-logo="true"] {
+  mix-blend-mode: multiply !important;
+}
+
+/*
+ * Dark themes: give the original company artwork a quiet
+ * neutral presentation field so black logos remain visible.
+ * This is branding space, not an app-icon shell.
+ */
+html.dark
+[data-nexus-company-logo-frame="true"],
+html[data-nexus-theme="jinlab_blue_dark"]
+[data-nexus-company-logo-frame="true"],
+html[data-nexus-theme="jinlab_graphite"]
+[data-nexus-company-logo-frame="true"] {
+  background: rgb(255 255 255 / .96) !important;
+  border-radius: 14px;
+  padding: 5px 10px;
+}
+
+html.dark
+[data-nexus-company-logo="true"],
+html[data-nexus-theme="jinlab_blue_dark"]
+[data-nexus-company-logo="true"],
+html[data-nexus-theme="jinlab_graphite"]
+[data-nexus-company-logo="true"] {
+  mix-blend-mode: multiply !important;
+  background: transparent !important;
 }

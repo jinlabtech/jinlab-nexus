@@ -380,6 +380,15 @@ export function nexusIconForRoute(
 
   if (
     path.startsWith(
+      "/hr/timebook"
+    )
+  ) {
+    return "timebook";
+  }
+
+
+  if (
+    path.startsWith(
       "/hr"
     )
   ) {

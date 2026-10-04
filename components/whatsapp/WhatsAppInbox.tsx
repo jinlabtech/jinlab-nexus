@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { usePermissions } from "@/hooks/usePermissions";
 import { supabase } from "@/lib/supabase";
 import { isAbort, whatsappAppUrl, whatsappError, whatsappService } from "@/lib/services/whatsappService";
-import type { WhatsAppComposerState, WhatsAppConnection, WhatsAppConversation } from "@/types/whatsapp";
+import type { WhatsAppComposerState, WhatsAppConnection, WhatsAppConversation, WhatsAppSalesStage } from "@/types/whatsapp";
 import WhatsAppConnectionCard from "./WhatsAppConnectionCard";
 import WhatsAppThread from "./WhatsAppThread";
 
@@ -81,6 +81,7 @@ export default function WhatsAppInbox() {
   const [connection, setConnection] = useState<WhatsAppConnection | null>(null);
   const [conversations, setConversations] = useState<WhatsAppConversation[]>([]);
   const [search, setSearch] = useState("");
+  const [nowForInbox, setNowForInbox] = useState(() => Date.now());
   const requestedFilter = params.get("filter");
   const initialFilter = requestedFilter === "unread" || requestedFilter === "follow_up" || requestedFilter === "unassigned" || requestedFilter === "waiting" || requestedFilter === "won" ? requestedFilter : "all";
   const [filter, setFilter] = useState<
@@ -98,6 +99,8 @@ export default function WhatsAppInbox() {
     router.replace(query.toString() ? "/whatsapp?" + query.toString() : "/whatsapp", { scroll: false });
   }
 
+  const [salesStage, setSalesStage] = useState<WhatsAppSalesStage | "">("");
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [composers, setComposers] = useState<Record<string, WhatsAppComposerState>>({});
   const [newConversation, setNewConversation] = useState(Boolean(initialPhone || customerId));
@@ -112,16 +115,17 @@ export default function WhatsAppInbox() {
     abort.current = controller;
     setLoading(true);
     try {
-      const response = await whatsappService.conversations(search, controller.signal);
+      const response = await whatsappService.conversations(search, controller.signal, { filter, salesStage });
       if (controller.signal.aborted) return;
       setConversations(response.conversations);
+      setNowForInbox(Date.now());
       setError("");
     } catch (caught) {
       if (!isAbort(caught) && !controller.signal.aborted) setError(whatsappError(caught));
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
-  }, [canView, connection?.setupRequired, search]);
+  }, [canView, connection?.setupRequired, search, filter, salesStage]);
 
   useEffect(() => {
     const debounce = window.setTimeout(() => void refresh(), 250);
@@ -131,7 +135,8 @@ export default function WhatsAppInbox() {
 
   const onUpdated = useCallback((conversation: WhatsAppConversation) => {
     setConversations((current) => current.map((item) => item.id === conversation.id ? conversation : item));
-  }, []);
+    void refresh();
+  }, [refresh]);
   const onComposerChange = useCallback((id: string, update: (current: WhatsAppComposerState) => WhatsAppComposerState) => {
     setComposers((current) => ({ ...current, [id]: update(current[id] ?? emptyComposer) }));
   }, []);
@@ -150,7 +155,6 @@ export default function WhatsAppInbox() {
   useEffect(() => {
 
     if (!canSend) {
-      setWhatsappTeam([]);
       return;
     }
 
@@ -192,7 +196,7 @@ export default function WhatsAppInbox() {
 
   const assigneeNames =
     new Map(
-      whatsappTeam.map(
+      (canSend ? whatsappTeam : []).map(
         (user) => [
           user.user_id,
           user.display_name,
@@ -201,64 +205,13 @@ export default function WhatsAppInbox() {
     );
 
 
-  const nowForInbox =
-    Date.now();
 
 
-  const visible =
-    conversations
-      .filter(
-        (item) => {
 
-          if (
-            filter === "all"
-          ) {
-            return true;
-          }
-
-          if (
-            filter === "unread"
-          ) {
-            return (
-              item.unread_count >
-              0
-            );
-          }
-
-          if (
-            filter ===
-            "follow_up"
-          ) {
-            return (
-              item.attention_state ===
-                "follow_up_due" ||
-              (
-                item.follow_up_at &&
-                Date.parse(
-                  item.follow_up_at
-                ) <=
-                  nowForInbox
-              )
-            );
-          }
-
-          if (
-            filter ===
-            "waiting"
-          ) {
-            return (
-              item.attention_state ===
-              "waiting_customer"
-            );
-          }
-
-          return (
-            item.sales_stage ===
-            "won"
-          );
-
-        }
-      )
+  const followUps = conversations.filter((item) => item.attention_state === "follow_up_due" || (item.follow_up_at && Date.parse(item.follow_up_at) <= nowForInbox)).length;
+  const opportunities = conversations.filter((item) => item.status === "open" && !["won", "paid", "lost"].includes(item.sales_stage));
+  const opportunityValue = opportunities.reduce((total, item) => total + (Number(item.sales_value) || 0), 0);
+  const visible = [...conversations]
       .sort(
         (
           a,
@@ -325,12 +278,28 @@ export default function WhatsAppInbox() {
     <Navbar companyName={connection?.account?.verified_name || "JINLAB Nexus"} onLogout={async () => { await supabase.auth.signOut(); router.replace("/login"); }} />
     <main className="mx-auto max-w-[1800px] space-y-5 p-4 sm:p-6 lg:p-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
-        <div><p className="text-sm font-medium text-primary">Customer conversations</p><h1 className="mt-1 flex items-center gap-3 text-3xl font-bold tracking-tight">WhatsApp <MessageCircle className="size-7 text-emerald-600" /></h1><p className="mt-2 max-w-2xl text-sm text-muted-foreground">Your business inbox, connected to customers and quotations in Nexus.</p></div>
+        <div><p className="text-sm font-medium text-primary">Customer conversations</p><h1 className="mt-1 flex items-center gap-3 text-3xl font-bold tracking-tight">WhatsApp <MessageCircle className="size-7 text-emerald-600" /></h1><p className="mt-2 max-w-2xl text-sm text-muted-foreground">Turn enquiries into sales: qualify leads, prepare quotations, assign follow-ups and track the outcome.</p></div>
         {can("whatsapp.send") && <Button size="lg" onClick={() => setNewConversation(true)}><Plus /> New conversation</Button>}
       </header>
       {permissionsLoading ? <div className="rounded-2xl border bg-card p-8 text-sm text-muted-foreground" role="status">Loading your workspace permissions…</div> : permissionsError ? <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">{permissionsError}</p> : !canView && !canManage ? <section className="rounded-2xl border bg-card p-8"><h2 className="font-semibold">WhatsApp access needed</h2><p className="mt-2 text-sm text-muted-foreground">Ask your administrator for WhatsApp inbox permission.</p></section> : <>
         <WhatsAppConnectionCard onChange={setConnection} />
         {newConversation && can("whatsapp.send") && <NewConversation key={`${customerId}:${initialPhone}`} initialPhone={initialPhone} customerId={customerId} canCreate={canSend && connection?.ready === true} onCreated={onCreated} onClose={() => setNewConversation(false)} />}
+        {canView && !connection?.setupRequired && <section aria-label="Sales overview" className="rounded-2xl border bg-card p-4">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <label className="text-sm font-semibold">Sales stage
+              <select aria-label="Filter by sales stage" value={salesStage} onChange={(event) => setSalesStage(event.target.value as WhatsAppSalesStage | "")} className="ml-3 rounded-lg border bg-background px-3 py-2">
+                <option value="">All stages</option>
+                {(["enquiry", "qualified", "quoted", "negotiating", "won", "paid", "lost"] as const).map((stage) => <option key={stage} value={stage}>{stage.charAt(0).toUpperCase() + stage.slice(1)}</option>)}
+              </select>
+            </label>
+            <dl className="flex flex-wrap gap-6 text-sm">
+              <div><dt className="text-muted-foreground">Open opportunities</dt><dd className="text-xl font-bold">{opportunities.length}</dd></div>
+              <div><dt className="text-muted-foreground">Follow-ups due</dt><dd className="text-xl font-bold">{followUps}</dd></div>
+              <div><dt className="text-muted-foreground">Estimated opportunity value</dt><dd className="text-xl font-bold">{new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(opportunityValue)}</dd></div>
+            </dl>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">{loading ? "Updating…" : `Summary of ${conversations.length} loaded conversations matching your search and filters (up to 100).`} Sales values are staff estimates, not recorded revenue.</p>
+        </section>}
         {canView && !connection?.setupRequired && <section className="grid overflow-hidden rounded-2xl border bg-card shadow-sm lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[310px_minmax(0,1fr)]" aria-label="WhatsApp inbox">
           <aside className={`${selectedId ? "hidden lg:flex" : "flex"} min-w-0 flex-col border-r`}>
             <div className="border-b p-4">

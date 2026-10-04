@@ -20,6 +20,7 @@ import {
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import IconStyleSelector from "@/components/nexus-icons/IconStyleSelector";
+import IconArtSelector from "@/components/nexus-icons/IconArtSelector";
 
 import {
   Button,
@@ -27,6 +28,7 @@ import {
 
 import {
   changeNexusTheme,
+  getNexusThemePreference,
   type NexusThemeKey,
 } from "@/components/theme/NexusThemeProvider";
 
@@ -477,13 +479,18 @@ export default function AppearanceSettingsPage() {
         settingsResult.data as UiSettings;
 
 
+      const personalTheme =
+        getNexusThemePreference() ??
+        settings.theme_key;
+
+
       setCurrentTheme(
-        settings.theme_key
+        personalTheme
       );
 
 
       setSelectedTheme(
-        settings.theme_key
+        personalTheme
       );
 
     } catch (
@@ -522,24 +529,10 @@ export default function AppearanceSettingsPage() {
       );
 
 
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "save_company_ui_settings",
-          {
-            p_theme_key:
-              selectedTheme,
-          }
-        );
-
-
-      if (error) {
-        throw error;
-      }
-
-
+      /*
+       * Personal display preference only.
+       * Never update company-wide UI settings here.
+       */
       changeNexusTheme(
         selectedTheme
       );
@@ -551,8 +544,9 @@ export default function AppearanceSettingsPage() {
 
 
       setMessage(
-        data?.message ??
-        "Nexus appearance updated."
+        selectedTheme === "system"
+          ? "Your appearance now follows your device."
+          : "Your personal Nexus appearance has been saved."
       );
 
     } catch (
@@ -562,7 +556,7 @@ export default function AppearanceSettingsPage() {
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Appearance could not be saved."
+          : "Your appearance preference could not be saved."
       );
 
     } finally {
@@ -640,7 +634,7 @@ export default function AppearanceSettingsPage() {
             </h1>
 
             <p className="mt-2 text-sm text-muted-foreground">
-              Only an Owner or Admin can change the company Nexus theme.
+              Every user can choose their own Nexus appearance.
             </p>
 
           </div>
@@ -676,12 +670,13 @@ export default function AppearanceSettingsPage() {
 
             <p className="mt-1 text-xs text-muted-foreground">
               Select a theme below, then apply it instantly.
-              Save Theme keeps the selection as the company default.
+              Your selection is personal. System follows your device appearance.
             </p>
           </div>
 
           <Button
             type="button"
+            className="min-w-[158px] border border-blue-400/30 bg-blue-600 text-white shadow-sm hover:bg-blue-500 disabled:opacity-100 dark:border-blue-300/25 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400"
             onClick={() =>
               changeNexusTheme(
                 selectedTheme
@@ -705,7 +700,7 @@ export default function AppearanceSettingsPage() {
             <div>
 
               <p className="text-sm font-medium text-muted-foreground">
-                Company Appearance
+                My Appearance
               </p>
 
 
@@ -898,6 +893,10 @@ export default function AppearanceSettingsPage() {
         </section>
 
 
+
+        <section className="mt-8">
+          <IconArtSelector />
+        </section>
 
         <section className="mt-8">
           <IconStyleSelector />

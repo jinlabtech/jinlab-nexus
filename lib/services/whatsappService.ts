@@ -56,8 +56,8 @@ export const whatsappService = {
   },
   account: (signal?: AbortSignal) => request<WhatsAppConnection>("/account", { signal }),
   connect: (active = true) => request<WhatsAppConnection>("/account", { method: "POST", body: JSON.stringify({ active }) }),
-  conversations: (search: string, signal?: AbortSignal) =>
-    request<{ conversations: WhatsAppConversation[] }>(`/conversations?search=${encodeURIComponent(search)}`, { signal }),
+  conversations: (search: string, signal?: AbortSignal, filters: { filter?: string; salesStage?: string } = {}) =>
+    request<{ conversations: WhatsAppConversation[] }>(`/conversations?${new URLSearchParams({ search, filter: filters.filter ?? "all", salesStage: filters.salesStage ?? "" })}`, { signal }),
   createConversation: (input: { phone: string; customerId?: string; contactName?: string }) =>
     request<{ conversation: WhatsAppConversation }>("/conversations", { method: "POST", body: JSON.stringify(input) }),
   conversation: (id: string, signal?: AbortSignal, before?: string) =>

@@ -105,7 +105,7 @@ export default function JinlabA4Invoice({ invoice, items, company, customer, pay
         .jinlab-classic-invoice *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
       }
     `}</style>
-    <article className="jinlab-classic-invoice" aria-label={`Invoice ${invoice.invoice_number}`}>
+    <article className="nexus-document jinlab-classic-invoice" aria-label={`Invoice ${invoice.invoice_number}`}>
       <header className="masthead">
         <div className="brand">
           {logo && <img className="logo" src={logo} alt={`${companyName} logo`} /* eslint-disable-line @next/next/no-img-element */ />}
