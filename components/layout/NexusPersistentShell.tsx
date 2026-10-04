@@ -8,6 +8,8 @@ import {
 
 import {
   ArrowLeft,
+  Activity,
+  Menu,
 } from "lucide-react";
 
 import {
@@ -323,10 +325,10 @@ export default function NexusPersistentShell({
 
 
         {/* MOBILE APP HEADER */}
-        <header className="nexus-mobile-app-header sticky top-0 z-[70] grid h-[56px] grid-cols-[44px_minmax(0,1fr)_44px] items-center border-b border-border/40 bg-background/94 px-2 backdrop-blur-xl md:hidden">
+        <header className="nexus-mobile-app-header sticky top-0 z-[70] grid h-[56px] grid-cols-[44px_minmax(0,1fr)_88px] items-center border-b border-border/40 bg-background/94 px-2 backdrop-blur-xl md:hidden">
 
           {!backTarget ? (
-            <div className="size-10" aria-hidden="true" />
+            <button type="button" onClick={toggleSidebar} aria-label="Open navigation" className="flex size-11 items-center justify-center rounded-full"><Menu className="size-5" /></button>
           ) : (
             <button
               type="button"
@@ -352,6 +354,8 @@ export default function NexusPersistentShell({
           </div>
 
 
+          <div className="flex items-center">
+            <button type="button" aria-label="Open Nexus Core helper" aria-controls="nexus-core-helper" onClick={() => window.dispatchEvent(new Event("nexus:helper-open"))} className="flex size-11 items-center justify-center rounded-full text-primary"><Activity className="size-5" /></button>
           <button
             type="button"
             onClick={() =>
@@ -365,6 +369,7 @@ export default function NexusPersistentShell({
               size="sm"
             />
           </button>
+          </div>
 
         </header>
 

@@ -17,6 +17,7 @@ export type NexusAppId =
   | "payroll"
   | "hr"
   | "email"
+  | "users"
   | "settings";
 
 
@@ -785,6 +786,26 @@ export const nexusApps:
     permission: "email.view",
     dockable: true,
     mobile: true,
+  },
+
+
+  {
+    id: "users",
+    label: "Users",
+    href: "/users",
+    activeRoot: "/users",
+    icon: "users",
+    permission: "user.view",
+    dockable: true,
+    mobile: true,
+    keywords: [
+      "users",
+      "staff",
+      "accounts",
+      "access",
+      "roles",
+      "employees",
+    ],
   },
 
 

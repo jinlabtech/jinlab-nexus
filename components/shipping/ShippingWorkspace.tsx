@@ -419,6 +419,8 @@ function ShippingWorkspace({view}:{view:View}){
  const [courierSearch,setCourierSearch]=useState('');
  const [courierStatusFilter,setCourierStatusFilter]=useState('all');
  const [connectionProvider,setConnectionProvider]=useState('courier_guy');const [apiKey,setApiKey]=useState('');const [pickup,setPickup]=useState<Address>(emptyAddress);const [waybill,setWaybill]=useState('');
+ const [mobileEditorOpen,setMobileEditorOpen]=useState(false);
+ const [mobileConnectionOpen,setMobileConnectionOpen]=useState(false);
  const applyWorkspace=useCallback((data:Workspace,fill=false)=>{setWorkspace(data);if(fill&&data.invoice&&data.customer){const c=data.customer;setForm({...blank,source_id:data.invoice.id,recipient_name:c.contact_person||c.customer_name||'',recipient_company:c.customer_name||'',recipient_phone:c.phone||'',recipient_email:c.email||'',address_line_1:c.address_line_1||'',address_line_2:c.address_line_2||'',city:c.city||'',province:c.province||'',postal_code:c.postal_code||'',country_code:!c.country||['South Africa','ZA'].includes(c.country)?'ZA':c.country.toUpperCase()});setRates([]);setRate('');setConfirmed(false)}},[]);
  const load=useCallback(async(invoiceId?:string,fill=false)=>{const request=++sequence.current;const data=await api(undefined,invoiceId) as Workspace;if(request===sequence.current)applyWorkspace(data,fill)},[applyWorkspace]);
  useEffect(()=>{let active=true;api(undefined,initialInvoice).then(data=>{if(active)applyWorkspace(data as Workspace,true)}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[applyWorkspace,initialInvoice]);
@@ -484,19 +486,55 @@ function ShippingWorkspace({view}:{view:View}){
  const active=shipments.filter(s=>!['draft','delivered','cancelled','returned'].includes(s.status));
  const attention=shipments.filter(s=>['sending','uncertain'].includes(s.booking_state||'')||['failed','exception','returned'].includes(s.status));
  const filtered=shipments.filter(s=>(view!=='tracking'||!!s.tracking_number||['sending','uncertain'].includes(s.booking_state||''))&&(statusFilter==='all'||(statusFilter==='attention'?attention.some(a=>a.id===s.id):statusFilter==='active'?active.some(a=>a.id===s.id):s.status===statusFilter))&&(providerFilter==='all'||s.provider_code===providerFilter)&&[s.shipment_number,s.source_reference,s.recipient_name,s.tracking_number,courierName(s.provider_code),s.city,s.status].join(' ').toLowerCase().includes(search.toLowerCase().trim()));
- const showEditor=view==='new'||!!initialInvoice||!!form.id;
+ const showEditor=view==='new'||!!initialInvoice||!!form.id||mobileEditorOpen;
  const pickupAddress=workspace?.settings.find(s=>s.provider_code===form.provider_code)?.collection_address;
 
  function startNew(){setForm({...blank});setRates([]);setRate('');setConfirmed(false);setWaybill('');setError('');setMessage('')}
- function edit(s:Shipment){const next={...blank};for(const key of Object.keys(next))next[key]=String(s[key as keyof Shipment]??'');setForm(next);setRates([]);setRate('');setConfirmed(false);setWaybill('');setMessage('');setError('')}
+ function openMobileNewShipment(){startNew();setMobileEditorOpen(true)}
+ function closeMobileShipment(){
+  setMobileEditorOpen(false);
+  if(view==='new'){
+   window.history.back();
+   return;
+  }
+  startNew();
+ }
+ function edit(s:Shipment){const next={...blank};for(const key of Object.keys(next))next[key]=String(s[key as keyof Shipment]??'');setForm(next);setRates([]);setRate('');setConfirmed(false);setWaybill('');setMessage('');setError('');setMobileEditorOpen(true)}
  async function save(){const numeric=['parcel_count','total_weight_kg','length_cm','width_cm','height_cm'];const shipment:Record<string,unknown>={...form,source_type:'invoice'};for(const key of numeric)shipment[key]=form[key]?Number(form[key]):null;const saved=await api({action:'save',shipment}) as {shipment_id:string};setForm(current=>({...current,id:saved.shipment_id}));await load();setMessage('Shipment draft saved. Request rates or link an existing courier waybill.');return saved.shipment_id}
  function field(key:string,label:string,type='text',required=false){return <label key={key} className="block space-y-1 text-sm"><span>{label}</span><input className={inputClass} type={type} required={required} min={type==='number'?(key==='parcel_count'?'1':'0.001'):undefined} step={type==='number'?(key==='parcel_count'?'1':'any'):undefined} value={form[key]||''} disabled={busy||locked||!workspace?.canManage} onChange={e=>update(key,e.target.value)}/></label>}
  return <DashboardLayout><main className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6">
  <header className="relative overflow-hidden rounded-3xl bg-slate-950 p-6 text-white sm:p-8">
- <div className="flex flex-wrap items-start justify-between gap-5"><div><p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-sky-300"><Truck className="h-5 w-5"/> JINLAB SHIPPING</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Your delivery desk.</h1><p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">From invoice to doorstep. Quote, book and follow your deliveries in one place.</p></div><div className="flex gap-2"><button aria-label="Refresh shipping" disabled={busy} className="rounded-xl border border-white/20 p-3 hover:bg-white/10" onClick={()=>void run(()=>load())}><RefreshCw className={`h-5 w-5 ${busy?'animate-spin':''}`}/></button>{workspace?.canManage&&<Link href="/shipping/new" onClick={startNew} className="flex items-center gap-2 rounded-xl bg-sky-400 px-4 py-3 text-sm font-semibold text-slate-950 hover:bg-sky-300"><Plus className="h-4 w-4"/>New shipment</Link>}</div></div>
+ <div className="flex flex-wrap items-start justify-between gap-5"><div><p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-sky-300"><Truck className="h-5 w-5"/> JINLAB SHIPPING</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Your delivery desk.</h1><p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">From invoice to doorstep. Quote, book and follow your deliveries in one place.</p></div><div className="flex gap-2"><button aria-label="Refresh shipping" disabled={busy} className="rounded-xl border border-white/20 p-3 hover:bg-white/10" onClick={()=>void run(()=>load())}><RefreshCw className={`h-5 w-5 ${busy?'animate-spin':''}`}/></button>{workspace?.canManage&&<>
+ <button
+  type="button"
+  onClick={openMobileNewShipment}
+  className="flex items-center gap-2 rounded-xl bg-sky-400 px-3 py-2 text-xs font-semibold text-slate-950 md:hidden"
+ >
+  <Plus className="h-4 w-4"/>
+  New
+ </button>
+
+ <button
+  type="button"
+  onClick={()=>setMobileConnectionOpen(true)}
+  className="flex items-center justify-center rounded-xl border border-white/20 px-3 py-2 text-sky-100 md:hidden"
+  aria-label="Courier setup"
+ >
+  <Plug className="h-4 w-4"/>
+ </button>
+
+ <Link
+  href="/shipping/new"
+  onClick={startNew}
+  className="hidden items-center gap-2 rounded-xl bg-sky-400 px-4 py-3 text-sm font-semibold text-slate-950 hover:bg-sky-300 md:flex"
+ >
+  <Plus className="h-4 w-4"/>
+  New shipment
+ </Link>
+</>}</div></div>
  <div className="mt-6 flex flex-wrap items-center gap-2 text-xs text-slate-300"><span className={`h-2 w-2 rounded-full ${workspace?.settings.length?'bg-emerald-400':'bg-amber-400'}`}/>{workspace?`${workspace.settings.length} courier API connection${workspace.settings.length===1?'':'s'}`:'Loading your workspace'}<span className="mx-2 text-slate-600">/</span> Invoice-linked deliveries</div>
  </header>
- <nav aria-label="Shipping navigation" className="flex gap-1 overflow-x-auto border-b pb-2">{navigation.filter(n=>!['new','connections'].includes(n.view)||workspace?.canManage).map(n=><Link key={n.view} href={n.href} onClick={n.view==='new'?startNew:undefined} aria-current={view===n.view?'page':undefined} className={`whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ${view===n.view?'bg-slate-900 text-white':'text-muted-foreground hover:bg-muted'}`}>{n.label}</Link>)}</nav>
+ <nav aria-label="Shipping navigation" className="flex gap-1 overflow-x-auto border-b pb-2">{navigation.filter(n=>!['new','connections'].includes(n.view)||workspace?.canManage).map(n=><Link key={n.view} href={n.href} onClick={n.view==='new'?startNew:undefined} aria-current={view===n.view?'page':undefined} className={`${['new','connections'].includes(n.view)?'hidden md:inline-flex':''} whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ${view===n.view?'bg-slate-900 text-white':'text-muted-foreground hover:bg-muted'}`}>{n.label}</Link>)}</nav>
  {workspace&&view==='overview'&&<>
  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
  {courierActivity.length?[
@@ -525,13 +563,37 @@ function ShippingWorkspace({view}:{view:View}){
   <p className="mt-2 text-xs text-muted-foreground">Nexus shipments</p>
  </div>)}
 </div></>}
- {view==='connections'&&workspace?.canManage&&<form id="courier-connection" className={panelClass} onSubmit={e=>{e.preventDefault();void run(async()=>{await api({action:'connect',provider:connectionProvider,apiKey,address:pickup});setApiKey('');await load();setMessage('Courier API verified and connected. You can now request rates and book shipments.')})}}>
- <h2 className="text-lg font-semibold">Connect a courier API</h2><p className="text-sm text-muted-foreground">The Courier Guy and Shiplogic accounts support rates and booking here. RAM, Fastway and other couriers can be linked by waybill after booking in their portal. API keys are encrypted and never shown again.</p>
+ {(view==='connections'||mobileConnectionOpen)&&workspace?.canManage&&<>
+ {mobileConnectionOpen&&
+  <button
+   type="button"
+   aria-label="Close courier setup"
+   className="nexus-shipping-sheet-backdrop fixed inset-0 z-[209] bg-black/35 md:hidden"
+   onClick={()=>setMobileConnectionOpen(false)}
+  />
+ }
+ <form
+  id="courier-connection"
+  className={`${panelClass} ${mobileConnectionOpen?'nexus-shipping-connection-sheet':''}`} onSubmit={e=>{e.preventDefault();void run(async()=>{await api({action:'connect',provider:connectionProvider,apiKey,address:pickup});setApiKey('');await load();setMessage('Courier API verified and connected. You can now request rates and book shipments.')})}}>
+ <div className="flex items-center justify-between gap-3">
+ <h2 className="text-lg font-semibold">Connect a courier API</h2>
+ {mobileConnectionOpen&&
+  <button
+   type="button"
+   className="flex size-9 items-center justify-center rounded-full bg-muted md:hidden"
+   onClick={()=>setMobileConnectionOpen(false)}
+   aria-label="Close courier setup"
+  >
+   ×
+  </button>
+ }
+ </div><p className="text-sm text-muted-foreground">The Courier Guy and Shiplogic accounts support rates and booking here. RAM, Fastway and other couriers can be linked by waybill after booking in their portal. API keys are encrypted and never shown again.</p>
  <label className="block text-sm">Courier<select className={inputClass} value={connectionProvider} disabled={busy} onChange={e=>{setConnectionProvider(e.target.value);setApiKey('');setPickup(workspace.settings.find(s=>s.provider_code===e.target.value)?.collection_address||emptyAddress)}}>{providers.filter(p=>p.api).map(p=><option key={p.code} value={p.code}>{p.name}</option>)}</select></label>
  <label className="block text-sm">API key<input className={inputClass} type="password" autoComplete="new-password" required value={apiKey} disabled={busy} onChange={e=>setApiKey(e.target.value)}/></label>
  <h3 className="font-semibold">Collection address</h3><div className="grid gap-3 sm:grid-cols-2">{Object.entries({name:'Contact name',company:'Company',phone:'Phone',email:'Email',street:'Street address',suburb:'Suburb',city:'City',province:'Province',postalCode:'Postal code',country:'Country code (ZA)'}).map(([key,label])=><label key={key} className="block text-sm">{label}<input className={inputClass} value={pickup[key as keyof Address]} disabled={busy} required={!['company','email','suburb'].includes(key)} onChange={e=>setPickup(current=>({...current,[key]:e.target.value}))}/></label>)}</div>
  <button disabled={busy} className="rounded-lg bg-primary px-4 py-2 text-primary-foreground">{busy?'Checking connection…':'Verify and save connection'}</button>
- </form>}
+ </form>
+ </>}
  {workspace&&view!=='connections'&&<div className="space-y-6">
  {view!=='new'&&!initialInvoice&&workspace?.settings.some(setting=>setting.provider_code==='courier_guy')&&<section className={panelClass}>
  <div className="flex flex-wrap items-start justify-between gap-3">
@@ -701,7 +763,18 @@ function ShippingWorkspace({view}:{view:View}){
  {filtered.length?<div className="overflow-x-auto"><table className="w-full min-w-[680px] text-left text-sm"><thead><tr className="border-b text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-3">Shipment / invoice</th><th className="px-3 py-3">Deliver to</th><th className="px-3 py-3">Courier / waybill</th><th className="px-3 py-3">Status</th><th className="px-3 py-3 text-right">Action</th></tr></thead><tbody className="divide-y">{filtered.map(s=><tr key={s.id} className={form.id===s.id?'bg-sky-50/50':'hover:bg-muted/40'}><td className="px-3 py-4"><span className="font-semibold">{s.shipment_number}</span><span className="mt-1 block text-xs text-muted-foreground">{s.source_reference||'No invoice'}</span></td><td className="px-3 py-4"><span>{s.recipient_name}</span><span className="mt-1 block text-xs text-muted-foreground">{s.city} · {s.parcel_count} parcel{s.parcel_count===1?'':'s'}</span></td><td className="px-3 py-4"><span>{courierName(s.provider_code)}</span><span className="mt-1 block text-xs text-muted-foreground">{s.tracking_number||'Awaiting booking'}</span></td><td className="px-3 py-4"><Status status={s.status}/>{['sending','uncertain'].includes(s.booking_state||'')&&<span className="mt-1 block text-xs text-amber-700">Check booking</span>}</td><td className="px-3 py-4 text-right"><button disabled={busy} className="rounded-lg border px-3 py-2 font-medium hover:bg-background" onClick={()=>{edit(s);requestAnimationFrame(()=>document.getElementById('shipment-detail')?.scrollIntoView({behavior:'smooth'}))}}>{s.status==='draft'?'Continue':'View'}</button></td></tr>)}</tbody></table></div>:<div className="rounded-xl border border-dashed px-6 py-12 text-center"><Package className="mx-auto mb-3 h-9 w-9 text-slate-300"/><h3 className="font-semibold">{shipments.length?'No shipments match your filters':'Your first delivery starts here'}</h3><p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">{shipments.length?'Try another name, waybill or status.':'Choose an invoice, check the customer’s address, then compare courier rates and book.'}</p>{workspace.canManage&&!shipments.length&&<Link href="/shipping/new" onClick={startNew} className="mt-5 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"><Plus className="h-4 w-4"/>Create shipment</Link>}</div>}
  </section>}
  {showEditor&&
- <section id="shipment-detail" className={panelClass}><div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-sky-700">{selected?'Shipment details':'New delivery'}</p><h2 className="mt-1 text-xl font-semibold">{selected?.shipment_number||'Arrange a shipment'}</h2></div>{selected&&<Status status={selected.status}/>}</div>
+ <section id="shipment-detail" className={`${panelClass} nexus-shipping-editor`}><div className="flex items-center justify-between gap-3"><div className="flex min-w-0 flex-1 items-center justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-wider text-sky-700">{selected?'Shipment details':'New delivery'}</p><h2 className="mt-1 text-xl font-semibold">{selected?.shipment_number||'Arrange a shipment'}</h2></div>{selected&&<Status status={selected.status}/>}</div>
+ </div>
+
+ <button
+  type="button"
+  onClick={closeMobileShipment}
+  className="absolute right-3 top-3 z-10 flex size-9 items-center justify-center rounded-full bg-muted text-lg md:hidden"
+  aria-label="Close shipment"
+ >
+  ×
+ </button>
+
  <div className="grid gap-2 sm:grid-cols-3">{[{label:'Delivery details',done:!!form.id},{label:'Courier quote',done:!!rate||locked},{label:'Book & track',done:!!selected?.tracking_number}].map((step,i)=><div key={step.label} className={`flex items-center gap-2 rounded-lg px-3 py-3 text-sm ${step.done?'bg-emerald-50 text-emerald-800':'bg-muted text-muted-foreground'}`}><span className="flex h-6 w-6 items-center justify-center rounded-full border text-xs">{step.done?'✓':i+1}</span>{step.label}</div>)}</div>
  {pickupAddress&&<div className="flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-slate-800"><MapPin className="mt-1 h-4 w-4 shrink-0"/><div><p className="text-xs font-semibold uppercase tracking-wide">Collect from</p><p className="mt-1 text-sm">{pickupAddress.company||pickupAddress.name} · {pickupAddress.street}, {pickupAddress.city}</p></div><ArrowRight className="ml-auto h-4 w-4 shrink-0"/></div>}
 

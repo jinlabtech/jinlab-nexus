@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import DataTable from "@/components/DataTable";
+import ActionModal from "@/components/ui/ActionModal";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import QuotationForm from "@/components/QuotationForm";
@@ -486,7 +487,22 @@ export default function QuotationsPage() {
 					onLogout={logout}
 				/>
 
-				<main className="p-4 sm:p-6 lg:p-8">
+				<ActionModal
+				open={showForm}
+				title="New Quotation"
+				subtitle="Create a customer quotation."
+				onClose={() => setShowForm(false)}
+				maxWidth="max-w-3xl"
+			>
+				<QuotationForm
+					customers={customers}
+					branches={branches}
+					onSave={createNewQuotation}
+					onCancel={() => setShowForm(false)}
+				/>
+			</ActionModal>
+
+			<main className="nexus-quotations-page p-4 sm:p-6 lg:p-8">
 					<div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6">
 						<h1 className="text-xl font-semibold">
 							Access denied
@@ -560,26 +576,7 @@ export default function QuotationsPage() {
 					</div>
 				)}
 
-				{showForm && (
-					<div className="mb-8">
-						<QuotationForm
-							customers={
-								customers
-							}
-							branches={
-								branches
-							}
-							onSave={
-								createNewQuotation
-							}
-							onCancel={() =>
-								setShowForm(
-									false
-								)
-							}
-						/>
-					</div>
-				)}
+
 
 				<section className="mb-5 grid gap-4 sm:grid-cols-3">
 					<div className="rounded-xl border bg-card p-5">
@@ -683,6 +680,20 @@ export default function QuotationsPage() {
 						emptyMessage="No quotations yet."
 					/>
 				)}
+				{can("quotation.create") && !showForm && (
+					<Button
+						type="button"
+						onClick={() => {
+							setMessage("");
+							setPageError("");
+							setShowForm(true);
+						}}
+						className="nexus-quotation-add-fab fixed z-[75] md:hidden"
+					>
+						+ Quote
+					</Button>
+				)}
+
 			</main>
 		</DashboardLayout>
 	);

@@ -179,7 +179,7 @@ export default function QuotationForm({
     <AppCard>
       <form
         onSubmit={handleSubmit}
-        className="grid gap-6"
+        className="nexus-quotation-form grid gap-6"
       >
         <div>
           <h2 className="text-xl font-semibold">
@@ -193,7 +193,7 @@ export default function QuotationForm({
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="nexus-quotation-form-grid grid gap-4 md:grid-cols-2">
           <label className="grid gap-2">
             <span className="text-sm font-medium">
               Customer
@@ -348,7 +348,7 @@ export default function QuotationForm({
           </div>
         )}
 
-        <div className="flex flex-wrap gap-3">
+        <div className="nexus-quotation-form-actions flex flex-wrap gap-3">
           <Button
             type="submit"
             disabled={saving}

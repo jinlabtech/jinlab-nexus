@@ -21,10 +21,12 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronUp,
+  Home,
   Pin,
   PinOff,
   RotateCcw,
   Search,
+  Settings,
   X,
 } from "lucide-react";
 
@@ -643,15 +645,11 @@ export default function NexusDock() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold">
-                  {launcherView === "search"
-                    ? "Search Nexus"
-                    : "Nexus Applications"}
+                  Search Nexus
                 </p>
 
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {launcherView === "search"
-                    ? "Find apps, features and actions instantly."
-                    : "Open apps and arrange the applications on your mobile dock."}
+                  Applications, features and actions in one place.
                 </p>
               </div>
 
@@ -686,7 +684,7 @@ export default function NexusDock() {
               </span>
             </div>
 
-            {launcherView === "search" && (
+            {query.trim() && (
               <NexusSearchResults
                 query={query}
                 onOpen={() =>
@@ -695,9 +693,8 @@ export default function NexusDock() {
               />
             )}
 
-            {launcherView === "apps" &&
-              recentApps.length > 0 &&
-              !query && (
+            {recentApps.length > 0 &&
+              !query.trim() && (
               <div className="mt-4">
                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   Recent
@@ -740,7 +737,7 @@ export default function NexusDock() {
 
             <div
               className={
-                launcherView === "search"
+                query.trim()
                   ? "hidden"
                   : "mt-4"
               }
@@ -861,7 +858,7 @@ export default function NexusDock() {
               )}
             </div>
 
-            {launcherView === "apps" &&
+            {!query.trim() &&
               pinnedApps.length > 0 && (
               <div className="mt-4 border-t border-border/40 pt-4">
                 <div className="flex items-center justify-between gap-3">
@@ -960,7 +957,88 @@ export default function NexusDock() {
         </div>
       )}
 
-      <div className="nexus-dock-shell pointer-events-none fixed inset-x-0 bottom-3 z-[80] flex justify-center px-2">
+      {/* ==================================================
+          PHONE SYSTEM DOCK
+          Core · Home · Settings · Search
+          ================================================== */}
+      <div className="nexus-phone-system-dock pointer-events-none fixed z-[80] md:hidden">
+        <nav
+          aria-label="Nexus phone navigation"
+          className="pointer-events-auto grid grid-cols-4 items-end"
+        >
+
+          <button
+            type="button"
+            onClick={() => {
+              setLauncherView("apps");
+              setQuery("");
+              saveMode("expanded");
+            }}
+            className="nexus-phone-system-item"
+            aria-label="Nexus Core"
+          >
+            <NexusIcon
+              name="core"
+              active={
+                mode === "expanded" &&
+                launcherView === "apps"
+              }
+              size="lg"
+            />
+
+            <span>
+              Core
+            </span>
+          </button>
+
+
+          <Link
+            href="/dashboard"
+            prefetch={false}
+            className="nexus-phone-system-item"
+            aria-label="Home"
+          >
+            <Home className="size-[21px]" />
+
+            <span>
+              Home
+            </span>
+          </Link>
+
+
+          <Link
+            href="/settings"
+            prefetch={false}
+            className="nexus-phone-system-item"
+            aria-label="Settings"
+          >
+            <Settings className="size-[21px]" />
+
+            <span>
+              Settings
+            </span>
+          </Link>
+
+
+          <button
+            type="button"
+            onClick={openSearch}
+            className="nexus-phone-system-item"
+            aria-label="Search Nexus"
+          >
+            <Search className="size-[21px]" />
+
+            <span>
+              Search
+            </span>
+          </button>
+
+        </nav>
+      </div>
+
+
+      {/* Desktop / tablet dock */}
+      <div className="nexus-dock-shell pointer-events-none fixed inset-x-0 bottom-3 z-[80] hidden justify-center px-2 md:flex">
         <nav
           aria-label="Nexus Dock"
           onDragOver={(event) => {
@@ -1094,8 +1172,8 @@ export default function NexusDock() {
             }}
             className={
               mode === "expanded"
-                ? "mx-0.5 flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary"
-                : "mx-0.5 flex size-11 shrink-0 items-center justify-center rounded-2xl text-primary transition hover:bg-primary/10"
+                ? "mx-0.5 hidden size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary md:flex"
+                : "mx-0.5 hidden size-11 shrink-0 items-center justify-center rounded-2xl text-primary transition hover:bg-primary/10 md:flex"
             }
             aria-label="Open Nexus applications"
           >

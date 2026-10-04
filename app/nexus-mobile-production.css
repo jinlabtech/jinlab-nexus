@@ -2497,3 +2497,2546 @@
   }
 
 }
+
+
+/* =========================================================
+   NEXUS FEATURE ART V7
+   Better visual identity inside major module hubs.
+   ========================================================= */
+
+.nexus-module-hub-icon {
+  position: relative;
+
+  isolation: isolate;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      currentColor 17%,
+      transparent
+    )
+    !important;
+
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      rgb(255 255 255 / .78),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        currentColor 13%,
+        var(--card)
+      ),
+      color-mix(
+        in srgb,
+        currentColor 5%,
+        var(--card)
+      )
+    )
+    !important;
+
+  box-shadow:
+    inset 0 1px 0
+      rgb(255 255 255 / .72),
+    inset 0 -1px 0
+      color-mix(
+        in srgb,
+        currentColor 8%,
+        transparent
+      ),
+    0 5px 12px
+      rgb(25 45 65 / .09)
+    !important;
+}
+
+
+.nexus-module-hub-icon::before {
+  content: "";
+
+  position: absolute;
+
+  width: 56%;
+  height: 56%;
+
+  top: -16%;
+  right: -10%;
+
+  border-radius: 999px;
+
+  background:
+    currentColor;
+
+  opacity: .10;
+}
+
+
+.nexus-module-hub-icon::after {
+  content: "";
+
+  position: absolute;
+
+  width: 7px;
+  height: 7px;
+
+  right: 8px;
+  bottom: 8px;
+
+  border:
+    1.5px solid
+    currentColor;
+
+  border-radius: 999px;
+
+  opacity: .38;
+}
+
+
+.nexus-module-hub-icon svg {
+  position: relative;
+
+  z-index: 2;
+
+  stroke-width: 1.9;
+
+  filter:
+    drop-shadow(
+      0 1px 1px
+      rgb(0 0 0 / .10)
+    );
+}
+
+
+@media screen and (max-width: 767px) {
+
+  .nexus-module-hub-icon {
+    box-shadow:
+      inset 0 1px 0
+        rgb(255 255 255 / .68),
+      0 3px 8px
+        rgb(30 50 70 / .08)
+      !important;
+  }
+
+
+  .nexus-module-hub-icon::after {
+    width: 5px;
+    height: 5px;
+
+    right: 5px;
+    bottom: 5px;
+  }
+
+}
+
+
+/* =========================================================
+   SHIPPING — MOBILE ACTION SHEETS
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-shipping-sheet-backdrop {
+    backdrop-filter: blur(2px);
+
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+
+  .nexus-shipping-connection-sheet,
+  .nexus-shipping-editor {
+    position:
+      fixed !important;
+
+    left:
+      0 !important;
+
+    right:
+      0 !important;
+
+    bottom:
+      0 !important;
+
+    z-index:
+      210 !important;
+
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+
+    max-height:
+      82dvh !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      12px
+      12px
+      calc(
+        14px +
+        env(safe-area-inset-bottom)
+      )
+      !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    border-radius:
+      20px
+      20px
+      0
+      0
+      !important;
+
+    background:
+      var(--background) !important;
+
+    box-shadow:
+      0 -22px 70px
+      rgb(0 0 0 / .24)
+      !important;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  .nexus-shipping-editor {
+    position:
+      fixed !important;
+  }
+
+
+  .nexus-shipping-editor
+  > div:first-child {
+    position:
+      sticky;
+
+    top:
+      -12px;
+
+    z-index:
+      8;
+
+    margin:
+      -12px
+      -12px
+      7px;
+
+    padding:
+      11px
+      50px
+      10px
+      12px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 96%,
+        transparent
+      );
+
+    border-bottom:
+      1px solid
+      var(--border);
+
+    backdrop-filter:
+      blur(12px);
+  }
+
+
+  /*
+   * Shipping progress takes one compact horizontal row.
+   */
+  .nexus-shipping-editor
+  > .grid:first-of-type {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      4px !important;
+  }
+
+
+  .nexus-shipping-editor
+  > .grid:first-of-type
+  > div {
+    min-height:
+      34px;
+
+    padding:
+      5px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  .nexus-shipping-editor
+  form {
+    gap:
+      8px !important;
+  }
+
+
+  /*
+   * Address and parcel entry remain packed:
+   * two fields per row on normal phones.
+   */
+  .nexus-shipping-editor
+  form
+  .grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-shipping-editor
+  label {
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-shipping-editor
+  input,
+  .nexus-shipping-editor
+  select {
+    min-height:
+      39px !important;
+
+    padding:
+      6px
+      8px !important;
+  }
+
+
+  .nexus-shipping-editor
+  h3 {
+    margin-top:
+      6px !important;
+
+    font-size:
+      12px !important;
+  }
+
+
+  .nexus-shipping-editor
+  p {
+    font-size:
+      10px;
+  }
+
+
+  .nexus-shipping-connection-sheet
+  .grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-shipping-connection-sheet
+  label {
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-shipping-connection-sheet
+  input,
+  .nexus-shipping-connection-sheet
+  select {
+    min-height:
+      39px !important;
+
+    padding:
+      6px
+      8px !important;
+  }
+
+}
+
+
+@media screen and (max-width: 350px) {
+
+  .nexus-shipping-editor
+  form
+  .grid,
+  .nexus-shipping-connection-sheet
+  .grid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS SEARCH = MOBILE APPLICATION LIBRARY
+   Five-position phone taskbar.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-dock-shell
+  .nexus-dock-glass {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+
+  /*
+   * Search is now the application launcher.
+   */
+  .nexus-launcher-shell
+  .nexus-launcher-glass {
+    max-height:
+      76dvh !important;
+  }
+
+
+  .nexus-launcher-search {
+    position:
+      sticky;
+
+    top:
+      0;
+
+    z-index:
+      10;
+
+    margin-top:
+      9px !important;
+  }
+
+
+  .nexus-launcher-search
+  input {
+    height:
+      44px !important;
+
+    border-radius:
+      14px !important;
+  }
+
+
+  /*
+   * Application library inside Search stays compact.
+   */
+  .nexus-launcher-glass
+  .nexus-launcher-tile {
+    min-height:
+      48px !important;
+
+    padding:
+      5px !important;
+
+    border-radius:
+      12px !important;
+  }
+
+
+  .nexus-launcher-glass
+  .nexus-launcher-tile
+  .nexus-icon {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS PHONE SYSTEM DOCK V8
+   Core · Home · Settings · Search
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /*
+   * Old dynamic phone dock no longer participates.
+   * Desktop keeps its normal dock.
+   */
+  .nexus-dock-shell {
+    display:
+      none !important;
+  }
+
+
+  .nexus-phone-system-dock {
+    left:
+      10px;
+
+    right:
+      10px;
+
+    bottom:
+      calc(
+        7px +
+        env(safe-area-inset-bottom)
+      );
+
+    height:
+      56px;
+  }
+
+
+  .nexus-phone-system-dock
+  nav {
+    width:
+      100%;
+
+    height:
+      56px;
+
+    padding:
+      3px
+      4px;
+
+    gap:
+      2px;
+
+    border:
+      0;
+
+    border-radius:
+      18px;
+
+    /*
+     * User requested transparent bar.
+     */
+    background:
+      transparent;
+
+    box-shadow:
+      none;
+
+    backdrop-filter:
+      none;
+
+    -webkit-backdrop-filter:
+      none;
+  }
+
+
+  .nexus-phone-system-item {
+    display:
+      flex;
+
+    min-width:
+      0;
+
+    height:
+      50px;
+
+    flex-direction:
+      column;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    gap:
+      2px;
+
+    padding:
+      2px;
+
+    border:
+      0 !important;
+
+    border-radius:
+      13px !important;
+
+    background:
+      transparent !important;
+
+    color:
+      var(--muted-foreground);
+
+    text-decoration:
+      none;
+
+    box-shadow:
+      none !important;
+
+    transition:
+      transform 100ms ease,
+      color 120ms ease;
+  }
+
+
+  .nexus-phone-system-item:active {
+    transform:
+      scale(.90);
+  }
+
+
+  .nexus-phone-system-item
+  > span:last-child {
+    max-width:
+      100%;
+
+    overflow:
+      hidden;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+
+    font-size:
+      8.5px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1;
+  }
+
+
+  /*
+   * Core is intentionally the strongest item.
+   */
+  .nexus-phone-system-item:first-child {
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-phone-system-item:first-child
+  .nexus-icon {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+
+  /*
+   * Other system actions stay restrained.
+   */
+  .nexus-phone-system-item
+  > svg {
+    width:
+      21px;
+
+    height:
+      21px;
+
+    stroke-width:
+      1.8;
+  }
+
+
+  /*
+   * Workspace ends above dock.
+   */
+  .nexus-app-workspace {
+    padding-bottom:
+      calc(
+        72px +
+        env(safe-area-inset-bottom)
+      ) !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS QUOTATIONS — MOBILE WORKFLOW
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-quotations-page {
+    padding:
+      8px
+      9px
+      12px
+      !important;
+  }
+
+
+  .nexus-quotations-page
+  > section:first-of-type {
+    margin-bottom:
+      8px !important;
+  }
+
+
+  .nexus-quotations-page
+  > section:first-of-type
+  p:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-quotations-page
+  > section:first-of-type
+  h1 {
+    margin:
+      0 !important;
+
+    font-size:
+      19px !important;
+  }
+
+
+  .nexus-quotations-page
+  > section:first-of-type
+  h1 + p {
+    display:
+      none;
+  }
+
+
+  /*
+   * Desktop New Quotation button is unnecessary on phone.
+   * Floating + Quote remains available instead.
+   */
+  .nexus-quotations-page
+  > section:first-of-type
+  > button {
+    display:
+      none !important;
+  }
+
+
+  /*
+   * KPI cards compact into one row.
+   */
+  .nexus-quotations-page
+  > section[class*="grid"] {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      5px !important;
+  }
+
+
+  .nexus-quotations-page
+  > section[class*="grid"]
+  > div {
+    padding:
+      8px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+
+  .nexus-quotations-page
+  > section[class*="grid"]
+  > div
+  p:first-child {
+    font-size:
+      9px !important;
+
+    line-height:
+      1.1 !important;
+  }
+
+
+  .nexus-quotations-page
+  > section[class*="grid"]
+  > div
+  p:last-child {
+    margin-top:
+      4px !important;
+
+    font-size:
+      13px !important;
+
+    line-height:
+      1.1 !important;
+  }
+
+
+  /*
+   * Register header becomes mainly a search bar.
+   */
+  .nexus-quotations-page
+  > section[class*="rounded-xl"][class*="bg-card"] {
+    padding:
+      7px !important;
+
+    margin-bottom:
+      8px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+
+  .nexus-quotations-page
+  > section[class*="rounded-xl"][class*="bg-card"]
+  > div:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-quotations-page
+  input[type="search"] {
+    height:
+      39px !important;
+
+    margin:
+      0 !important;
+  }
+
+
+  /*
+   * Floating creation control.
+   */
+  .nexus-quotation-add-fab {
+    right:
+      11px !important;
+
+    bottom:
+      calc(
+        68px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    height:
+      40px !important;
+
+    min-height:
+      40px !important;
+
+    padding:
+      0
+      14px !important;
+
+    border-radius:
+      999px !important;
+
+    box-shadow:
+      0 8px 22px
+      rgb(0 0 0 / .16)
+      !important;
+  }
+
+
+  /* =======================================================
+     QUOTATION FORM SHEET
+     ======================================================= */
+
+  .nexus-quotation-form {
+    gap:
+      9px !important;
+  }
+
+
+  /*
+   * Popup header already says New Quotation.
+   */
+  .nexus-quotation-form
+  > div:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-quotation-form-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-quotation-form
+  label {
+    gap:
+      3px !important;
+  }
+
+
+  .nexus-quotation-form
+  label
+  > span {
+    font-size:
+      10px !important;
+
+    line-height:
+      1.1 !important;
+  }
+
+
+  .nexus-quotation-form
+  :is(
+    input,
+    select
+  ) {
+    min-height:
+      39px !important;
+
+    height:
+      39px !important;
+
+    padding-left:
+      8px !important;
+
+    padding-right:
+      8px !important;
+  }
+
+
+  .nexus-quotation-form
+  textarea {
+    min-height:
+      58px !important;
+
+    max-height:
+      88px;
+
+    padding:
+      7px
+      8px !important;
+  }
+
+
+  /*
+   * Save/Cancel remain visible while editing.
+   */
+  .nexus-quotation-form-actions {
+    position:
+      sticky;
+
+    bottom:
+      -12px;
+
+    z-index:
+      10;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      6px !important;
+
+    margin:
+      0
+      -12px
+      -12px;
+
+    padding:
+      8px
+      12px
+      calc(
+        8px +
+        env(safe-area-inset-bottom)
+      );
+
+    border-top:
+      1px solid
+      var(--border);
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 96%,
+        transparent
+      );
+
+    backdrop-filter:
+      blur(12px);
+
+    -webkit-backdrop-filter:
+      blur(12px);
+  }
+
+
+  .nexus-quotation-form-actions
+  button {
+    width:
+      100%;
+
+    min-height:
+      40px !important;
+  }
+
+}
+
+
+@media screen and (max-width: 350px) {
+
+  .nexus-quotation-form-grid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS REPAIRS V9
+   Technician-first phone workspace.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /* -------------------------------------------------------
+     REPAIR PAGE
+     ------------------------------------------------------- */
+
+  .nexus-repairs-page {
+    padding:
+      0
+      8px
+      12px
+      !important;
+  }
+
+
+  /*
+   * The Repair mode switcher stays visible while the
+   * technician moves around the Job Card.
+   */
+  .nexus-repairs-header {
+    position:
+      sticky;
+
+    top:
+      0;
+
+    z-index:
+      45;
+
+    margin:
+      0
+      -8px
+      7px
+      !important;
+
+    padding:
+      5px
+      8px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 94%,
+        transparent
+      );
+
+    border-bottom:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 65%,
+        transparent
+      );
+
+    backdrop-filter:
+      blur(12px);
+
+    -webkit-backdrop-filter:
+      blur(12px);
+  }
+
+
+  /*
+   * Desktop title is unnecessary on phone.
+   * The permanent Nexus top bar already identifies Repairs.
+   */
+  .nexus-repairs-header
+  > div:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-repairs-modes {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      );
+
+    width:
+      100%;
+
+    gap:
+      4px !important;
+  }
+
+
+  .nexus-repairs-modes
+  button {
+    width:
+      100%;
+
+    min-height:
+      36px !important;
+
+    height:
+      36px !important;
+
+    padding:
+      4px
+      7px !important;
+
+    gap:
+      3px !important;
+
+    border-radius:
+      10px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-repairs-modes
+  svg {
+    width:
+      14px !important;
+
+    height:
+      14px !important;
+
+    margin-right:
+      2px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     JOB CARD QUEUE
+     ------------------------------------------------------- */
+
+  .nexus-repair-queue {
+    margin-bottom:
+      8px !important;
+
+    border-radius:
+      13px !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  .nexus-repair-queue-toolbar {
+    padding:
+      8px !important;
+  }
+
+
+  .nexus-repair-queue-toolbar
+  [role="group"] {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      4px !important;
+
+    margin-bottom:
+      7px !important;
+  }
+
+
+  .nexus-repair-queue-toolbar
+  [role="group"]
+  button {
+    min-height:
+      34px !important;
+
+    padding:
+      4px
+      7px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  .nexus-repair-queue-toolbar
+  h2,
+  .nexus-repair-queue-toolbar
+  h2 + p {
+    display:
+      none;
+  }
+
+
+  .nexus-repair-queue-filters {
+    grid-template-columns:
+      1fr
+      1fr !important;
+
+    gap:
+      5px !important;
+
+    width:
+      100%;
+  }
+
+
+  .nexus-repair-queue-filters
+  > input:first-child {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .nexus-repair-queue-filters
+  :is(
+    input,
+    select,
+    button
+  ) {
+    width:
+      100%;
+
+    height:
+      37px !important;
+
+    min-height:
+      37px !important;
+
+    padding:
+      5px
+      7px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-repair-queue
+  > div:last-child {
+    padding:
+      8px !important;
+  }
+
+
+  .nexus-repair-queue
+  > div:last-child
+  > p:first-child {
+    margin-bottom:
+      6px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-repair-queue-list {
+    gap:
+      6px !important;
+  }
+
+
+  .nexus-repair-queue-card {
+    padding:
+      8px
+      9px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+
+  .nexus-repair-queue-card
+  > div:first-child {
+    gap:
+      6px !important;
+  }
+
+
+  .nexus-repair-queue-card
+  span[class*="text-base"] {
+    font-size:
+      12px !important;
+  }
+
+
+  .nexus-repair-queue-card
+  span[class*="rounded-full"] {
+    padding:
+      3px
+      6px !important;
+
+    font-size:
+      8px !important;
+  }
+
+
+  .nexus-repair-queue-card
+  p {
+    margin-top:
+      3px !important;
+  }
+
+
+  /*
+   * Fault remains visible, but never makes a queue item huge.
+   */
+  .nexus-repair-queue-card
+  p[class*="text-sm"]:not(
+    [class*="text-muted-foreground"]
+  ) {
+    display:
+      -webkit-box;
+
+    overflow:
+      hidden;
+
+    -webkit-line-clamp:
+      1;
+
+    -webkit-box-orient:
+      vertical;
+  }
+
+
+  .nexus-repair-queue-meta {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      5px
+      10px !important;
+
+    margin-top:
+      4px;
+  }
+
+
+  .nexus-repair-queue-meta
+  p:first-child {
+    font-size:
+      8px !important;
+  }
+
+
+  .nexus-repair-queue-meta
+  p:last-child {
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-repair-queue-footer {
+    margin-top:
+      6px !important;
+
+    padding-top:
+      5px !important;
+  }
+
+
+  .nexus-repair-queue-footer
+  > span:first-child {
+    display:
+      none;
+  }
+
+
+  /* -------------------------------------------------------
+     NEW JOB CARD = MOBILE SHEET
+     ------------------------------------------------------- */
+
+  .nexus-repair-new-sheet {
+    position:
+      fixed !important;
+
+    left:
+      0 !important;
+
+    right:
+      0 !important;
+
+    bottom:
+      0 !important;
+
+    z-index:
+      210 !important;
+
+    width:
+      100% !important;
+
+    max-height:
+      88dvh !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      12px
+      10px
+      calc(
+        14px +
+        env(safe-area-inset-bottom)
+      )
+      !important;
+
+    overflow-y:
+      auto !important;
+
+    border-radius:
+      20px
+      20px
+      0
+      0
+      !important;
+
+    box-shadow:
+      0 -22px 70px
+      rgb(0 0 0 / .25)
+      !important;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  .nexus-repair-sheet-close {
+    position:
+      sticky;
+
+    top:
+      0;
+
+    z-index:
+      20;
+
+    float:
+      right;
+
+    display:
+      flex;
+
+    width:
+      34px;
+
+    height:
+      34px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    margin-bottom:
+      -34px;
+
+    border-radius:
+      999px;
+
+    background:
+      var(--muted) !important;
+
+    font-size:
+      19px;
+  }
+
+
+  .nexus-repair-new-sheet
+  > div:first-of-type {
+    margin-bottom:
+      9px !important;
+
+    padding-right:
+      40px;
+  }
+
+
+  .nexus-repair-new-sheet
+  > div:first-of-type
+  p {
+    display:
+      none;
+  }
+
+
+  .nexus-repair-new-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  /*
+   * Wide / detailed New Job sections still span both columns.
+   */
+  .nexus-repair-new-grid
+  > [class*="col-span"],
+  .nexus-repair-new-grid
+  > div[class*="md:col-span"],
+  .nexus-repair-new-grid
+  > label[class*="md:col-span"] {
+    grid-column:
+      1 / -1 !important;
+  }
+
+
+  .nexus-repair-new-grid
+  label {
+    gap:
+      3px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  .nexus-repair-new-grid
+  :is(
+    input,
+    select
+  ) {
+    min-height:
+      39px !important;
+
+    height:
+      39px !important;
+
+    padding:
+      5px
+      8px !important;
+  }
+
+
+  .nexus-repair-new-grid
+  textarea {
+    min-height:
+      58px !important;
+
+    max-height:
+      80px;
+
+    padding:
+      7px
+      8px !important;
+  }
+
+
+  /*
+   * Smart Device Assist and Nexus Eye become compact tools,
+   * not giant informational cards.
+   */
+  .nexus-repair-new-grid
+  [class*="border-blue-100"],
+  .nexus-repair-new-grid
+  [class*="border-blue-200"] {
+    padding:
+      8px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+
+  .nexus-repair-new-grid
+  [class*="border-blue-100"]
+  p[class*="text-xs"],
+  .nexus-repair-new-grid
+  [class*="border-blue-200"]
+  p[class*="text-sm"][class*="text-muted"] {
+    display:
+      none;
+  }
+
+
+  /* -------------------------------------------------------
+     SCANNER
+     ------------------------------------------------------- */
+
+  .nexus-repair-process {
+    gap:
+      8px !important;
+  }
+
+
+  .nexus-repair-scan-panel {
+    position:
+      sticky;
+
+    top:
+      47px;
+
+    z-index:
+      35;
+
+    padding:
+      7px !important;
+
+    border-radius:
+      12px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 96%,
+        transparent
+      ) !important;
+
+    backdrop-filter:
+      blur(12px);
+
+    -webkit-backdrop-filter:
+      blur(12px);
+  }
+
+
+  .nexus-repair-scanner-settings {
+    margin-bottom:
+      5px;
+  }
+
+
+  .nexus-repair-scanner-settings
+  summary {
+    display:
+      inline-flex;
+
+    min-height:
+      26px;
+
+    align-items:
+      center;
+
+    font-size:
+      9px;
+
+    font-weight:
+      600;
+
+    color:
+      var(--muted-foreground);
+
+    cursor:
+      pointer;
+  }
+
+
+  .nexus-repair-scanner-settings
+  > div {
+    grid-template-columns:
+      1fr
+      1fr !important;
+
+    gap:
+      5px !important;
+
+    margin-top:
+      4px;
+  }
+
+
+  .nexus-repair-scanner-settings
+  > div
+  > div:last-child {
+    display:
+      none;
+  }
+
+
+  .nexus-repair-scanner-settings
+  label {
+    font-size:
+      9px !important;
+  }
+
+
+  .nexus-repair-scanner-settings
+  :is(
+    input,
+    select
+  ) {
+    height:
+      36px !important;
+
+    min-height:
+      36px !important;
+  }
+
+
+  .nexus-repair-scan-form {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      5px !important;
+
+    margin-top:
+      4px !important;
+  }
+
+
+  .nexus-repair-scan-form
+  > div:first-child {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .nexus-repair-scan-form
+  button {
+    width:
+      100%;
+
+    min-height:
+      37px !important;
+
+    height:
+      37px !important;
+
+    padding:
+      4px
+      7px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  .nexus-repair-scan-form
+  input {
+    height:
+      39px !important;
+
+    min-height:
+      39px !important;
+  }
+
+
+  .nexus-repair-scan-panel
+  video {
+    max-height:
+      270px !important;
+
+    margin-top:
+      6px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     OPEN JOB CARD SUMMARY
+     ------------------------------------------------------- */
+
+  .nexus-repair-job-summary {
+    padding:
+      9px !important;
+
+    border-radius:
+      12px !important;
+  }
+
+
+  .nexus-repair-job-summary
+  > div:first-child {
+    gap:
+      6px !important;
+  }
+
+
+  .nexus-repair-job-summary
+  h2 {
+    font-size:
+      16px !important;
+  }
+
+
+  .nexus-repair-job-summary
+  > div:first-child
+  p[class*="text-muted"] {
+    display:
+      none;
+  }
+
+
+  .nexus-repair-job-summary
+  > div:first-child
+  button {
+    min-height:
+      32px !important;
+
+    height:
+      32px !important;
+
+    padding:
+      4px
+      8px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  .nexus-repair-job-main-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      6px !important;
+
+    margin-top:
+      8px !important;
+  }
+
+
+  .nexus-repair-job-main-grid
+  > div {
+    min-width:
+      0;
+
+    padding:
+      5px;
+
+    border-radius:
+      8px;
+
+    background:
+      var(--muted);
+  }
+
+
+  .nexus-repair-job-main-grid
+  p:first-child {
+    font-size:
+      8px !important;
+  }
+
+
+  .nexus-repair-job-main-grid
+  p:last-child {
+    margin-top:
+      2px !important;
+
+    font-size:
+      10px !important;
+
+    line-height:
+      1.2 !important;
+  }
+
+
+  .nexus-repair-job-detail-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      5px !important;
+
+    margin-top:
+      7px !important;
+  }
+
+
+  .nexus-repair-job-detail-grid
+  > div {
+    padding:
+      7px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+
+  .nexus-repair-job-detail-grid
+  p:first-child {
+    font-size:
+      8px !important;
+  }
+
+
+  .nexus-repair-job-detail-grid
+  p:last-child,
+  .nexus-repair-job-detail-grid
+  div[class*="space-y"] {
+    margin-top:
+      3px !important;
+
+    font-size:
+      9px !important;
+
+    line-height:
+      1.25 !important;
+  }
+
+
+  /*
+   * Workflow timestamps become one horizontal strip rather
+   * than five stacked cards.
+   */
+  .nexus-repair-job-timeline {
+    display:
+      flex !important;
+
+    gap:
+      5px !important;
+
+    margin-top:
+      7px !important;
+
+    overflow-x:
+      auto;
+
+    scrollbar-width:
+      none;
+  }
+
+
+  .nexus-repair-job-timeline::-webkit-scrollbar {
+    display:
+      none;
+  }
+
+
+  .nexus-repair-job-timeline
+  > div {
+    flex:
+      0 0
+      105px;
+
+    padding:
+      6px !important;
+
+    border-radius:
+      8px !important;
+  }
+
+
+  .nexus-repair-job-timeline
+  p {
+    font-size:
+      8px !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     TECHNICIAN ACTION CARDS
+     ------------------------------------------------------- */
+
+  .nexus-repair-action-card,
+  .nexus-repair-work-card,
+  .nexus-repair-audit-card {
+    padding:
+      9px !important;
+
+    border-radius:
+      12px !important;
+  }
+
+
+  .nexus-repair-action-card
+  > div:first-child,
+  .nexus-repair-work-card
+  > div:first-child {
+    margin-bottom:
+      7px !important;
+  }
+
+
+  .nexus-repair-action-card
+  h3,
+  .nexus-repair-work-card
+  h3,
+  .nexus-repair-audit-card
+  h3 {
+    font-size:
+      12px !important;
+  }
+
+
+  .nexus-repair-action-card
+  textarea {
+    min-height:
+      68px !important;
+  }
+
+
+  .nexus-repair-action-card
+  input,
+  .nexus-repair-action-card
+  select,
+  .nexus-repair-work-card
+  input,
+  .nexus-repair-work-card
+  select {
+    min-height:
+      38px !important;
+
+    height:
+      38px !important;
+  }
+
+
+  .nexus-repair-action-card
+  button,
+  .nexus-repair-work-card
+  button {
+    min-height:
+      38px !important;
+  }
+
+
+  /*
+   * Work lines stay dense.
+   */
+  .nexus-repair-work-card
+  [class*="rounded-xl"][class*="border"][class*="p-3"] {
+    padding:
+      7px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+
+  /*
+   * Audit history should never make the technician scroll
+   * through the entire job just to get to the next control.
+   */
+  .nexus-repair-audit-card
+  > div {
+    max-height:
+      190px;
+
+    overflow-y:
+      auto;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  .nexus-repair-audit-card
+  > div
+  > div {
+    padding-bottom:
+      6px !important;
+  }
+
+}
+
+
+@media screen and (max-width: 350px) {
+
+  .nexus-repair-new-grid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .nexus-repair-job-main-grid,
+  .nexus-repair-job-detail-grid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS MOBILE V10 — DESKTOP PARITY
+   Same application. Same workflow. Responsive presentation.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /* -------------------------------------------------------
+     REPAIRS HEADER
+     Keep the identity users know from desktop.
+     ------------------------------------------------------- */
+
+  .nexus-repairs-header {
+    position:
+      relative !important;
+
+    top:
+      auto !important;
+
+    z-index:
+      auto !important;
+
+    margin:
+      0 0 8px !important;
+
+    padding:
+      7px 0 0 !important;
+
+    border:
+      0 !important;
+
+    background:
+      transparent !important;
+
+    backdrop-filter:
+      none !important;
+
+    -webkit-backdrop-filter:
+      none !important;
+  }
+
+
+  .nexus-repairs-header
+  > div:first-child {
+    display:
+      block !important;
+  }
+
+
+  .nexus-repairs-header
+  > div:first-child
+  > p:first-child {
+    margin-bottom:
+      1px !important;
+
+    font-size:
+      8px !important;
+
+    letter-spacing:
+      .08em !important;
+  }
+
+
+  .nexus-repairs-header h1 {
+    margin-top:
+      0 !important;
+
+    font-size:
+      18px !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+
+  .nexus-repairs-header
+  h1 + p {
+    display:
+      -webkit-box !important;
+
+    margin-top:
+      3px !important;
+
+    overflow:
+      hidden;
+
+    font-size:
+      10px !important;
+
+    line-height:
+      1.25 !important;
+
+    -webkit-line-clamp:
+      2;
+
+    -webkit-box-orient:
+      vertical;
+  }
+
+
+  /*
+   * Queue / Scan / New Job remain the same desktop concepts,
+   * simply packed for touch.
+   */
+  .nexus-repairs-modes {
+    margin-top:
+      7px;
+  }
+
+
+  /* -------------------------------------------------------
+     QUEUE
+     Keep all desktop information available.
+     ------------------------------------------------------- */
+
+  .nexus-repair-queue-toolbar h2 {
+    display:
+      block !important;
+
+    font-size:
+      13px !important;
+  }
+
+
+  .nexus-repair-queue-toolbar
+  h2 + p {
+    display:
+      -webkit-box !important;
+
+    margin-top:
+      2px !important;
+
+    overflow:
+      hidden;
+
+    font-size:
+      9px !important;
+
+    line-height:
+      1.2 !important;
+
+    -webkit-line-clamp:
+      1;
+
+    -webkit-box-orient:
+      vertical;
+  }
+
+
+  .nexus-repair-queue-footer
+  > span:first-child {
+    display:
+      inline !important;
+
+    min-width:
+      0;
+
+    overflow:
+      hidden;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+  }
+
+
+  /* -------------------------------------------------------
+     NEW JOB CARD
+     Same desktop form, responsively packed.
+     ------------------------------------------------------- */
+
+  .nexus-repair-new-card {
+    position:
+      relative !important;
+
+    inset:
+      auto !important;
+
+    z-index:
+      auto !important;
+
+    width:
+      auto !important;
+
+    max-width:
+      none !important;
+
+    max-height:
+      none !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      10px !important;
+
+    overflow:
+      visible !important;
+
+    border-radius:
+      12px !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  .nexus-repair-new-card
+  > div:first-of-type {
+    margin-bottom:
+      8px !important;
+
+    padding-right:
+      0 !important;
+  }
+
+
+  .nexus-repair-new-card
+  > div:first-of-type
+  p {
+    display:
+      block !important;
+
+    margin-top:
+      2px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /*
+   * Fields remain two-across when practical,
+   * but their desktop ordering does not change.
+   */
+  .nexus-repair-new-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+
+  /* -------------------------------------------------------
+     SCANNER
+     Keep desktop scanner structure intact.
+     ------------------------------------------------------- */
+
+  .nexus-repair-scan-panel {
+    position:
+      relative !important;
+
+    top:
+      auto !important;
+
+    z-index:
+      auto !important;
+
+    background:
+      var(--background) !important;
+
+    backdrop-filter:
+      none !important;
+
+    -webkit-backdrop-filter:
+      none !important;
+  }
+
+
+  .nexus-repair-scanner-settings {
+    display:
+      block !important;
+
+    margin-bottom:
+      7px !important;
+  }
+
+
+  .nexus-repair-scanner-settings-title {
+    margin-bottom:
+      5px;
+
+    font-size:
+      9px;
+
+    font-weight:
+      700;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-repair-scanner-settings
+  > .grid {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      6px !important;
+  }
+
+
+  .nexus-repair-scanner-settings
+  > .grid
+  > div:last-child {
+    display:
+      block !important;
+
+    grid-column:
+      1 / -1;
+
+    font-size:
+      8px !important;
+  }
+
+
+  /* -------------------------------------------------------
+     JOB CARD
+     Same desktop information, better phone arrangement.
+     ------------------------------------------------------- */
+
+  .nexus-repair-job-main-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+
+  .nexus-repair-job-detail-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+
+  /*
+   * Restore workflow stages as cards rather than converting
+   * them into a fundamentally different horizontal control.
+   */
+  .nexus-repair-job-timeline {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      5px !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  .nexus-repair-job-timeline
+  > div {
+    width:
+      auto !important;
+
+    flex:
+      none !important;
+  }
+
+
+  /*
+   * Audit remains part of the same full Job Card.
+   */
+  .nexus-repair-audit-card
+  > div {
+    max-height:
+      none !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  /*
+   * Action cards remain in desktop workflow order.
+   */
+  .nexus-repair-action-card,
+  .nexus-repair-work-card,
+  .nexus-repair-audit-card {
+    margin-top:
+      0 !important;
+  }
+
+}
+
+
+@media screen and (max-width: 350px) {
+
+  .nexus-repair-new-grid,
+  .nexus-repair-job-main-grid,
+  .nexus-repair-job-detail-grid,
+  .nexus-repair-job-timeline {
+    grid-template-columns:
+      1fr !important;
+  }
+
+}

@@ -985,8 +985,8 @@ export default function RepairScannerPage() {
         onLogout={logout}
       />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <main className="nexus-repairs-page mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="nexus-repairs-header mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-blue-600">JINLAB NEXUS REPAIR CONTROL</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
@@ -997,14 +997,15 @@ export default function RepairScannerPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="nexus-repairs-modes flex flex-wrap gap-2">
             <Button
               type="button"
               className={viewMode === "queue" ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
               variant={viewMode === "queue" ? "default" : "outline"}
               onClick={() => setViewMode("queue")}
             >
-              Job Card Queue
+              <span className="hidden sm:inline">Job Card Queue</span>
+              <span className="sm:hidden">Queue</span>
             </Button>
 
             <Button
@@ -1018,7 +1019,8 @@ export default function RepairScannerPage() {
               onClick={() => setViewMode("scan")}
             >
               <Barcode className="mr-2 h-4 w-4" />
-              Scan & Process
+              <span className="hidden sm:inline">Scan & Process</span>
+              <span className="sm:hidden">Scan</span>
             </Button>
 
             {can("repair.create") && (
@@ -1033,7 +1035,8 @@ export default function RepairScannerPage() {
                 onClick={() => setViewMode("new")}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                New Job Card
+                <span className="hidden sm:inline">New Job Card</span>
+                <span className="sm:hidden">+ Job</span>
               </Button>
             )}
           </div>
@@ -1062,7 +1065,8 @@ export default function RepairScannerPage() {
         )}
 
         {viewMode === "queue" ? null : viewMode === "new" && can("repair.create") ? (
-          <div className={cardClass()}>
+          <div className={`${cardClass()} nexus-repair-new-card`}>
+
             <div className="mb-5 flex items-center gap-3">
               <div className="rounded-xl bg-blue-50 p-2 text-blue-600">
                 <Plus className="h-5 w-5" />
@@ -1075,7 +1079,7 @@ export default function RepairScannerPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="nexus-repair-new-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <label className="space-y-1.5 text-sm">
                 <span className="font-medium">Branch *</span>
                 <SearchableSelect searchLabel="Branches"
@@ -1400,9 +1404,14 @@ export default function RepairScannerPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-5">
-            <div className={cardClass()}>
-              <div className="grid gap-4 lg:grid-cols-[1fr_1fr_auto] lg:items-end">
+          <div className="nexus-repair-process space-y-5">
+            <div className={`${cardClass()} nexus-repair-scan-panel`}>
+              <div className="nexus-repair-scanner-settings">
+                <div className="nexus-repair-scanner-settings-title md:hidden">
+                  Scanner settings
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-[1fr_1fr_auto] lg:items-end">
                 <label className="space-y-1.5 text-sm">
                   <span className="font-medium">Registered scanner</span>
                   <SearchableSelect searchLabel="Records"
@@ -1439,10 +1448,11 @@ export default function RepairScannerPage() {
                 <div className="text-xs text-muted-foreground lg:text-right">
                   USB/Bluetooth scanner: keep the scan box focused and scan.
                 </div>
+                </div>
               </div>
 
               <form
-                className="mt-4 flex flex-col gap-3 sm:flex-row"
+                className="nexus-repair-scan-form mt-4 flex flex-col gap-3 sm:flex-row"
                 onSubmit={(event) => {
                   event.preventDefault();
                   void lookup(code);
@@ -1548,7 +1558,7 @@ export default function RepairScannerPage() {
 
             {selectedJob && (
               <>
-                <div className={cardClass()}>
+                <div className={`${cardClass()} nexus-repair-job-summary`}>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
@@ -1580,7 +1590,7 @@ export default function RepairScannerPage() {
                     </Button>
                   </div>
 
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="nexus-repair-job-main-grid mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                       <p className="text-xs uppercase text-muted-foreground">Customer</p>
                       <p className="mt-1 font-semibold">{selectedJob.customer_name}</p>
@@ -1609,7 +1619,7 @@ export default function RepairScannerPage() {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <div className="nexus-repair-job-detail-grid mt-5 grid gap-4 sm:grid-cols-2">
                     <div className="rounded-xl border p-4">
                       <p className="text-xs uppercase text-muted-foreground">Reported fault</p>
                       <p className="mt-2 text-sm">{selectedJob.reported_fault}</p>
@@ -1631,7 +1641,7 @@ export default function RepairScannerPage() {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                  <div className="nexus-repair-job-timeline mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                     <div className="rounded-xl bg-muted/40 p-3">
                       <p className="text-xs text-muted-foreground">Intake</p>
                       <p className="mt-1 text-sm font-semibold">{dateTime(jobDetail?.intake_confirmed_at)}</p>
@@ -1679,7 +1689,7 @@ export default function RepairScannerPage() {
                 {selectedJob.intake_confirmed &&
                   ["received", "diagnosing", "awaiting_approval"].includes(selectedJob.status) &&
                   can("repair.update") && (
-                    <div className={cardClass()}>
+                    <div className={`${cardClass()} nexus-repair-action-card`}>
                       <div className="mb-4 flex items-center gap-2">
                         <Wrench className="h-5 w-5 text-blue-600" />
                         <h3 className="font-bold">2. Diagnosis & Proposed Price</h3>
@@ -1724,7 +1734,7 @@ export default function RepairScannerPage() {
                   )}
 
                 {selectedJob.status === "awaiting_approval" && can("repair.quote.approve") && (
-                  <div className={cardClass()}>
+                  <div className={`${cardClass()} nexus-repair-action-card`}>
                     <div className="mb-4 flex items-center gap-2">
                       <ShieldCheck className="h-5 w-5 text-blue-600" />
                       <h3 className="font-bold">3. Record Customer Price Approval</h3>
@@ -1810,7 +1820,7 @@ export default function RepairScannerPage() {
                   </div>
                 )}
 
-                <div className={cardClass()}>
+                <div className={`${cardClass()} nexus-repair-work-card`}>
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <div>
                       <h3 className="font-bold">Recorded Work / Parts</h3>
@@ -2069,7 +2079,7 @@ export default function RepairScannerPage() {
                   </div>
                 )}
 
-                <div className={cardClass()}>
+                <div className={`${cardClass()} nexus-repair-audit-card`}>
                   <h3 className="font-bold">Job Audit Timeline</h3>
                   <div className="mt-4 space-y-3">
                     {jobEvents.length > 0 ? (

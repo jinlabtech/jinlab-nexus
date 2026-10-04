@@ -1,0 +1,77 @@
+/* =========================================================
+   NEXUS CONTROL CONTRACT
+   Themes may colour the environment.
+   They must not repaint or decorate functional controls.
+   ========================================================= */
+
+html[data-nexus-theme]
+.nexus-shell
+button:not(:where(.nexus-document, .nexus-document *)),
+html[data-nexus-theme]
+.nexus-shell
+[data-slot="button"]:not(:where(.nexus-document, .nexus-document *)) {
+  text-shadow: none !important;
+  filter: none !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+
+/*
+ * Remove the global animated theme shine from buttons.
+ */
+html[data-nexus-theme]
+.nexus-shell
+button:not(:where(.nexus-document, .nexus-document *))::after,
+html[data-nexus-theme]
+.nexus-shell
+[data-slot="button"]:not(:where(.nexus-document, .nexus-document *))::after {
+  display: none !important;
+}
+
+
+/*
+ * shadcn/Nexus buttons own their own visual state.
+ */
+html[data-nexus-theme]
+.nexus-shell
+[data-slot="button"] {
+  box-shadow: none !important;
+
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 100ms ease
+    !important;
+}
+
+
+html[data-nexus-theme]
+.nexus-shell
+[data-slot="button"]:active:not(:disabled) {
+  transform: scale(.97);
+}
+
+
+/*
+ * Outline / neutral buttons must remain visually neutral
+ * regardless of Frost, Graphite, Glass, etc.
+ */
+html[data-nexus-theme]
+.nexus-shell
+[data-slot="button"][class*="border"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+
+/*
+ * Never allow the theme engine to change button geometry.
+ */
+html[data-nexus-theme]
+.nexus-shell
+button {
+  border-radius: inherit;
+}

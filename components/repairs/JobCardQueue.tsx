@@ -150,8 +150,8 @@ export default function JobCardQueue({
   }
 
   return (
-    <section className="mb-6 rounded-2xl border bg-background shadow-sm">
-      <div className="border-b p-4 sm:p-5">
+    <section className="nexus-repair-queue mb-6 rounded-2xl border bg-background shadow-sm">
+      <div className="nexus-repair-queue-toolbar border-b p-4 sm:p-5">
         <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Job Card views">
           {([['active', 'Active jobs'], ['archived', 'Completed & cancelled']] as const).map(([value, label]) => (
             <button key={value} type="button" aria-pressed={view === value}
@@ -174,7 +174,7 @@ export default function JobCardQueue({
               {view === "active" ? "Current repairs and devices waiting for collection." : "Collected, closed and cancelled jobs. Search and open any card to view its history."}
             </p>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1fr)_180px_170px_auto]">
+          <div className="nexus-repair-queue-filters grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1fr)_180px_170px_auto]">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -243,12 +243,12 @@ export default function JobCardQueue({
         )}
 
         {!error && !loading && rows.length > 0 && (
-          <div className="space-y-3">
+          <div className="nexus-repair-queue-list space-y-3">
             {displayRows.map((job) => (
               <div
                 key={job.id}
                 onClick={() => onOpen(job.job_number)}
-                className="w-full cursor-pointer rounded-xl border p-4 text-left transition hover:border-primary/40 hover:bg-muted/50"
+                className="nexus-repair-queue-card w-full cursor-pointer rounded-xl border p-4 text-left transition hover:border-primary/40 hover:bg-muted/50"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0">
@@ -293,14 +293,14 @@ export default function JobCardQueue({
                     {job.reported_fault && <p className="mt-2 text-sm">{job.reported_fault}</p>}
                   </div>
 
-                  <div className="grid shrink-0 grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-4">
+                  <div className="nexus-repair-queue-meta grid shrink-0 grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-4">
                     <div><p className="text-xs text-muted-foreground">Technician</p><p className="font-medium">{job.assigned_employee || "Unassigned"}</p></div>
                     <div><p className="text-xs text-muted-foreground">Approved</p><p className="font-medium">{money(job.approved_amount)}</p></div>
                     <div><p className="text-xs text-muted-foreground">Invoice</p><p className="font-medium">{job.invoice_number || "—"}</p></div>
                     <div><p className="text-xs text-muted-foreground">Balance</p><p className="font-medium">{money(job.balance_due)}</p></div>
                   </div>
                 </div>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-xs text-muted-foreground">
+                <div className="nexus-repair-queue-footer mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-xs text-muted-foreground">
                   <span>{job.serial_number ? `Serial: ${job.serial_number}` : job.imei ? `IMEI: ${job.imei}` : "No serial/IMEI captured"}</span>
                   <div className="flex items-center gap-3">
                     {canDelete && job.status === "received" && (
