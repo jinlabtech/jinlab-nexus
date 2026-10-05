@@ -5285,3 +5285,2256 @@
   }
 
 }
+
+
+/* =========================================================
+   NEXUS MOBILE EXPERIENCE 2.0
+   Phone-only native motion + glass interaction layer
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /*
+   * APP / MODULE OPENING
+   */
+
+  @keyframes nexus-mobile-app-open {
+    0% {
+      opacity: 0;
+      transform:
+        translate3d(0, 14px, 0)
+        scale(.955);
+      filter:
+        blur(3px)
+        saturate(.92);
+    }
+
+    55% {
+      opacity: 1;
+      transform:
+        translate3d(0, -1px, 0)
+        scale(1.006);
+      filter:
+        blur(0)
+        saturate(1.03);
+    }
+
+    100% {
+      opacity: 1;
+      transform:
+        translate3d(0, 0, 0)
+        scale(1);
+      filter:
+        none;
+    }
+  }
+
+
+  @keyframes nexus-mobile-content-settle {
+    0% {
+      opacity: 0;
+      transform:
+        translate3d(0, 8px, 0);
+    }
+
+    100% {
+      opacity: 1;
+      transform:
+        translate3d(0, 0, 0);
+    }
+  }
+
+
+  .nexus-page-enter {
+    width: 100%;
+    min-width: 0;
+
+    transform-origin:
+      center 24px;
+
+    animation:
+      nexus-mobile-app-open
+      380ms
+      cubic-bezier(.16, .84, .24, 1)
+      both !important;
+
+    will-change:
+      transform,
+      opacity,
+      filter;
+  }
+
+
+  .nexus-page-enter > * {
+    animation:
+      nexus-mobile-content-settle
+      340ms
+      70ms
+      cubic-bezier(.22, .82, .24, 1)
+      both;
+  }
+
+
+  /*
+   * TOUCH FEEDBACK
+   *
+   * Uses the independent CSS scale property so it doesn't
+   * destroy transforms used by individual Nexus components.
+   */
+
+  .nexus-page-enter
+  :is(
+    button,
+    a,
+    [role="button"]
+  ) {
+    -webkit-tap-highlight-color:
+      transparent;
+
+    touch-action:
+      manipulation;
+
+    transition:
+      scale 115ms ease,
+      opacity 115ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+
+
+  .nexus-page-enter
+  :is(
+    button,
+    a,
+    [role="button"]
+  ):active {
+    scale:
+      .965;
+
+    opacity:
+      .9;
+  }
+
+
+  /*
+   * ACTION MODALS / QUICK ACTIONS
+   */
+
+  .nexus-mobile-modal-backdrop {
+    background:
+      color-mix(
+        in srgb,
+        #000 38%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(9px)
+      saturate(115%);
+
+    backdrop-filter:
+      blur(9px)
+      saturate(115%);
+
+    transition:
+      opacity 220ms ease !important;
+  }
+
+
+  .nexus-mobile-modal-panel {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 82%,
+        transparent
+      ) !important;
+
+    color:
+      var(--foreground) !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 74%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(28px)
+      saturate(145%);
+
+    backdrop-filter:
+      blur(28px)
+      saturate(145%);
+
+    box-shadow:
+      0 24px 65px
+      rgba(0,0,0,.24) !important;
+
+    transition:
+      transform 290ms
+      cubic-bezier(.16,.84,.24,1),
+      opacity 220ms ease !important;
+  }
+
+
+  .nexus-mobile-modal-header {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 68%,
+        transparent
+      ) !important;
+
+    border-color:
+      color-mix(
+        in srgb,
+        var(--border) 70%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(24px)
+      saturate(145%);
+
+    backdrop-filter:
+      blur(24px)
+      saturate(145%);
+  }
+
+
+  .nexus-mobile-modal-body {
+    background:
+      transparent !important;
+  }
+
+
+  /*
+   * SHADCN / NEXUS POPUPS
+   */
+
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="select-content"] {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 83%,
+        transparent
+      ) !important;
+
+    border-color:
+      color-mix(
+        in srgb,
+        var(--border) 75%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(26px)
+      saturate(145%);
+
+    backdrop-filter:
+      blur(26px)
+      saturate(145%);
+
+    box-shadow:
+      0 18px 50px
+      rgba(0,0,0,.18) !important;
+  }
+
+
+  /*
+   * CARDS SHOULD FEEL FLOATING,
+   * NOT LIKE STATIC WEBSITE BOXES
+   */
+
+  .nexus-app-card,
+  [data-slot="card"] {
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 91%,
+        transparent
+      ) !important;
+
+    border-color:
+      color-mix(
+        in srgb,
+        var(--border) 78%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(14px)
+      saturate(120%);
+
+    backdrop-filter:
+      blur(14px)
+      saturate(120%);
+
+    transition:
+      scale 150ms ease,
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease !important;
+  }
+
+
+  /*
+   * NEXUS INTELLIGENCE
+   */
+
+  .nexus-intelligence-canvas {
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 88%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(18px)
+      saturate(128%);
+
+    backdrop-filter:
+      blur(18px)
+      saturate(128%);
+
+    transition:
+      background 240ms ease,
+      border-color 200ms ease,
+      box-shadow 240ms ease !important;
+  }
+
+
+  .nexus-canvas__orb {
+    transition:
+      scale 140ms ease,
+      transform 220ms
+      cubic-bezier(.16,.84,.24,1),
+      box-shadow 220ms ease !important;
+  }
+
+
+  .nexus-canvas__orb:active {
+    scale:
+      .92;
+  }
+
+
+  .nexus-canvas-signal {
+    -webkit-backdrop-filter:
+      blur(12px);
+
+    backdrop-filter:
+      blur(12px);
+
+    transition:
+      scale 140ms ease,
+      opacity 160ms ease,
+      background 160ms ease !important;
+  }
+
+
+  .nexus-canvas-signal:active {
+    scale:
+      .96;
+  }
+
+
+  /*
+   * NEXUS PULSE / NOTIFICATIONS
+   */
+
+  .nexus-pulse {
+    -webkit-backdrop-filter:
+      blur(18px)
+      saturate(130%);
+
+    backdrop-filter:
+      blur(18px)
+      saturate(130%);
+  }
+
+
+  .nexus-pulse__stack {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 82%,
+        transparent
+      );
+
+    -webkit-backdrop-filter:
+      blur(22px)
+      saturate(140%);
+
+    backdrop-filter:
+      blur(22px)
+      saturate(140%);
+  }
+
+
+  .nexus-arrival-notifications {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 79%,
+        transparent
+      ) !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 72%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(26px)
+      saturate(150%);
+
+    backdrop-filter:
+      blur(26px)
+      saturate(150%);
+
+    box-shadow:
+      0 20px 55px
+      rgba(0,0,0,.22) !important;
+  }
+
+
+  .nexus-arrival-notification {
+    transition:
+      scale 130ms ease,
+      background 150ms ease,
+      opacity 150ms ease !important;
+  }
+
+
+  .nexus-arrival-notification:active {
+    scale:
+      .975;
+  }
+
+
+  /*
+   * FORMS INSIDE GLASS POPUPS
+   */
+
+  .nexus-mobile-modal-panel
+  :is(
+    input,
+    select,
+    textarea
+  ) {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 78%,
+        transparent
+      ) !important;
+
+    color:
+      var(--foreground) !important;
+
+    border-color:
+      color-mix(
+        in srgb,
+        var(--border) 78%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(10px);
+
+    backdrop-filter:
+      blur(10px);
+  }
+
+
+  /*
+   * SOFT BUTTON SURFACES
+   */
+
+  .nexus-mobile-modal-panel
+  button:not([class*="bg-primary"]):not([class*="bg-destructive"]) {
+    background-color:
+      color-mix(
+        in srgb,
+        var(--background) 72%,
+        transparent
+      );
+  }
+
+}
+
+
+/*
+ * DESKTOP REMAINS STABLE.
+ * Mobile Experience must not alter desktop page opening.
+ */
+
+@media screen and (min-width: 768px) {
+
+  .nexus-page-enter {
+    animation:
+      none !important;
+
+    opacity:
+      1 !important;
+
+    transform:
+      none !important;
+
+    filter:
+      none !important;
+  }
+
+
+  .nexus-page-enter > * {
+    animation:
+      none !important;
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nexus-page-enter,
+  .nexus-page-enter > *,
+  .nexus-mobile-modal-panel,
+  .nexus-arrival-notification,
+  .nexus-canvas-signal {
+    animation:
+      none !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS MOBILE HOME 2.0
+   Phone operating-system experience
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-phone-home {
+    position:
+      relative;
+
+    isolation:
+      isolate;
+
+    min-height:
+      calc(
+        100dvh -
+        56px
+      );
+
+    padding-bottom:
+      calc(
+        110px +
+        env(
+          safe-area-inset-bottom
+        )
+      );
+
+    overflow:
+      hidden;
+  }
+
+
+  .nexus-phone-home-ambient {
+    position:
+      absolute;
+
+    inset:
+      0;
+
+    z-index:
+      -1;
+
+    pointer-events:
+      none;
+
+    overflow:
+      hidden;
+  }
+
+
+  .nexus-phone-home-ambient
+  span {
+    position:
+      absolute;
+
+    width:
+      220px;
+
+    height:
+      220px;
+
+    border-radius:
+      999px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 10%,
+        transparent
+      );
+
+    filter:
+      blur(55px);
+
+    opacity:
+      .55;
+
+    animation:
+      nexus-mobile-ambient-drift
+      10s
+      ease-in-out
+      infinite
+      alternate;
+  }
+
+
+  .nexus-phone-home-ambient
+  span:first-child {
+    top:
+      -80px;
+
+    right:
+      -80px;
+  }
+
+
+  .nexus-phone-home-ambient
+  span:last-child {
+    top:
+      280px;
+
+    left:
+      -110px;
+
+    animation-delay:
+      -4s;
+  }
+
+
+  @keyframes nexus-mobile-ambient-drift {
+    from {
+      transform:
+        translate3d(
+          0,
+          0,
+          0
+        )
+        scale(
+          1
+        );
+    }
+
+    to {
+      transform:
+        translate3d(
+          22px,
+          26px,
+          0
+        )
+        scale(
+          1.08
+        );
+    }
+  }
+
+
+  .nexus-phone-home-hero {
+    padding:
+      20px
+      18px
+      10px;
+  }
+
+
+  .nexus-phone-home-heading {
+    display:
+      flex;
+
+    align-items:
+      flex-start;
+
+    justify-content:
+      space-between;
+
+    gap:
+      16px;
+  }
+
+
+  .nexus-phone-home-eyebrow {
+    margin:
+      0;
+
+    font-size:
+      10px;
+
+    font-weight:
+      800;
+
+    letter-spacing:
+      .18em;
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-phone-home-heading
+  h1 {
+    margin:
+      5px
+      0
+      0;
+
+    font-size:
+      29px;
+
+    line-height:
+      1.04;
+
+    font-weight:
+      760;
+
+    letter-spacing:
+      -.035em;
+
+    color:
+      var(--foreground);
+  }
+
+
+  .nexus-phone-home-subtitle {
+    margin:
+      7px
+      0
+      0;
+
+    font-size:
+      12px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-phone-quick-button {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      46px;
+
+    height:
+      46px;
+
+    flex:
+      0 0 auto;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 76%,
+        transparent
+      );
+
+    border-radius:
+      16px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 68%,
+        transparent
+      );
+
+    color:
+      var(--foreground);
+
+    -webkit-backdrop-filter:
+      blur(20px)
+      saturate(135%);
+
+    backdrop-filter:
+      blur(20px)
+      saturate(135%);
+
+    box-shadow:
+      0 8px 26px
+      rgba(
+        0,
+        0,
+        0,
+        .08
+      );
+
+    transition:
+      scale
+      120ms
+      ease;
+  }
+
+
+  .nexus-phone-quick-button:active {
+    scale:
+      .9;
+  }
+
+
+  .nexus-phone-quick-button
+  svg {
+    width:
+      21px;
+
+    height:
+      21px;
+  }
+
+
+  .nexus-phone-live-card {
+    position:
+      relative;
+
+    display:
+      grid;
+
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      auto;
+
+    align-items:
+      center;
+
+    gap:
+      12px;
+
+    margin-top:
+      19px;
+
+    min-height:
+      84px;
+
+    padding:
+      14px
+      15px;
+
+    overflow:
+      hidden;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 76%,
+        transparent
+      );
+
+    border-radius:
+      22px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 77%,
+        transparent
+      );
+
+    -webkit-backdrop-filter:
+      blur(25px)
+      saturate(145%);
+
+    backdrop-filter:
+      blur(25px)
+      saturate(145%);
+
+    box-shadow:
+      0 14px 40px
+      rgba(
+        0,
+        0,
+        0,
+        .08
+      );
+  }
+
+
+  .nexus-phone-live-identity {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    gap:
+      11px;
+
+    min-width:
+      0;
+  }
+
+
+  .nexus-phone-live-orb {
+    position:
+      relative;
+
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      42px;
+
+    height:
+      42px;
+
+    flex:
+      0 0 auto;
+
+    border-radius:
+      15px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 13%,
+        transparent
+      );
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-phone-live-orb::after {
+    content:
+      "";
+
+    position:
+      absolute;
+
+    inset:
+      -4px;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--primary) 26%,
+        transparent
+      );
+
+    border-radius:
+      18px;
+
+    animation:
+      nexus-live-orb-pulse
+      2.6s
+      ease-out
+      infinite;
+  }
+
+
+  @keyframes nexus-live-orb-pulse {
+    0% {
+      opacity:
+        .8;
+
+      scale:
+        .78;
+    }
+
+    70%,
+    100% {
+      opacity:
+        0;
+
+      scale:
+        1.25;
+    }
+  }
+
+
+  .nexus-phone-live-orb
+  svg {
+    width:
+      19px;
+
+    height:
+      19px;
+  }
+
+
+  .nexus-phone-live-identity
+  strong {
+    display:
+      block;
+
+    font-size:
+      14px;
+  }
+
+
+  .nexus-phone-live-identity
+  small {
+    display:
+      block;
+
+    margin-top:
+      2px;
+
+    font-size:
+      10px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-phone-live-time {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    gap:
+      5px;
+
+    font-size:
+      12px;
+
+    font-weight:
+      650;
+
+    color:
+      var(--foreground);
+  }
+
+
+  .nexus-phone-live-time
+  svg {
+    width:
+      13px;
+
+    height:
+      13px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-phone-live-wave {
+    position:
+      absolute;
+
+    right:
+      16px;
+
+    bottom:
+      9px;
+
+    display:
+      flex;
+
+    align-items:
+      flex-end;
+
+    gap:
+      3px;
+
+    height:
+      12px;
+
+    opacity:
+      .35;
+  }
+
+
+  .nexus-phone-live-wave
+  i {
+    width:
+      2px;
+
+    height:
+      5px;
+
+    border-radius:
+      99px;
+
+    background:
+      var(--primary);
+
+    animation:
+      nexus-live-wave
+      1.2s
+      ease-in-out
+      infinite
+      alternate;
+  }
+
+
+  .nexus-phone-live-wave
+  i:nth-child(2) {
+    animation-delay:
+      .12s;
+  }
+
+
+  .nexus-phone-live-wave
+  i:nth-child(3) {
+    animation-delay:
+      .24s;
+  }
+
+
+  .nexus-phone-live-wave
+  i:nth-child(4) {
+    animation-delay:
+      .36s;
+  }
+
+
+  .nexus-phone-live-wave
+  i:nth-child(5) {
+    animation-delay:
+      .48s;
+  }
+
+
+  @keyframes nexus-live-wave {
+    from {
+      height:
+        3px;
+    }
+
+    to {
+      height:
+        12px;
+    }
+  }
+
+
+  .nexus-phone-quick-strip {
+    display:
+      flex;
+
+    gap:
+      9px;
+
+    padding:
+      7px
+      18px
+      12px;
+
+    overflow-x:
+      auto;
+
+    overscroll-behavior-x:
+      contain;
+
+    scrollbar-width:
+      none;
+  }
+
+
+  .nexus-phone-quick-strip::-webkit-scrollbar {
+    display:
+      none;
+  }
+
+
+  .nexus-phone-quick-chip {
+    display:
+      inline-flex;
+
+    align-items:
+      center;
+
+    gap:
+      7px;
+
+    flex:
+      0 0 auto;
+
+    min-height:
+      39px;
+
+    padding:
+      7px
+      12px;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 78%,
+        transparent
+      );
+
+    border-radius:
+      999px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 70%,
+        transparent
+      );
+
+    color:
+      var(--foreground);
+
+    font-size:
+      11px;
+
+    font-weight:
+      650;
+
+    -webkit-backdrop-filter:
+      blur(18px);
+
+    backdrop-filter:
+      blur(18px);
+
+    transition:
+      scale
+      120ms
+      ease;
+  }
+
+
+  .nexus-phone-quick-chip:active {
+    scale:
+      .94;
+  }
+
+
+  .nexus-phone-quick-chip--primary {
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 12%,
+        var(--background)
+      );
+
+    border-color:
+      color-mix(
+        in srgb,
+        var(--primary) 28%,
+        var(--border)
+      );
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-phone-quick-chip
+  > svg {
+    width:
+      14px;
+
+    height:
+      14px;
+  }
+
+
+  .nexus-phone-quick-chip
+  .nexus-icon {
+    width:
+      19px;
+
+    height:
+      19px;
+  }
+
+
+  .nexus-phone-recent,
+  .nexus-phone-app-library {
+    padding:
+      8px
+      18px
+      0;
+  }
+
+
+  .nexus-phone-section-heading {
+    display:
+      flex;
+
+    align-items:
+      flex-end;
+
+    justify-content:
+      space-between;
+
+    margin-bottom:
+      12px;
+  }
+
+
+  .nexus-phone-section-heading
+  strong {
+    display:
+      block;
+
+    font-size:
+      15px;
+  }
+
+
+  .nexus-phone-section-heading
+  small {
+    display:
+      block;
+
+    margin-top:
+      2px;
+
+    font-size:
+      10px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-phone-recent-grid {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      9px;
+
+    padding:
+      10px;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 72%,
+        transparent
+      );
+
+    border-radius:
+      20px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 65%,
+        transparent
+      );
+
+    -webkit-backdrop-filter:
+      blur(20px)
+      saturate(130%);
+
+    backdrop-filter:
+      blur(20px)
+      saturate(130%);
+  }
+
+
+  .nexus-phone-recent-app {
+    display:
+      flex;
+
+    flex-direction:
+      column;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    gap:
+      5px;
+
+    min-width:
+      0;
+
+    min-height:
+      70px;
+
+    padding:
+      6px;
+
+    border-radius:
+      14px;
+
+    color:
+      var(--foreground);
+
+    text-align:
+      center;
+
+    transition:
+      scale
+      120ms
+      ease,
+      background
+      140ms
+      ease;
+  }
+
+
+  .nexus-phone-recent-app:active {
+    scale:
+      .92;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--muted) 65%,
+        transparent
+      );
+  }
+
+
+  .nexus-phone-recent-app
+  > span:last-child {
+    width:
+      100%;
+
+    overflow:
+      hidden;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+
+    font-size:
+      9px;
+
+    font-weight:
+      600;
+  }
+
+
+  .nexus-phone-recent-icon {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      38px;
+
+    height:
+      38px;
+  }
+
+
+  .nexus-phone-app-library {
+    padding-top:
+      19px;
+  }
+
+
+  .nexus-phone-app--arrive {
+    opacity:
+      0;
+
+    transform:
+      translate3d(
+        0,
+        12px,
+        0
+      )
+      scale(
+        .93
+      );
+
+    animation:
+      nexus-phone-icon-arrive
+      420ms
+      cubic-bezier(
+        .16,
+        .84,
+        .24,
+        1
+      )
+      forwards;
+  }
+
+
+  @keyframes nexus-phone-icon-arrive {
+    0% {
+      opacity:
+        0;
+
+      transform:
+        translate3d(
+          0,
+          12px,
+          0
+        )
+        scale(
+          .93
+        );
+    }
+
+    68% {
+      opacity:
+        1;
+
+      transform:
+        translate3d(
+          0,
+          -1px,
+          0
+        )
+        scale(
+          1.018
+        );
+    }
+
+    100% {
+      opacity:
+        1;
+
+      transform:
+        translate3d(
+          0,
+          0,
+          0
+        )
+        scale(
+          1
+        );
+    }
+  }
+
+
+  .nexus-phone-app {
+    -webkit-tap-highlight-color:
+      transparent;
+
+    transition:
+      scale
+      110ms
+      ease,
+      opacity
+      110ms
+      ease;
+  }
+
+
+  .nexus-phone-app:active {
+    scale:
+      .9;
+
+    opacity:
+      .82;
+  }
+
+
+  .nexus-phone-app-icon {
+    position:
+      relative;
+
+    transition:
+      transform
+      150ms
+      cubic-bezier(
+        .16,
+        .84,
+        .24,
+        1
+      ),
+      filter
+      150ms
+      ease;
+  }
+
+
+  .nexus-phone-app:active
+  .nexus-phone-app-icon {
+    transform:
+      scale(
+        .94
+      );
+  }
+
+
+  /*
+   * TRANSPARENT NATIVE BOTTOM SHEET
+   */
+
+  .nexus-phone-sheet-backdrop {
+    position:
+      fixed;
+
+    inset:
+      0;
+
+    z-index:
+      240;
+
+    display:
+      flex;
+
+    align-items:
+      flex-end;
+
+    background:
+      rgba(
+        0,
+        0,
+        0,
+        .32
+      );
+
+    -webkit-backdrop-filter:
+      blur(
+        8px
+      )
+      saturate(
+        115%
+      );
+
+    backdrop-filter:
+      blur(
+        8px
+      )
+      saturate(
+        115%
+      );
+
+    animation:
+      nexus-phone-sheet-backdrop-in
+      180ms
+      ease
+      both;
+  }
+
+
+  @keyframes nexus-phone-sheet-backdrop-in {
+    from {
+      opacity:
+        0;
+    }
+
+    to {
+      opacity:
+        1;
+    }
+  }
+
+
+  .nexus-phone-sheet {
+    width:
+      100%;
+
+    padding:
+      8px
+      16px
+      calc(
+        18px +
+        env(
+          safe-area-inset-bottom
+        )
+      );
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 70%,
+        transparent
+      );
+
+    border-bottom:
+      0;
+
+    border-radius:
+      28px
+      28px
+      0
+      0;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 76%,
+        transparent
+      );
+
+    color:
+      var(--foreground);
+
+    -webkit-backdrop-filter:
+      blur(
+        32px
+      )
+      saturate(
+        155%
+      );
+
+    backdrop-filter:
+      blur(
+        32px
+      )
+      saturate(
+        155%
+      );
+
+    box-shadow:
+      0
+      -24px
+      70px
+      rgba(
+        0,
+        0,
+        0,
+        .22
+      );
+
+    animation:
+      nexus-phone-sheet-arrive
+      360ms
+      cubic-bezier(
+        .16,
+        .84,
+        .24,
+        1
+      )
+      both;
+  }
+
+
+  @keyframes nexus-phone-sheet-arrive {
+    from {
+      opacity:
+        0;
+
+      transform:
+        translate3d(
+          0,
+          34px,
+          0
+        )
+        scale(
+          .975
+        );
+    }
+
+    to {
+      opacity:
+        1;
+
+      transform:
+        translate3d(
+          0,
+          0,
+          0
+        )
+        scale(
+          1
+        );
+    }
+  }
+
+
+  .nexus-phone-sheet-handle {
+    width:
+      36px;
+
+    height:
+      4px;
+
+    margin:
+      2px
+      auto
+      15px;
+
+    border-radius:
+      99px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--foreground) 22%,
+        transparent
+      );
+  }
+
+
+  .nexus-phone-sheet-header {
+    display:
+      flex;
+
+    align-items:
+      flex-start;
+
+    justify-content:
+      space-between;
+
+    gap:
+      14px;
+
+    padding:
+      0
+      2px
+      13px;
+  }
+
+
+  .nexus-phone-sheet-header
+  p {
+    margin:
+      0;
+
+    font-size:
+      10px;
+
+    font-weight:
+      800;
+
+    letter-spacing:
+      .16em;
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-phone-sheet-header
+  h2 {
+    margin:
+      4px
+      0
+      0;
+
+    font-size:
+      22px;
+
+    line-height:
+      1.1;
+  }
+
+
+  .nexus-phone-sheet-header
+  span {
+    display:
+      block;
+
+    margin-top:
+      5px;
+
+    font-size:
+      11px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-phone-sheet-close {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      40px;
+
+    height:
+      40px;
+
+    flex:
+      0
+      0
+      auto;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 75%,
+        transparent
+      );
+
+    border-radius:
+      14px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 64%,
+        transparent
+      );
+  }
+
+
+  .nexus-phone-sheet-close
+  svg {
+    width:
+      17px;
+
+    height:
+      17px;
+  }
+
+
+  .nexus-phone-sheet-actions {
+    display:
+      grid;
+
+    gap:
+      8px;
+  }
+
+
+  .nexus-phone-sheet-action {
+    display:
+      grid;
+
+    grid-template-columns:
+      52px
+      minmax(
+        0,
+        1fr
+      )
+      20px;
+
+    align-items:
+      center;
+
+    gap:
+      11px;
+
+    min-height:
+      68px;
+
+    padding:
+      8px
+      11px;
+
+    opacity:
+      0;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 70%,
+        transparent
+      );
+
+    border-radius:
+      18px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 59%,
+        transparent
+      );
+
+    color:
+      var(--foreground);
+
+    text-align:
+      left;
+
+    -webkit-backdrop-filter:
+      blur(
+        18px
+      );
+
+    backdrop-filter:
+      blur(
+        18px
+      );
+
+    animation:
+      nexus-phone-sheet-action-in
+      300ms
+      cubic-bezier(
+        .16,
+        .84,
+        .24,
+        1
+      )
+      forwards;
+
+    transition:
+      scale
+      110ms
+      ease;
+  }
+
+
+  @keyframes nexus-phone-sheet-action-in {
+    from {
+      opacity:
+        0;
+
+      transform:
+        translate3d(
+          0,
+          8px,
+          0
+        )
+        scale(
+          .985
+        );
+    }
+
+    to {
+      opacity:
+        1;
+
+      transform:
+        translate3d(
+          0,
+          0,
+          0
+        )
+        scale(
+          1
+        );
+    }
+  }
+
+
+  .nexus-phone-sheet-action:active {
+    scale:
+      .965;
+  }
+
+
+  .nexus-phone-sheet-action-icon {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      50px;
+
+    height:
+      50px;
+
+    border-radius:
+      15px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 8%,
+        transparent
+      );
+  }
+
+
+  .nexus-phone-sheet-action-copy {
+    min-width:
+      0;
+  }
+
+
+  .nexus-phone-sheet-action-copy
+  strong {
+    display:
+      block;
+
+    font-size:
+      13px;
+  }
+
+
+  .nexus-phone-sheet-action-copy
+  small {
+    display:
+      block;
+
+    margin-top:
+      3px;
+
+    font-size:
+      10px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-phone-sheet-action
+  > svg {
+    width:
+      17px;
+
+    height:
+      17px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  /*
+   * GLASS MOBILE DRAWER
+   */
+
+  .nexus-mobile-sidebar {
+    transition:
+      transform
+      320ms
+      cubic-bezier(
+        .16,
+        .84,
+        .24,
+        1
+      ) !important;
+
+    box-shadow:
+      18px
+      0
+      60px
+      rgba(
+        0,
+        0,
+        0,
+        .16
+      );
+  }
+
+
+  .nexus-mobile-drawer {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 82%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(
+        30px
+      )
+      saturate(
+        145%
+      );
+
+    backdrop-filter:
+      blur(
+        30px
+      )
+      saturate(
+        145%
+      );
+  }
+
+
+  .nexus-mobile-app-header {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 76%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(
+        24px
+      )
+      saturate(
+        145%
+      );
+
+    backdrop-filter:
+      blur(
+        24px
+      )
+      saturate(
+        145%
+      );
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nexus-phone-home-ambient span,
+  .nexus-phone-live-orb::after,
+  .nexus-phone-live-wave i,
+  .nexus-phone-app--arrive,
+  .nexus-phone-sheet-backdrop,
+  .nexus-phone-sheet,
+  .nexus-phone-sheet-action {
+    animation:
+      none !important;
+
+    opacity:
+      1 !important;
+
+    transform:
+      none !important;
+  }
+
+}
