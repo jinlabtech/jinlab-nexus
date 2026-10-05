@@ -404,7 +404,7 @@ export default function InvoiceLivePreview({
                       size="sm"
                       onClick={saveField}
                       disabled={saving}
-                      className="bg-black text-white"
+                      className="nexus-primary-action"
                     >
                       Save
                     </Button>
@@ -466,7 +466,7 @@ export default function InvoiceLivePreview({
                       size="sm"
                       onClick={saveField}
                       disabled={saving}
-                      className="bg-black text-white"
+                      className="nexus-primary-action"
                     >
                       Save
                     </Button>
@@ -760,7 +760,7 @@ export default function InvoiceLivePreview({
                                 disabled={
                                   saving
                                 }
-                                className="bg-black text-white hover:bg-black/85"
+                                className="nexus-primary-action"
                               >
                                 {saving
                                   ? "Saving..."
@@ -818,7 +818,7 @@ export default function InvoiceLivePreview({
                     size="sm"
                     onClick={saveField}
                     disabled={saving}
-                    className="bg-black text-white"
+                    className="nexus-primary-action"
                   >
                     {saving
                       ? "Saving..."
@@ -908,7 +908,7 @@ export default function InvoiceLivePreview({
                       size="sm"
                       onClick={saveField}
                       disabled={saving}
-                      className="bg-black text-white"
+                      className="nexus-primary-action"
                     >
                       {saving
                         ? "Saving..."

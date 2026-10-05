@@ -1,8 +1,14 @@
 /* =========================================================
-   NEXUS CONTROL CONTRACT
-   Themes may colour the environment.
-   They must not repaint or decorate functional controls.
+   JINLAB NEXUS — FUNCTIONAL CONTROL CONTRACT
+
+   Themes may style the environment.
+   They must NEVER cover, distort or repaint actions.
    ========================================================= */
+
+
+/* ---------------------------------------------------------
+   REMOVE THEME EFFECTS FROM FUNCTIONAL BUTTONS
+   --------------------------------------------------------- */
 
 html[data-nexus-theme]
 .nexus-shell
@@ -10,40 +16,82 @@ button:not(:where(.nexus-document, .nexus-document *)),
 html[data-nexus-theme]
 .nexus-shell
 [data-slot="button"]:not(:where(.nexus-document, .nexus-document *)) {
-  text-shadow: none !important;
-  filter: none !important;
+  position:
+    relative;
 
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  isolation:
+    isolate;
+
+  text-shadow:
+    none !important;
+
+  filter:
+    none !important;
+
+  backdrop-filter:
+    none !important;
+
+  -webkit-backdrop-filter:
+    none !important;
 }
 
 
 /*
- * Remove the global animated theme shine from buttons.
+ * The old material shine was sometimes visually covering
+ * button text/icons.
  */
+html[data-nexus-theme]
+.nexus-shell
+button:not(:where(.nexus-document, .nexus-document *))::before,
 html[data-nexus-theme]
 .nexus-shell
 button:not(:where(.nexus-document, .nexus-document *))::after,
 html[data-nexus-theme]
 .nexus-shell
+[data-slot="button"]:not(:where(.nexus-document, .nexus-document *))::before,
+html[data-nexus-theme]
+.nexus-shell
 [data-slot="button"]:not(:where(.nexus-document, .nexus-document *))::after {
-  display: none !important;
+  display:
+    none !important;
+
+  content:
+    none !important;
 }
 
 
-/*
- * shadcn/Nexus buttons own their own visual state.
- */
+/* ---------------------------------------------------------
+   SHARED NEXUS BUTTON GEOMETRY
+   --------------------------------------------------------- */
+
+html[data-nexus-theme]
+.nexus-shell
+[data-slot="button"]:not(
+  [class*="rounded-full"]
+) {
+  border-radius:
+    13px !important;
+
+  overflow:
+    visible !important;
+
+  z-index:
+    2;
+}
+
+
 html[data-nexus-theme]
 .nexus-shell
 [data-slot="button"] {
-  box-shadow: none !important;
+  box-shadow:
+    none !important;
 
   transition:
     background-color 140ms ease,
     border-color 140ms ease,
     color 140ms ease,
-    transform 100ms ease
+    transform 100ms ease,
+    opacity 120ms ease
     !important;
 }
 
@@ -51,27 +99,436 @@ html[data-nexus-theme]
 html[data-nexus-theme]
 .nexus-shell
 [data-slot="button"]:active:not(:disabled) {
-  transform: scale(.97);
+  transform:
+    scale(.97);
 }
 
 
 /*
- * Outline / neutral buttons must remain visually neutral
- * regardless of Frost, Graphite, Glass, etc.
+ * Icons always remain above the button surface.
  */
-html[data-nexus-theme]
 .nexus-shell
-[data-slot="button"][class*="border"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+[data-slot="button"]
+svg {
+  position:
+    relative;
+
+  z-index:
+    3;
+}
+
+
+/* ---------------------------------------------------------
+   ACTION AREAS
+   --------------------------------------------------------- */
+
+.nexus-customer-form-actions,
+.nexus-quotation-form-actions {
+  position:
+    sticky !important;
+
+  bottom:
+    0 !important;
+
+  z-index:
+    45 !important;
+
+  isolation:
+    isolate;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--background)
+      94%,
+      transparent
+    ) !important;
+
+  -webkit-backdrop-filter:
+    blur(18px);
+
+  backdrop-filter:
+    blur(18px);
+}
+
+
+.nexus-customer-form-actions
+[data-slot="button"],
+.nexus-quotation-form-actions
+[data-slot="button"] {
+  position:
+    relative;
+
+  z-index:
+    46;
 }
 
 
 /*
- * Never allow the theme engine to change button geometry.
+ * Repair workflow actions must never be visually hidden
+ * by cards/theme material.
  */
-html[data-nexus-theme]
-.nexus-shell
+.nexus-repair-action-card,
+.nexus-repair-work-card,
+.nexus-repair-job-summary {
+  position:
+    relative;
+
+  isolation:
+    isolate;
+}
+
+
+.nexus-repair-action-card
+[data-slot="button"],
+.nexus-repair-work-card
+[data-slot="button"],
+.nexus-repair-job-summary
+[data-slot="button"] {
+  position:
+    relative;
+
+  z-index:
+    5;
+}
+
+
+/* ---------------------------------------------------------
+   APPEARANCE SETTINGS
+   Apply Theme must always remain a normal usable control.
+   --------------------------------------------------------- */
+
+.nexus-live-theme-bar {
+  position:
+    relative !important;
+
+  z-index:
+    10 !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.nexus-live-theme-bar
+[data-slot="button"],
+.nexus-live-theme-bar
 button {
-  border-radius: inherit;
+  position:
+    relative !important;
+
+  z-index:
+    12 !important;
+
+  overflow:
+    visible !important;
+
+  opacity:
+    1 !important;
 }
+
+
+/* ---------------------------------------------------------
+   PRINT / DOCUMENT ACTIONS
+   --------------------------------------------------------- */
+
+.nexus-print-toolbar,
+.nexus-document-view-controls {
+  position:
+    relative;
+
+  isolation:
+    isolate;
+}
+
+
+.nexus-print-toolbar
+button,
+.nexus-document-view-controls
+button {
+  position:
+    relative !important;
+
+  z-index:
+    120 !important;
+
+  overflow:
+    visible !important;
+
+  opacity:
+    1 !important;
+
+  pointer-events:
+    auto !important;
+}
+
+
+/* =========================================================
+   PHONE ACTION SAFETY
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /*
+   * Leave a real safety zone above the fixed Nexus taskbar.
+   */
+  .nexus-app-workspace {
+    padding-bottom:
+      calc(
+        118px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    scroll-padding-bottom:
+      calc(
+        118px +
+        env(safe-area-inset-bottom)
+      ) !important;
+  }
+
+
+  /*
+   * If Nexus scrolls an action into view, it must stop
+   * above the taskbar.
+   */
+  .nexus-app-workspace
+  :is(
+    button,
+    [data-slot="button"],
+    input,
+    select,
+    textarea
+  ) {
+    scroll-margin-bottom:
+      calc(
+        112px +
+        env(safe-area-inset-bottom)
+      );
+  }
+
+
+  /*
+   * Action buttons need proper phone-sized touch areas.
+   */
+  .nexus-repair-action-card
+  [data-slot="button"],
+  .nexus-repair-work-card
+  [data-slot="button"],
+  .nexus-customer-form-actions
+  [data-slot="button"],
+  .nexus-quotation-form-actions
+  [data-slot="button"],
+  .nexus-live-theme-bar
+  [data-slot="button"] {
+    min-height:
+      44px !important;
+
+    height:
+      auto !important;
+
+    white-space:
+      normal !important;
+
+    line-height:
+      1.2 !important;
+  }
+
+
+  /*
+   * Form action bars float inside their popup, not behind
+   * the Nexus taskbar.
+   */
+  .nexus-customer-form-actions,
+  .nexus-quotation-form-actions {
+    margin-bottom:
+      0 !important;
+
+    padding-bottom:
+      calc(
+        10px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    border-top:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border)
+        75%,
+        transparent
+      );
+  }
+
+
+  /*
+   * Apply Theme area is ordinary page content on phone.
+   */
+  .nexus-live-theme-bar {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      10px !important;
+  }
+
+
+  .nexus-live-theme-bar
+  [data-slot="button"] {
+    width:
+      100% !important;
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   PRINT
+   --------------------------------------------------------- */
+
+@media print {
+
+  .nexus-phone-system-dock,
+  .nexus-dock-shell,
+  #nexus-helper-root {
+    display:
+      none !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS ACTION VISIBILITY V3
+   Functional controls must beat themes.
+   ========================================================= */
+
+/*
+ * Standard action = consistent JINLAB blue.
+ */
+.nexus-shell
+[data-slot="button"][data-variant="default"]:not(:disabled) {
+  background:
+    #0878d1 !important;
+
+  color:
+    #ffffff !important;
+
+  border-color:
+    #0878d1 !important;
+
+  opacity:
+    1 !important;
+
+  filter:
+    none !important;
+
+  text-shadow:
+    none !important;
+
+  box-shadow:
+    0 4px 12px
+    rgb(0 80 160 / .14)
+    !important;
+}
+
+
+.nexus-shell
+[data-slot="button"][data-variant="default"]:not(:disabled):hover {
+  background:
+    #066ab9 !important;
+
+  color:
+    #ffffff !important;
+}
+
+
+/*
+ * Neutral actions remain clear on both light and dark themes.
+ */
+.nexus-shell
+[data-slot="button"][data-variant="outline"]:not(:disabled) {
+  background:
+    var(--background) !important;
+
+  color:
+    var(--foreground) !important;
+
+  border:
+    1px solid
+    var(--border) !important;
+
+  opacity:
+    1 !important;
+}
+
+
+.nexus-shell
+[data-slot="button"][data-variant="ghost"]:not(:disabled) {
+  color:
+    var(--foreground) !important;
+
+  opacity:
+    1 !important;
+}
+
+
+/*
+ * Disabled buttons remain identifiable but clearly disabled.
+ */
+.nexus-shell
+[data-slot="button"]:disabled {
+  opacity:
+    .48 !important;
+
+  filter:
+    none !important;
+
+  text-shadow:
+    none !important;
+}
+
+
+/*
+ * No theme decoration may sit above control text.
+ */
+.nexus-shell
+[data-slot="button"]
+> * {
+  position:
+    relative;
+
+  z-index:
+    2;
+}
+
+
+/*
+ * Ordinary links styled as actions.
+ */
+.nexus-primary-action {
+  background:
+    #0878d1 !important;
+
+  color:
+    #ffffff !important;
+
+  border-color:
+    #0878d1 !important;
+}
+
+
+/* Print actions must never inherit document/theme darkness. */
+.nexus-print-toolbar
+[data-slot="button"],
+.nexus-document-view-controls
+[data-slot="button"] {
+  opacity:
+    1 !important;
+
+  filter:
+    none !important;
+}
+

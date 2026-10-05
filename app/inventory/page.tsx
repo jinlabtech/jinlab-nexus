@@ -1164,6 +1164,7 @@ export default function InventoryPage() {
               !showItemForm && (
                 <Button
                   type="button"
+                  className="nexus-primary-action"
                   onClick={openAddItem}
                 >
                   + Add Item

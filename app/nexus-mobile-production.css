@@ -1995,7 +1995,7 @@
       sticky;
 
     bottom:
-      -12px;
+      0;
 
     z-index:
       12;
@@ -4810,6 +4810,348 @@
 
     font-size:
       15px !important;
+  }
+
+}
+
+
+/* =========================================================
+   POS MOBILE STABILITY V2
+   Same till as desktop, properly arranged for phone.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-pos-screen {
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+
+    padding:
+      8px
+      8px
+      calc(
+        128px +
+        env(safe-area-inset-bottom)
+      )
+      !important;
+
+    overflow-x:
+      hidden;
+  }
+
+
+  /*
+   * Phone header already says Point of Sale.
+   * Keep only the useful refresh action.
+   */
+  .nexus-pos-heading {
+    margin-bottom:
+      8px !important;
+
+    align-items:
+      center !important;
+  }
+
+
+  .nexus-pos-heading
+  > div:first-child {
+    display:
+      none;
+  }
+
+
+  .nexus-pos-heading
+  > [data-slot="button"] {
+    margin-left:
+      auto;
+
+    min-height:
+      38px !important;
+  }
+
+
+  .nexus-pos-workspace {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+
+  .nexus-pos-product-search {
+    width:
+      100%;
+
+    min-width:
+      0;
+  }
+
+
+  .nexus-pos-product-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-pos-product-tile {
+    width:
+      100%;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      108px !important;
+
+    padding:
+      9px !important;
+  }
+
+
+  /*
+   * Floating cart launcher sits ABOVE Nexus taskbar.
+   */
+  .nexus-pos-screen
+  > div
+  > button[aria-label="Open current POS cart"] {
+    left:
+      8px !important;
+
+    right:
+      8px !important;
+
+    bottom:
+      calc(
+        82px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    width:
+      auto !important;
+
+    max-width:
+      520px;
+
+    margin:
+      0 auto;
+
+    z-index:
+      72 !important;
+
+    border-radius:
+      17px !important;
+  }
+
+
+  /*
+   * Cart becomes a controlled floating POS workspace,
+   * not an enormous page covering the whole phone.
+   */
+  .nexus-pos-screen
+  aside.fixed {
+    top:
+      66px !important;
+
+    left:
+      8px !important;
+
+    right:
+      8px !important;
+
+    bottom:
+      calc(
+        80px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    width:
+      auto !important;
+
+    max-width:
+      520px;
+
+    max-height:
+      calc(
+        100dvh -
+        154px -
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    margin:
+      0 auto;
+
+    display:
+      flex !important;
+
+    flex-direction:
+      column;
+
+    overflow:
+      hidden !important;
+
+    border-radius:
+      24px !important;
+
+    z-index:
+      76 !important;
+
+    box-shadow:
+      0 26px 70px
+      rgb(0 0 0 / .30)
+      !important;
+  }
+
+
+  /*
+   * Cart header stays visible.
+   */
+  .nexus-pos-screen
+  aside.fixed
+  > div:first-child,
+  .nexus-pos-screen
+  aside.fixed
+  > div:nth-child(2) {
+    flex:
+      0 0 auto;
+  }
+
+
+  /*
+   * Checkout section itself scrolls.
+   */
+  .nexus-pos-checkout-panel {
+    flex:
+      1 1 auto;
+
+    min-height:
+      0;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain;
+
+    padding:
+      12px !important;
+
+    padding-bottom:
+      calc(
+        16px +
+        env(safe-area-inset-bottom)
+      ) !important;
+  }
+
+
+  .nexus-pos-checkout-panel
+  :is(
+    input,
+    select,
+    button
+  ) {
+    max-width:
+      100%;
+  }
+
+
+  /*
+   * Keep payment choices in one stable four-button strip.
+   */
+  .nexus-pos-checkout-panel
+  .grid.grid-cols-4 {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      5px !important;
+  }
+
+
+  .nexus-pos-checkout-panel
+  .grid.grid-cols-4
+  button {
+    min-width:
+      0;
+
+    min-height:
+      42px !important;
+
+    padding:
+      5px
+      2px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /*
+   * Most important POS action always remains reachable.
+   */
+  .nexus-pos-complete-sale {
+    position:
+      sticky;
+
+    bottom:
+      0;
+
+    z-index:
+      15;
+
+    min-height:
+      48px !important;
+
+    border-radius:
+      14px !important;
+
+    background:
+      #0878d1 !important;
+
+    color:
+      #ffffff !important;
+
+    box-shadow:
+      0 7px 20px
+      rgb(0 85 175 / .24)
+      !important;
+  }
+
+
+  /*
+   * Empty cart should not create unnecessary visual height.
+   */
+  .nexus-pos-screen
+  aside.fixed
+  > div.p-10.text-center {
+    padding:
+      20px !important;
+  }
+
+}
+
+
+@media screen and (max-width: 350px) {
+
+  .nexus-pos-product-grid {
+    grid-template-columns:
+      1fr
+      1fr !important;
   }
 
 }

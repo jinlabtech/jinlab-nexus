@@ -1478,7 +1478,7 @@ export default function InvoiceDetailPage() {
                       invoice.status ===
                         "cancelled"
                     }
-                    className="w-full bg-black text-white hover:bg-black/85"
+                    className="w-full nexus-primary-action"
                   >
                     Record Payment
                   </Button>
@@ -1502,7 +1502,7 @@ export default function InvoiceDetailPage() {
                         "cancelled" ||
                       Boolean(paymentPlan)
                     }
-                    className="w-full bg-black text-white hover:bg-black/85"
+                    className="w-full nexus-primary-action"
                   >
                     {paymentPlan
                       ? "Payment Plan Active"
@@ -1707,7 +1707,7 @@ export default function InvoiceDetailPage() {
                                 );
                               }}
                               disabled={actionLoading}
-                              className="w-full bg-black text-white hover:bg-black/85"
+                              className="w-full nexus-primary-action"
                             >
                               Pay Next Instalment —{" "}
                               {formatCurrency(
@@ -1884,7 +1884,7 @@ export default function InvoiceDetailPage() {
                 Number(invoice.balance_due) <= 0 ||
                 invoice.status === "cancelled"
               }
-              className="bg-black text-white hover:bg-black/85"
+              className="nexus-primary-action"
             >
               Create Payment Link
             </Button>
@@ -2199,7 +2199,7 @@ export default function InvoiceDetailPage() {
                 disabled={
                   actionLoading
                 }
-                className="bg-black text-white hover:bg-black/85"
+                className="nexus-primary-action"
               >
                 {actionLoading
                   ? "Creating..."
@@ -2233,7 +2233,7 @@ export default function InvoiceDetailPage() {
                   Number(invoice.balance_due) <= 0 ||
                   invoice.status === "cancelled"
                 }
-                className="bg-black text-white hover:bg-black/85"
+                className="nexus-primary-action"
               >
                 Record Payment
               </Button>
@@ -2250,7 +2250,7 @@ export default function InvoiceDetailPage() {
                   invoice.status === "cancelled" ||
                   Boolean(paymentPlan)
                 }
-                className="bg-black text-white hover:bg-black/85"
+                className="nexus-primary-action"
               >
                 {paymentPlan
                   ? `Payment Plan ${planDisplayStatus}`

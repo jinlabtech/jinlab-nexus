@@ -15,6 +15,7 @@
 @import "../components/dashboard/nexus-control-deck.css";
 @import "./nexus-mobile-production.css";
 @import "./nexus-experience-polish.css";
+@import "./nexus-control-contract.css";
 
 @font-face {
   font-family: NexusUI;
@@ -486,7 +487,6 @@
 
 @import "./nexus-mobile-stability.css";
 
-@import "./nexus-control-contract.css";
 
 
 /* Counter workflows need readable fields and reachable actions on phones. */

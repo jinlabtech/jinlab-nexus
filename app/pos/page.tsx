@@ -2693,7 +2693,7 @@ export default function PosPage() {
 
       <main className="nexus-pos-screen mx-auto max-w-[1600px] p-3 pb-32 md:p-6 md:pb-24 lg:p-8">
 
-        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div className="nexus-pos-heading mb-6 flex flex-wrap items-start justify-between gap-4">
 
           <div>
 
@@ -2948,7 +2948,7 @@ export default function PosPage() {
         }
 
 
-        <div className="grid gap-4 xl:grid-cols-[1fr_430px] xl:gap-6">
+        <div className="nexus-pos-workspace grid gap-4 xl:grid-cols-[1fr_430px] xl:gap-6">
 
           <section>
 
@@ -3504,7 +3504,7 @@ export default function PosPage() {
             }
 
 
-            <div className="space-y-4 border-t p-4 xl:p-5">
+            <div className="nexus-pos-checkout-panel space-y-4 border-t p-4 xl:p-5">
 
               <label className="block space-y-2 text-sm">
 
@@ -3894,7 +3894,7 @@ export default function PosPage() {
                 onClick={() =>
                   void checkout()
                 }
-                className="h-12 w-full bg-primary text-base font-bold text-white hover:bg-primary"
+                className="nexus-pos-complete-sale h-12 w-full bg-primary text-base font-bold text-white hover:bg-primary"
               >
 
                 {
