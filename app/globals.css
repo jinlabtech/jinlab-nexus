@@ -551,7 +551,7 @@
 @media print {
   .nexus-print-toolbar, .nexus-document-view-controls, #nexus-helper-root,
   .nexus-dock-shell, .nexus-phone-system-dock { display: none !important; }
-  .nexus-a4-fit, .nexus-a4-paper { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; zoom: 1 !important; transform: none !important; }
+  .nexus-a4-fit { margin: 0 !important; padding: 0 !important; overflow: visible !important; }
   .nexus-print-page { min-height: 0 !important; background: #fff !important; }
   html:has(.nexus-print-page), body:has(.nexus-print-page) { height: auto !important; overflow: visible !important; }
   body:has(.nexus-print-page)::before, body:has(.nexus-print-page)::after { display: none !important; }
@@ -565,3 +565,241 @@
 .nexus-module-hub-item:focus-visible { outline: 2px solid var(--ring); outline-offset: 5px; }
 .nexus-module-hub-item:active .nexus-feature-icon { transform: scale(.96); }
 @media (prefers-reduced-motion: reduce) { .nexus-module-hub-item, .nexus-module-hub-item .nexus-feature-icon { transition: none !important; transform: none !important; } }
+
+
+/* =========================================================
+   NEXUS TRUE A4 DOCUMENT CONTRACT
+   Screen preview scales the physical A4 page.
+   Printing always uses 210 mm × 297 mm.
+   ========================================================= */
+
+.nexus-a4-preview-stage {
+  width:
+    100%;
+
+  overflow-x:
+    auto;
+
+  overflow-y:
+    visible;
+
+  padding:
+    14px
+    8px
+    28px;
+
+  background:
+    #e8eaed;
+}
+
+
+.nexus-a4-scale-holder {
+  position:
+    relative;
+
+  width:
+    100%;
+}
+
+
+.nexus-a4-paper {
+  width:
+    210mm;
+
+  min-width:
+    210mm;
+
+  max-width:
+    210mm;
+
+  margin:
+    0 auto;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 12px 35px
+    rgb(0 0 0 / .16);
+}
+
+
+.nexus-a4-fit-screen
+.nexus-a4-scale-holder {
+  overflow:
+    visible;
+}
+
+
+.nexus-a4-full-size {
+  overflow-x:
+    auto;
+}
+
+
+.nexus-a4-full-size
+.nexus-a4-paper {
+  margin-left:
+    0;
+
+  margin-right:
+    0;
+}
+
+
+@media screen and (max-width: 767px) {
+
+  .nexus-document-view-controls {
+    position:
+      sticky;
+
+    top:
+      0;
+
+    z-index:
+      120;
+
+    display:
+      grid;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      6px;
+
+    padding:
+      8px;
+
+    background:
+      rgb(255 255 255 / .96);
+
+    border-bottom:
+      1px solid
+      #d8d8d8;
+  }
+
+
+  .nexus-document-view-controls
+  span {
+    grid-column:
+      1 / -1;
+
+    font-size:
+      10px;
+
+    line-height:
+      1.3;
+
+    color:
+      #555;
+  }
+
+
+  .nexus-document-view-controls
+  button {
+    min-height:
+      40px;
+
+    font-size:
+      11px;
+  }
+
+
+  .nexus-a4-preview-stage {
+    padding:
+      8px
+      4px
+      22px;
+  }
+
+}
+
+
+@media print {
+
+  @page {
+    size:
+      A4 portrait;
+
+    margin:
+      0;
+  }
+
+
+  html,
+  body {
+    width:
+      210mm !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    background:
+      #ffffff !important;
+  }
+
+
+  .nexus-print-page {
+    width:
+      210mm !important;
+
+    min-height:
+      297mm !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    background:
+      #ffffff !important;
+  }
+
+
+  .nexus-a4-preview-stage,
+  .nexus-a4-scale-holder,
+  .nexus-a4-paper {
+    width:
+      210mm !important;
+
+    min-width:
+      210mm !important;
+
+    max-width:
+      210mm !important;
+
+    height:
+      auto !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    overflow:
+      visible !important;
+
+    transform:
+      none !important;
+
+    zoom:
+      1 !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  .nexus-a4-paper {
+    transform:
+      none !important;
+  }
+
+}

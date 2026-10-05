@@ -51,7 +51,7 @@ export default function JinlabA4Invoice({ invoice, items, company, customer, pay
     <style>{`
       @font-face{font-family:NexusInvoice;src:url('/fonts/open-sans-400.ttf') format('truetype');font-weight:400;font-display:swap}
       @font-face{font-family:NexusInvoice;src:url('/fonts/open-sans-700.ttf') format('truetype');font-weight:700;font-display:swap}
-      @page{size:A4 portrait;margin:20mm 12.5mm 17mm 16mm}
+      @page{size:A4 portrait;margin:0}
       .jinlab-classic-invoice{box-sizing:border-box;width:210mm;min-height:297mm;margin:0 auto;padding:20mm 12.5mm 17mm 16mm;background:#fff;color:#111;font-family:NexusInvoice,'Open Sans',Arial,sans-serif;font-size:9pt;line-height:1.35;box-shadow:0 1px 8px #0001}
       .jinlab-classic-invoice *{box-sizing:border-box}
       .jinlab-classic-invoice p,.jinlab-classic-invoice h1,.jinlab-classic-invoice h2{margin:0}
@@ -100,9 +100,28 @@ export default function JinlabA4Invoice({ invoice, items, company, customer, pay
       .jinlab-classic-invoice .history-row{display:flex;justify-content:space-between;gap:10pt;padding:4pt 0;border-bottom:1px solid #ddd}
       .jinlab-classic-invoice .footer{margin-top:24pt;white-space:pre-line;font-size:8pt;break-inside:avoid}
       @media print{
-        html,body{margin:0!important;padding:0!important;background:#fff!important}
-        .jinlab-classic-invoice{width:100%!important;min-height:0!important;margin:0!important;padding:0!important;box-shadow:none!important}
-        .jinlab-classic-invoice *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+        html,body{
+          width:210mm!important;
+          margin:0!important;
+          padding:0!important;
+          background:#fff!important
+        }
+
+        .jinlab-classic-invoice{
+          box-sizing:border-box!important;
+          width:210mm!important;
+          max-width:210mm!important;
+          min-height:297mm!important;
+          margin:0!important;
+          padding:20mm 12.5mm 17mm 16mm!important;
+          background:#fff!important;
+          box-shadow:none!important
+        }
+
+        .jinlab-classic-invoice *{
+          -webkit-print-color-adjust:exact;
+          print-color-adjust:exact
+        }
       }
     `}</style>
     <article className="nexus-document jinlab-classic-invoice" aria-label={`Invoice ${invoice.invoice_number}`}>
