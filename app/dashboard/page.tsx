@@ -11,6 +11,9 @@ import CoreCoverage from "@/components/intelligence/CoreCoverage";
 import CoreFindingCard, { CORE_MODULE_LABELS } from "@/components/intelligence/CoreFindingCard";
 import CoreQuestionPanel from "@/components/intelligence/CoreQuestionPanel";
 import NexusControlDeck from "@/components/dashboard/NexusControlDeck";
+import NexusWeatherWidget from "@/components/dashboard/NexusWeatherWidget";
+import NexusNotificationCenter from "@/components/dashboard/NexusNotificationCenter";
+import NexusWidgetBoard from "@/components/dashboard/NexusWidgetBoard";
 import { supabase } from "@/lib/supabase";
 import { getDocumentLogoUrl } from "@/lib/services/settingsService";
 import { coreAborted, coreError, coreIntelligenceService, downloadCoreReport, waitForCoreSignal } from "@/lib/services/coreIntelligenceService";
@@ -211,6 +214,26 @@ export default function DashboardPage() {
             openDashboardSurface
           }
         />
+
+          <NexusWidgetBoard
+            items={[
+              {
+                id: "weather",
+                title: "Local Weather",
+                content: <NexusWeatherWidget />,
+              },
+              {
+                id: "notifications",
+                title: "Nexus Notifications",
+                content: (
+                  <NexusNotificationCenter
+                    findings={analysis?.findings ?? []}
+                    checking={checking}
+                  />
+                ),
+              },
+            ]}
+          />
 
         <section
           className="border-y border-border/60 py-2"

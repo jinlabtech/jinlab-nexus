@@ -16,6 +16,7 @@ export default function NexusPageMotion({
     <div
       key={pathname}
       className="nexus-page-enter"
+      data-nexus-route={pathname}
     >
       {children}
     </div>

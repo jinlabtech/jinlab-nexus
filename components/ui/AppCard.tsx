@@ -1,19 +1,15 @@
 type AppCardProps = {
   children: React.ReactNode;
+  className?: string;
 };
 
 export default function AppCard({
   children,
+  className = "",
 }: AppCardProps) {
   return (
     <div
-      style={{
-        background: "white",
-        border: "1px solid #ddd",
-        borderRadius: "10px",
-        padding: "20px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-      }}
+      className={`nexus-app-card rounded-xl border bg-card p-5 text-card-foreground shadow-sm ${className}`}
     >
       {children}
     </div>

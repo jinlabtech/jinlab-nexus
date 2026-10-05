@@ -5155,3 +5155,133 @@
   }
 
 }
+
+
+/* =========================================================
+   NEXUS MOBILE CUSTOMER THEME CONTRACT
+   Customer forms must follow selected Nexus theme.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-mobile-modal-panel {
+    background:
+      var(--background) !important;
+
+    color:
+      var(--foreground) !important;
+
+    border-color:
+      var(--border) !important;
+  }
+
+
+  .nexus-mobile-modal-header {
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 96%,
+        transparent
+      ) !important;
+
+    color:
+      var(--foreground) !important;
+
+    border-color:
+      var(--border) !important;
+  }
+
+
+  .nexus-mobile-modal-body {
+    background:
+      var(--background) !important;
+
+    color:
+      var(--foreground) !important;
+  }
+
+
+  .nexus-mobile-modal-body
+  .nexus-app-card {
+    background:
+      var(--card) !important;
+
+    color:
+      var(--card-foreground) !important;
+
+    border-color:
+      var(--border) !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  .nexus-customer-form {
+    color:
+      var(--foreground) !important;
+  }
+
+
+  .nexus-customer-form
+  label,
+  .nexus-customer-form
+  h2,
+  .nexus-customer-form
+  h3 {
+    color:
+      var(--foreground) !important;
+  }
+
+
+  .nexus-customer-form
+  input,
+  .nexus-customer-form
+  select,
+  .nexus-customer-form
+  textarea {
+    background:
+      var(--background) !important;
+
+    color:
+      var(--foreground) !important;
+
+    border-color:
+      var(--border) !important;
+  }
+
+
+  .nexus-customer-form
+  input::placeholder,
+  .nexus-customer-form
+  textarea::placeholder {
+    color:
+      var(--muted-foreground) !important;
+
+    opacity:
+      .82;
+  }
+
+
+  .nexus-customer-account {
+    background:
+      color-mix(
+        in srgb,
+        var(--muted) 45%,
+        var(--card)
+      ) !important;
+
+    color:
+      var(--foreground) !important;
+
+    border-color:
+      var(--border) !important;
+  }
+
+
+  .nexus-customer-form-actions {
+    border-color:
+      var(--border) !important;
+  }
+
+}

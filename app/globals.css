@@ -803,3 +803,84 @@
   }
 
 }
+
+
+/* =========================================================
+   NEXUS EXPERIENCE LAYER
+   Native-style module arrival
+   ========================================================= */
+
+@keyframes nexus-module-arrive {
+  0% {
+    opacity: 0;
+    transform:
+      translate3d(0, 9px, 0)
+      scale(.982);
+    filter:
+      saturate(.96);
+  }
+
+  62% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translate3d(0, 0, 0)
+      scale(1);
+    filter:
+      saturate(1);
+  }
+}
+
+
+.nexus-page-enter {
+  width:
+    100%;
+
+  min-width:
+    0;
+
+  transform-origin:
+    center 28px;
+
+  animation:
+    nexus-module-arrive
+    235ms
+    cubic-bezier(.22, .82, .24, 1)
+    both;
+
+  will-change:
+    transform,
+    opacity;
+}
+
+
+@media screen and (max-width: 767px) {
+
+  .nexus-page-enter {
+    transform-origin:
+      center 20px;
+
+    animation-duration:
+      215ms;
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nexus-page-enter {
+    animation:
+      none !important;
+
+    transform:
+      none !important;
+
+    opacity:
+      1 !important;
+  }
+
+}
