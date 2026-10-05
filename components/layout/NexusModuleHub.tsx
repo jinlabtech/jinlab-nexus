@@ -8,44 +8,17 @@ import {
 import Link from "next/link";
 
 import {
-  Archive,
-  BarChart3,
-  Barcode,
-  Bell,
-  BookOpen,
-  Boxes,
-  Building2,
-  CalendarDays,
-  ChevronRight,
-  CircleDollarSign,
-  ClipboardCheck,
-  FileCheck2,
-  FileClock,
-  FileText,
-  Landmark,
-  PackageCheck,
-  PackageSearch,
-  Plus,
-  Receipt,
-  ReceiptText,
-  RotateCcw,
-  ScanBarcode,
-  Settings,
-  ShieldCheck,
-  ShoppingBag,
-  Store,
-  Tags,
-  Truck,
-  UserCog,
-  Users,
-  WalletCards,
-  Wrench,
-  type LucideIcon,
+  ChevronRight, Plus, ShoppingBag, Users, FileText, Receipt, Store, ChartColumn, Package, Settings, Wrench, ScanLine, Barcode, Tags, Shapes, ArrowLeftRight, Truck, Archive, RotateCcw, Wallet, ShieldCheck, BadgeDollarSign, Lightbulb, Landmark, BookOpen, Coins, CalendarDays, Calculator, NotebookPen, CircleAlert, Play, History, BriefcaseBusiness, BrainCircuit, Bell, Clock, Monitor, SlidersHorizontal, FolderOpen, Tablet, type LucideIcon,
 } from "lucide-react";
 
 import {
   useRouter,
 } from "next/navigation";
+
+import {
+  NexusIcon,
+  nexusIconForRoute,
+} from "@/components/nexus-icons/NexusIcon";
 
 import type {
   NexusAppId,
@@ -127,105 +100,13 @@ type Props = {
 };
 
 
-const icons:
-  Record<
-    NexusHubIcon,
-    LucideIcon
-  > = {
-
-  new: Plus,
-  sales: ShoppingBag,
-  customers: Users,
-  quotes: FileText,
-  invoices: ReceiptText,
-  pos: Store,
-
-  analytics: BarChart3,
-
-  inventory: Boxes,
-  settings: Settings,
-  repairs: Wrench,
-
-  scanner: ScanBarcode,
-  barcode: Barcode,
-  labels: Tags,
-  categories: Boxes,
-  movements: PackageSearch,
-  suppliers: Truck,
-  archive: Archive,
-
-  receipts: Receipt,
-  returns: RotateCcw,
-  cashup: CircleDollarSign,
-  approvals: ClipboardCheck,
-  pricing: Tags,
-
-  recommendations:
-    PackageCheck,
-
-  purchasing:
-    ShoppingBag,
-
-  accounting:
-    CircleDollarSign,
-
-  bank: Landmark,
-  accounts: BookOpen,
-  debtors: Users,
-  expenses: WalletCards,
-  calendar: CalendarDays,
-  costing: Boxes,
-  journals: BookOpen,
-  payables: ReceiptText,
-  exceptions: FileCheck2,
-
-  payroll:
-    CircleDollarSign,
-
-  runs: FileClock,
-  compliance: ShieldCheck,
-  history: FileClock,
-  payslips: ReceiptText,
-
-  hr: Building2,
-  intelligence: BarChart3,
-  notifications: Bell,
-  reports: FileText,
-  time: FileClock,
-  devices: ScanBarcode,
-  manage: UserCog,
-  users: Users,
-  records: BookOpen,
-  documents: FileCheck2,
-  kiosk: Store,
+const featureIcons: Record<NexusHubIcon, LucideIcon> = {
+  new:Plus,sales:ShoppingBag,customers:Users,quotes:FileText,invoices:Receipt,pos:Store,analytics:ChartColumn,inventory:Package,settings:Settings,repairs:Wrench,scanner:ScanLine,barcode:Barcode,labels:Tags,categories:Shapes,movements:ArrowLeftRight,suppliers:Truck,archive:Archive,receipts:Receipt,returns:RotateCcw,cashup:Wallet,approvals:ShieldCheck,pricing:BadgeDollarSign,recommendations:Lightbulb,purchasing:ShoppingBag,accounting:Calculator,bank:Landmark,accounts:BookOpen,debtors:Coins,expenses:Wallet,calendar:CalendarDays,costing:Calculator,journals:NotebookPen,payables:Coins,exceptions:CircleAlert,payroll:BriefcaseBusiness,runs:Play,compliance:ShieldCheck,history:History,payslips:FileText,hr:Users,intelligence:BrainCircuit,notifications:Bell,reports:ChartColumn,time:Clock,devices:Monitor,manage:SlidersHorizontal,users:Users,records:FolderOpen,documents:FileText,kiosk:Tablet,
 };
-
-
-const tones:
-  Record<
-    NexusTone,
-    string
-  > = {
-
-  blue:
-    "bg-blue-500/12 text-blue-600 dark:text-blue-400",
-
-  green:
-    "bg-emerald-500/12 text-emerald-600 dark:text-emerald-400",
-
-  violet:
-    "bg-violet-500/12 text-violet-600 dark:text-violet-400",
-
-  amber:
-    "bg-amber-500/12 text-amber-600 dark:text-amber-400",
-
-  cyan:
-    "bg-cyan-500/12 text-cyan-600 dark:text-cyan-400",
-
-  rose:
-    "bg-rose-500/12 text-rose-600 dark:text-rose-400",
-};
-
+function FeatureIcon({name}:{name:NexusHubIcon}) {
+  const Icon = featureIcons[name] ?? Package;
+  return <span className="nexus-feature-icon" aria-hidden="true"><Icon /></span>;
+}
 
 export default function NexusModuleHub({
   title,
@@ -282,7 +163,13 @@ export default function NexusModuleHub({
 
 
   return (
-    <section className="nexus-module-hub w-full px-4 pb-8 pt-5">
+    <section
+      className="nexus-module-hub w-full px-4 pb-8 pt-5"
+      data-nexus-module={
+        moduleId ??
+        undefined
+      }
+    >
 
       <div className="nexus-module-hub-header mb-6 px-1">
 
@@ -320,32 +207,15 @@ export default function NexusModuleHub({
           className="nexus-module-continue mb-6 flex items-center gap-3 rounded-[22px] border border-border/45 bg-card/70 p-3.5 shadow-sm transition active:scale-[0.985]"
         >
 
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-
-            {(() => {
-
-              const Icon =
-                icons[
-                  memory.icon as
-                    NexusHubIcon
-                ];
-
-
-              const DisplayIcon =
-                Icon ??
-                ShoppingBag;
-
-
-              return (
-                <DisplayIcon
-                  className="size-6"
-                  strokeWidth={1.8}
-                />
-              );
-
-            })()}
-
-          </div>
+          <NexusIcon
+            name={
+              nexusIconForRoute(
+                memory.href
+              )
+            }
+            size="lg"
+            className="nexus-module-continue-icon"
+          />
 
 
           <div className="min-w-0 flex-1">
@@ -370,62 +240,49 @@ export default function NexusModuleHub({
       <div className="nexus-module-hub-grid grid grid-cols-3 gap-x-3 gap-y-7">
 
         {items.map(
-          (item) => {
+          (item) => (
 
-            const Icon =
-              icons[item.icon];
-
-            const tone =
-              tones[
+            <Link
+              key={
+                item.href +
+                item.label
+              }
+              href={item.href}
+              prefetch={false}
+              data-nexus-feature={
+                item.icon
+              }
+              data-nexus-tone={
                 item.tone ??
                 "blue"
-              ];
+              }
+              onPointerEnter={() =>
+                prepareRoute(
+                  item.href
+                )
+              }
+              onTouchStart={() =>
+                prepareRoute(
+                  item.href
+                )
+              }
+              onFocus={() =>
+                prepareRoute(
+                  item.href
+                )
+              }
+              className="nexus-module-hub-item group flex min-w-0 flex-col items-center gap-2 text-center no-underline"
+            >
 
+              <FeatureIcon name={item.icon} />
 
-            return (
-              <Link
-                key={
-                  item.href +
-                  item.label
-                }
-                href={item.href}
-                prefetch={false}
-                onPointerEnter={() =>
-                  prepareRoute(
-                    item.href
-                  )
-                }
-                onTouchStart={() =>
-                  prepareRoute(
-                    item.href
-                  )
-                }
-                onFocus={() =>
-                  prepareRoute(
-                    item.href
-                  )
-                }
-                className="nexus-module-hub-item group flex min-w-0 flex-col items-center gap-2 text-center no-underline"
-              >
+              <span className="nexus-feature-label w-full px-1 text-[12px] font-medium text-foreground">
+                {item.label}
+              </span>
 
-                <div
-                  className={`nexus-module-hub-icon flex size-[72px] items-center justify-center rounded-[22px] border border-current/10 shadow-sm transition duration-150 group-active:scale-[0.88] ${tone}`}
-                >
-                  <Icon
-                    strokeWidth={1.8}
-                    className="size-8"
-                  />
-                </div>
+            </Link>
 
-
-                <span className="w-full truncate px-1 text-[11px] font-medium text-foreground">
-                  {item.label}
-                </span>
-
-              </Link>
-            );
-
-          }
+          )
         )}
 
       </div>

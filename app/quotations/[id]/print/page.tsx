@@ -1,5 +1,7 @@
 "use client";
 
+import A4Preview from "@/components/documents/A4Preview";
+
 import {
   useEffect,
   useState,
@@ -395,7 +397,7 @@ export default function QuotationPrintPage() {
         </div>
       </div>
 
-      <div className="nexus-a4-preview-stage py-8 print:py-0">
+      <A4Preview>
         <JinlabSignatureQuotation
           quotation={quotation}
           items={items}
@@ -403,7 +405,7 @@ export default function QuotationPrintPage() {
           customer={customer}
           branch={branch}
         />
-      </div>
+      </A4Preview>
     </main>
   );
 }

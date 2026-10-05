@@ -64,7 +64,7 @@ export default function JobCardQueue({
   const [rows, setRows] = useState<JobCardQueueRow[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
-  const [view, setView] = useState<"active" | "archived">("active");
+  const [view, setView] = useState<"active" | "archived" | "not_repaired">("active");
   const requestId = useRef(0);
   const [sortOrder, setSortOrder] = useState<
     "newest" | "oldest" | "workflow"
@@ -79,7 +79,7 @@ export default function JobCardQueue({
     setError("");
     const { data, error: rpcError } = await supabase.rpc("get_service_job_queue", {
       p_search: search.trim() || null,
-      p_status: status || view,
+      p_status: view === "not_repaired" ? "not_repaired" : status || view,
       p_limit: 150,
     });
 
@@ -153,7 +153,7 @@ export default function JobCardQueue({
     <section className="nexus-repair-queue mb-6 rounded-2xl border bg-background shadow-sm">
       <div className="nexus-repair-queue-toolbar border-b p-4 sm:p-5">
         <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Job Card views">
-          {([['active', 'Active jobs'], ['archived', 'Completed & cancelled']] as const).map(([value, label]) => (
+          {([['active', 'Active jobs'], ['not_repaired', 'Not repaired'], ['archived', 'Completed & cancelled']] as const).map(([value, label]) => (
             <button key={value} type="button" aria-pressed={view === value}
               onClick={() => {
                 requestId.current += 1;
@@ -171,7 +171,7 @@ export default function JobCardQueue({
           <div>
             <h2 className="text-lg font-bold">Job Card Queue</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {view === "active" ? "Current repairs and devices waiting for collection." : "Collected, closed and cancelled jobs. Search and open any card to view its history."}
+              {view === "active" ? "Current repairs and devices waiting for collection." : view === "not_repaired" ? "Unsuccessful repairs and devices not repaired, including returned jobs. Open a card for the recorded reason." : "Collected, closed and cancelled jobs. Search and open any card to view its history."}
             </p>
           </div>
           <div className="nexus-repair-queue-filters grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1fr)_180px_170px_auto]">
@@ -186,6 +186,7 @@ export default function JobCardQueue({
             <select
               value={status}
               aria-label="Job Card status"
+              disabled={view === "not_repaired"}
               onChange={(e) => setStatus(e.target.value)}
               className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             >

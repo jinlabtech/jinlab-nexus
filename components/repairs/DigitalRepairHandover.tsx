@@ -1182,7 +1182,7 @@ export default function DigitalRepairHandover({
 <img src={signatureView.url} alt="Customer’s saved signature" className="max-h-64 w-full rounded border bg-white object-contain"/><p className="break-all text-xs">Reference: {signatureView.reference}<br/>SHA-256: {signatureView.sha256}</p><p className="text-xs text-muted-foreground">Private link expires after two minutes. Close and reopen to renew.</p></div></div>}
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-2 sm:p-5">
-          <div className="flex max-h-[96vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border bg-background text-foreground shadow-2xl">
+          <div className="nexus-repair-handover flex max-h-[calc(100dvh-2rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border bg-background text-foreground shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b px-5 py-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-blue-600">
@@ -1210,7 +1210,7 @@ export default function DigitalRepairHandover({
               </button>
             </div>
 
-            <div className="overflow-y-auto p-5">
+            <div className="min-h-0 overflow-y-auto overscroll-contain p-5">
               <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border bg-muted p-3 text-sm"><span>{details?.signed_at ? `Signature: Captured · ${new Date(details.signed_at).toLocaleString()}` : "Signature record"}</span><Button type="button" variant="outline" disabled={busy} onClick={()=>void viewSignature()}>View saved signature</Button>{details?.handover_id&&<span className="break-all text-xs text-muted-foreground">Reference: {details.handover_id}</span>}</div>
               {error && (
                 <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

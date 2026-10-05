@@ -176,7 +176,7 @@ export const nexusApps:
       {
         id: "pos",
         label: "Point of Sale",
-        href: "/pos/hub",
+        href: "/pos",
         icon: "pos",
         tone: "rose",
         permission: "pos.view",
@@ -317,7 +317,7 @@ export const nexusApps:
   {
     id: "pos",
     label: "POS",
-    href: "/pos/hub",
+    href: "/pos",
     activeRoot: "/pos",
     icon: "pos",
     permission: "pos.view",

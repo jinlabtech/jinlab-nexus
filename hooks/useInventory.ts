@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useRef,
 } from "react";
 
 import {
@@ -47,8 +48,11 @@ export function useInventory(
   const [errorMessage, setErrorMessage] =
     useState("");
 
+  const requestVersion = useRef(0);
+
   const refreshInventory =
     useCallback(async () => {
+      const version = ++requestVersion.current;
       if (!companyId) {
         setItems([]);
         setCategories([]);
@@ -82,24 +86,27 @@ export function useInventory(
           ),
         ]);
 
+        if (version !== requestVersion.current) return;
         setItems(itemData);
         setCategories(categoryData);
         setSuppliers(supplierData);
         setBranchStock(stockData);
         setMovements(movementData);
       } catch (error) {
+        if (version !== requestVersion.current) return;
         setErrorMessage(
           error instanceof Error
             ? error.message
             : "Inventory information could not be loaded."
         );
       } finally {
-        setLoading(false);
+        if (version === requestVersion.current) setLoading(false);
       }
     }, [companyId]);
 
   useEffect(() => {
-    refreshInventory();
+    void refreshInventory();
+    return () => { requestVersion.current += 1; };
   }, [refreshInventory]);
 
   return {

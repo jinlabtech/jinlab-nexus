@@ -501,8 +501,6 @@
    * Actual documents remain A4 internally.
    * Only their SCREEN preview is zoomed down.
    */
-  .jinlab-classic-invoice,
-  .jinlab-a4-quotation,
   .barcode-sheet {
     transform-origin:
       top center;
@@ -902,340 +900,9 @@
   }
 
 
-  .jinlab-classic-invoice {
-    width:
-      100% !important;
-
-    min-height:
-      0 !important;
-
-    margin:
-      0 !important;
-
-    padding:
-      14px !important;
-
-    font-size:
-      11px !important;
-
-    line-height:
-      1.4 !important;
-
-    zoom:
-      1 !important;
-
-    transform:
-      none !important;
-
-    box-shadow:
-      0 1px 5px
-      rgb(0 0 0 / .10) !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .masthead {
-    display:
-      grid !important;
-
-    grid-template-columns:
-      minmax(0,1fr)
-      auto !important;
-
-    gap:
-      10px !important;
-
-    align-items:
-      start !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .brand {
-    max-width:
-      none !important;
-
-    min-width:
-      0 !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .logo {
-    width:
-      118px !important;
-
-    height:
-      auto !important;
-
-    max-height:
-      70px !important;
-
-    margin-bottom:
-      4px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .company-name {
-    font-size:
-      12px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .company-details {
-    font-size:
-      10px !important;
-
-    line-height:
-      1.35 !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .heading {
-    min-width:
-      0 !important;
-
-    padding-top:
-      0 !important;
-  }
-
-
-  .jinlab-classic-invoice
-  h1 {
-    font-size:
-      21px !important;
-
-    line-height:
-      1 !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .number {
-    font-size:
-      10px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .balance-label {
-    margin-top:
-      10px !important;
-
-    font-size:
-      9px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .balance-amount {
-    font-size:
-      13px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .billing {
-    display:
-      grid !important;
-
-    grid-template-columns:
-      1fr !important;
-
-    gap:
-      10px !important;
-
-    margin-top:
-      16px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .customer {
-    max-width:
-      none !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .dates {
-    width:
-      100% !important;
-
-    grid-template-columns:
-      1fr
-      auto !important;
-
-    gap:
-      5px
-      10px !important;
-
-    font-size:
-      10px !important;
-
-    text-align:
-      left !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .dates
-  span:nth-child(even) {
-    text-align:
-      right;
-  }
-
-
   /*
    * Invoice items stay readable without widening the phone.
    */
-  .jinlab-classic-invoice
-  .items {
-    width:
-      100% !important;
-
-    margin-top:
-      12px !important;
-
-    table-layout:
-      auto !important;
-
-    font-size:
-      9px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .items th,
-  .jinlab-classic-invoice
-  .items td {
-    padding:
-      6px
-      3px !important;
-
-    overflow-wrap:
-      break-word !important;
-
-    word-break:
-      normal !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .items
-  .index {
-    width:
-      20px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .items
-  .quantity {
-    width:
-      34px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .items
-  .rate,
-  .jinlab-classic-invoice
-  .items
-  .amount {
-    width:
-      auto !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .items
-  .adjustment {
-    width:
-      auto !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .totals {
-    width:
-      100% !important;
-
-    margin-top:
-      8px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .total-row {
-    grid-template-columns:
-      1fr
-      auto !important;
-
-    min-height:
-      0 !important;
-
-    padding:
-      6px
-      4px !important;
-
-    gap:
-      10px !important;
-
-    font-size:
-      10px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .document-notes,
-  .jinlab-classic-invoice
-  .conditions {
-    margin-top:
-      18px !important;
-
-    font-size:
-      9px !important;
-
-    line-height:
-      1.35 !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .banks {
-    margin-top:
-      14px !important;
-
-    font-size:
-      10px !important;
-
-    line-height:
-      1.35 !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .signatures {
-    gap:
-      14px !important;
-
-    margin-top:
-      24px !important;
-
-    font-size:
-      10px !important;
-  }
-
-
-  .jinlab-classic-invoice
-  .signature {
-    width:
-      50% !important;
-  }
 
 }
 
@@ -1247,101 +914,6 @@
    ========================================================= */
 
 @media screen and (max-width: 767px) {
-
-  .jinlab-a4-quotation {
-    width:
-      100% !important;
-
-    min-height:
-      0 !important;
-
-    margin:
-      0 !important;
-
-    padding:
-      14px !important;
-
-    zoom:
-      1 !important;
-
-    transform:
-      none !important;
-
-    box-shadow:
-      0 1px 5px
-      rgb(0 0 0 / .10) !important;
-  }
-
-
-  .jinlab-a4-quotation
-  header img {
-    max-height:
-      72px !important;
-
-    object-fit:
-      contain;
-  }
-
-
-  .jinlab-a4-quotation
-  header
-  > div {
-    gap:
-      10px !important;
-  }
-
-
-  .jinlab-a4-quotation
-  h1 {
-    font-size:
-      21px !important;
-  }
-
-
-  .jinlab-a4-quotation
-  section[class*="grid-cols"] {
-    grid-template-columns:
-      1fr !important;
-
-    gap:
-      10px !important;
-  }
-
-
-  .jinlab-a4-quotation
-  table {
-    width:
-      100% !important;
-
-    table-layout:
-      auto !important;
-
-    font-size:
-      9px !important;
-  }
-
-
-  .jinlab-a4-quotation
-  col {
-    width:
-      auto !important;
-  }
-
-
-  .jinlab-a4-quotation
-  th,
-  .jinlab-a4-quotation
-  td {
-    padding:
-      6px
-      3px !important;
-
-    word-break:
-      normal !important;
-
-    overflow-wrap:
-      break-word !important;
-  }
 
 }
 
@@ -5037,6 +4609,207 @@
   .nexus-repair-job-timeline {
     grid-template-columns:
       1fr !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS CORE — SAME CORE, PHONE-SIZED
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  #nexus-core-helper {
+    top:
+      auto !important;
+
+    left:
+      8px !important;
+
+    right:
+      8px !important;
+
+    bottom:
+      calc(
+        68px +
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    z-index:
+      96 !important;
+
+    width:
+      auto !important;
+
+    max-width:
+      none !important;
+
+    height:
+      min(
+        760px,
+        calc(
+          100dvh -
+          92px -
+          env(safe-area-inset-bottom)
+        )
+      ) !important;
+
+    max-height:
+      calc(
+        100dvh -
+        92px -
+        env(safe-area-inset-bottom)
+      ) !important;
+
+    border:
+      1px solid
+      var(--border) !important;
+
+    border-radius:
+      20px !important;
+
+    box-shadow:
+      0 20px 65px
+      rgb(0 0 0 / .24)
+      !important;
+
+    overflow:
+      hidden;
+  }
+
+
+  #nexus-core-helper
+  > header {
+    padding:
+      11px
+      12px !important;
+  }
+
+
+  #nexus-core-helper
+  > header
+  p:first-child {
+    font-size:
+      13px !important;
+  }
+
+
+  #nexus-core-helper
+  > header
+  p:last-child {
+    font-size:
+      9px !important;
+  }
+
+}
+
+
+/* =========================================================
+   POS — PHONE AS BARCODE SCANNER
+   Desktop POS structure remains unchanged.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-pos-camera-scanner {
+    display:
+      block !important;
+
+    margin-top:
+      2px;
+  }
+
+
+  .nexus-pos-camera-scanner
+  > button {
+    min-height:
+      44px !important;
+
+    border-radius:
+      12px !important;
+
+    font-size:
+      12px !important;
+
+    font-weight:
+      700 !important;
+  }
+
+
+  .nexus-pos-product-search {
+    position:
+      relative;
+  }
+
+
+  .nexus-pos-product-search
+  input[type="search"] {
+    min-height:
+      46px !important;
+
+    font-size:
+      16px !important;
+  }
+
+
+  /*
+   * Keep two products across, but make the entire card
+   * a generous touch target.
+   */
+  .nexus-pos-product-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .nexus-pos-product-tile {
+    min-height:
+      112px !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      13px !important;
+
+    touch-action:
+      manipulation;
+  }
+
+
+  .nexus-pos-product-tile:active {
+    transform:
+      scale(.96) !important;
+
+    border-color:
+      var(--primary) !important;
+  }
+
+
+  .nexus-pos-product-tile
+  h3 {
+    font-size:
+      12px !important;
+
+    line-height:
+      1.2 !important;
+  }
+
+
+  .nexus-pos-product-tile
+  p:last-child {
+    margin-top:
+      7px !important;
+
+    font-size:
+      15px !important;
   }
 
 }

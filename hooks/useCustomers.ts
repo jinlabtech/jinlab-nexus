@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useRef,
 } from "react";
 
 import {
@@ -29,8 +30,11 @@ export function useCustomers(
     setErrorMessage,
   ] = useState("");
 
+  const requestVersion = useRef(0);
+
   const refreshCustomers =
     useCallback(async () => {
+      const version = ++requestVersion.current;
       if (!companyId) {
         setCustomers([]);
         setLoading(false);
@@ -47,15 +51,17 @@ export function useCustomers(
             includeArchived
           );
 
+        if (version !== requestVersion.current) return;
         setCustomers(data);
       } catch (error) {
+        if (version !== requestVersion.current) return;
         setErrorMessage(
           error instanceof Error
             ? error.message
             : "Customers could not be loaded."
         );
       } finally {
-        setLoading(false);
+        if (version === requestVersion.current) setLoading(false);
       }
     }, [
       companyId,
@@ -63,7 +69,8 @@ export function useCustomers(
     ]);
 
   useEffect(() => {
-    refreshCustomers();
+    void refreshCustomers();
+    return () => { requestVersion.current += 1; };
   }, [refreshCustomers]);
 
   return {

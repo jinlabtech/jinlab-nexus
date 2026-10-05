@@ -14,6 +14,7 @@
 @import "../components/nexus-icons/nexus-premium-art.css";
 @import "../components/dashboard/nexus-control-deck.css";
 @import "./nexus-mobile-production.css";
+@import "./nexus-experience-polish.css";
 
 @font-face {
   font-family: NexusUI;
@@ -486,3 +487,81 @@
 @import "./nexus-mobile-stability.css";
 
 @import "./nexus-control-contract.css";
+
+
+/* Counter workflows need readable fields and reachable actions on phones. */
+@media (max-width: 767px) {
+  .nexus-repair-new-card .nexus-repair-new-grid,
+  .nexus-repair-action-card .grid,
+  .nexus-repair-work-card .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+  :is(.nexus-repair-new-card, .nexus-repair-action-card, .nexus-repair-work-card, .nexus-repair-handover) label,
+  :is(.nexus-repair-new-card, .nexus-repair-action-card, .nexus-repair-work-card) label > span {
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+  }
+  :is(.nexus-repair-new-card, .nexus-repair-action-card, .nexus-repair-work-card, .nexus-repair-handover) :is(input, select, textarea) {
+    font-size: 16px !important;
+    min-height: 44px !important;
+    max-width: 100%;
+  }
+  :is(.nexus-repair-new-card, .nexus-repair-action-card, .nexus-repair-work-card, .nexus-repair-handover) textarea {
+    min-height: 96px !important;
+    max-height: none !important;
+  }
+  :is(.nexus-repair-new-card, .nexus-repair-action-card, .nexus-repair-work-card, .nexus-repair-handover) button {
+    min-height: 44px !important;
+    height: auto !important;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+    font-size: 14px !important;
+  }
+  .nexus-repair-job-main-grid p,
+  .nexus-repair-job-detail-grid p {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+  }
+  .nexus-repair-handover {
+    max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Keep document controls separate from the application's theme and floating tools. */
+.nexus-print-page { background: #eee !important; color: #111 !important; isolation: isolate; }
+.nexus-print-toolbar { position: sticky !important; top: 0 !important; z-index: 110 !important; background: #fff !important; color: #111 !important; opacity: 1 !important; }
+.nexus-print-toolbar button, .nexus-document-view-controls button { background: #fff !important; color: #111 !important; border: 1px solid #555 !important; min-height: 44px; padding: 8px 12px; border-radius: 8px; }
+.nexus-print-toolbar button:last-child { background: #172033 !important; color: #fff !important; }
+.nexus-document-view-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px; color: #111; background: #fff; font-size: 13px; }
+.nexus-document-view-controls button[aria-pressed="true"] { outline: 2px solid #172033; outline-offset: 1px; }
+.nexus-a4-fit { width: calc(100% - 16px); margin: 16px auto; overflow-x: auto; padding-bottom: 16px; }
+.nexus-a4-paper { width: 210mm; margin: 0 auto; }
+.nexus-live-theme-bar:not(:where(.nexus-document, .nexus-document *)) { position: relative !important; top: auto !important; z-index: 1 !important; background: var(--background) !important; color: var(--foreground) !important; opacity: 1 !important; }
+.nexus-live-theme-bar button { min-height: 44px; flex-shrink: 0; white-space: normal; }
+@media screen and (min-width: 768px) {
+  .nexus-shell .nexus-app-workspace { padding-bottom: 120px !important; scroll-padding-bottom: 120px; }
+}
+@media screen and (max-width: 767px) {
+  .nexus-repair-queue-toolbar > div[role="group"] { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+  .nexus-repair-queue-toolbar > div[role="group"] button { min-width: 0; min-height: 44px; padding: 8px 5px !important; white-space: normal; font-size: 12px !important; }
+  .nexus-repair-action-card summary { min-height: 44px; font-size: 14px !important; }
+  .nexus-live-theme-bar button { width: 100%; }
+}
+@media print {
+  .nexus-print-toolbar, .nexus-document-view-controls, #nexus-helper-root,
+  .nexus-dock-shell, .nexus-phone-system-dock { display: none !important; }
+  .nexus-a4-fit, .nexus-a4-paper { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; zoom: 1 !important; transform: none !important; }
+  .nexus-print-page { min-height: 0 !important; background: #fff !important; }
+  html:has(.nexus-print-page), body:has(.nexus-print-page) { height: auto !important; overflow: visible !important; }
+  body:has(.nexus-print-page)::before, body:has(.nexus-print-page)::after { display: none !important; }
+}
+
+/* Feature icons identify the action, rather than repeating the parent module art. */
+.nexus-module-hub-item .nexus-feature-icon { display: grid; place-items: center; width: 56px; height: 56px; flex-shrink: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--muted); color: var(--primary); box-shadow: 0 2px 5px #0000000a; transition: transform 140ms ease, background-color 140ms ease; }
+.nexus-module-hub-item .nexus-feature-icon svg { width: 27px !important; height: 27px !important; stroke-width: 1.8; filter: none !important; transform: none !important; }
+.nexus-module-hub-item .nexus-feature-label { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: break-word; line-height: 1.35 !important; min-height: 2.7em; letter-spacing: normal !important; }
+.nexus-module-hub-item { touch-action: manipulation; -webkit-tap-highlight-color: transparent; border-radius: 12px; }
+.nexus-module-hub-item:focus-visible { outline: 2px solid var(--ring); outline-offset: 5px; }
+.nexus-module-hub-item:active .nexus-feature-icon { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) { .nexus-module-hub-item, .nexus-module-hub-item .nexus-feature-icon { transition: none !important; transform: none !important; } }

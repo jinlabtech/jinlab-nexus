@@ -113,6 +113,7 @@ export default function NexusDock() {
 
   const {
     isTouch,
+    isCompact,
   } = useNexusDeviceMode();
 
   const {
@@ -299,8 +300,13 @@ export default function NexusDock() {
               (app) =>
                 !app.permission ||
                 can(app.permission)
-            ),
-      [can, loading]
+            ).map((app) => ({
+              ...app,
+              href: !isCompact && app.href.endsWith("/hub")
+                ? app.href.slice(0, -4)
+                : app.href,
+            })),
+      [can, loading, isCompact]
     );
 
   useEffect(() => {
@@ -649,7 +655,7 @@ export default function NexusDock() {
                 </p>
 
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Applications, features and actions in one place.
+                  Applications, records, files and actions in one place.
                 </p>
               </div>
 
@@ -675,7 +681,7 @@ export default function NexusDock() {
                 onChange={(event) =>
                   setQuery(event.target.value)
                 }
-                placeholder="Search apps and actions..."
+                placeholder="Search Nexus, records and files..."
                 className="h-14 w-full rounded-2xl border border-border/50 bg-background/55 pl-12 pr-16 text-base outline-none transition placeholder:text-muted-foreground focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
               />
 
@@ -970,19 +976,17 @@ export default function NexusDock() {
           <button
             type="button"
             onClick={() => {
-              setLauncherView("apps");
-              setQuery("");
-              saveMode("expanded");
+              saveMode("normal");
+              window.dispatchEvent(
+                new Event("nexus:helper-open")
+              );
             }}
             className="nexus-phone-system-item"
             aria-label="Nexus Core"
+            aria-controls="nexus-core-helper"
           >
             <NexusIcon
               name="core"
-              active={
-                mode === "expanded" &&
-                launcherView === "apps"
-              }
               size="lg"
             />
 

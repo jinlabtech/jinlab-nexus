@@ -1,5 +1,7 @@
 "use client";
 
+import A4Preview from "@/components/documents/A4Preview";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
@@ -487,7 +489,7 @@ export default function InvoicePrintPage() {
         </div>
       </div>
 
-      <div className="nexus-a4-preview-stage py-8 print:py-0">
+      <A4Preview>
         <InvoiceTemplateRenderer
           template={template}
           invoice={invoice}
@@ -500,7 +502,7 @@ export default function InvoicePrintPage() {
           bankAccounts={bankAccounts}
           paymentTermsLabel={paymentTermsLabel}
         />
-      </div>
+      </A4Preview>
     </main>
   );
 }

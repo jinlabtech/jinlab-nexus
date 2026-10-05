@@ -36,6 +36,7 @@ import SplitTenderPanel, {
 import SuspendedSalesPanel, {
   type RecalledSuspendedSale,
 } from "@/components/pos/SuspendedSalesPanel";
+import PosCameraScanner from "@/components/pos/PosCameraScanner";
 import Navbar from "@/components/Navbar";
 
 import {
@@ -1748,6 +1749,66 @@ export default function PosPage() {
       : 0;
 
 
+  function handleScannerCode(
+    raw: string
+  ) {
+
+    const query =
+      raw
+        .trim()
+        .toLowerCase();
+
+
+    if (!query) {
+      return;
+    }
+
+
+    const exact =
+      workspace
+        ?.products.find(
+          (product) =>
+            product.sku
+              .toLowerCase() ===
+              query ||
+            (
+              product.barcode ??
+              ""
+            )
+              .toLowerCase() ===
+              query
+        );
+
+
+    if (!exact) {
+
+      setSearch(
+        raw
+      );
+
+      setErrorMessage(
+        `Barcode ${raw} is not in this POS catalogue.`
+      );
+
+      return;
+    }
+
+
+    setErrorMessage(
+      ""
+    );
+
+    setSearch(
+      ""
+    );
+
+    addProduct(
+      exact
+    );
+
+  }
+
+
   function handleSearchEnter() {
 
     const query =
@@ -2936,7 +2997,7 @@ export default function PosPage() {
               </label>
 
 
-              <div className="grid min-w-0 gap-2">
+              <div className="nexus-pos-product-search grid min-w-0 gap-2">
                 <label htmlFor="pos-product-search" className="text-sm font-semibold">
                   Search products
                 </label>
@@ -2996,12 +3057,23 @@ export default function PosPage() {
                     </button>
                   )}
                 </div>
+
+                <PosCameraScanner
+                  disabled={
+                    !selectedBranchId ||
+                    refreshing
+                  }
+                  onCode={
+                    handleScannerCode
+                  }
+                />
+
               </div>
 
             </div>
 
 
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+            <div className="nexus-pos-product-grid grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
 
               {
                 filteredProducts.map(
@@ -3018,7 +3090,7 @@ export default function PosPage() {
                           product
                         )
                       }
-                      className="group min-w-0 rounded-2xl border bg-card p-3 text-left transition active:scale-[0.985] active:bg-muted/40 md:p-5 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-md"
+                      className="nexus-pos-product-tile group min-w-0 rounded-2xl border bg-card p-3 text-left transition active:scale-[0.985] active:bg-muted/40 md:p-5 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-md"
                     >
 
                       <div className="flex items-start justify-between gap-3">

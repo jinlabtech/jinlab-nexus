@@ -22,6 +22,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import OwnerJobCorrection from "@/components/repairs/OwnerJobCorrection";
 import JobCardQueue from "@/components/repairs/JobCardQueue";
 import DigitalRepairHandover from "@/components/repairs/DigitalRepairHandover";
 import SearchableRepairPicker from "@/components/repairs/SearchableRepairPicker";
@@ -69,6 +70,9 @@ type InventoryItem = {
 };
 
 type JobDetail = {
+  updated_at: string;
+  repair_outcome: string | null;
+  repair_outcome_reason: string | null;
   diagnosis: string | null;
   proposed_amount: number;
   device_condition: string | null;
@@ -184,6 +188,9 @@ export default function RepairScannerPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
 
+  const [isOwner, setIsOwner] = useState(false);
+  const [repairOutcome, setRepairOutcome] = useState("unsuccessful");
+  const [repairReason, setRepairReason] = useState("");
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
   const [jobLines, setJobLines] = useState<JobLine[]>([]);
   const [jobEvents, setJobEvents] = useState<JobEvent[]>([]);
@@ -493,14 +500,17 @@ export default function RepairScannerPage() {
       setCompanyId(currentCompanyId);
       setUserName(profile.full_name || user.email || "JINLAB User");
 
-      const [companyResponse, permissionResponse] = await Promise.all([
+      const [companyResponse, permissionResponse, ownerResponse] = await Promise.all([
         supabase
           .from("company")
           .select("company_name")
           .eq("id", currentCompanyId)
           .maybeSingle(),
         supabase.rpc("get_current_user_permissions"),
+        supabase.rpc("current_user_is_owner"),
       ]);
+
+      setIsOwner(ownerResponse.data === true);
 
       if (companyResponse.data?.company_name) {
         setCompanyName(companyResponse.data.company_name);
@@ -588,7 +598,7 @@ export default function RepairScannerPage() {
       supabase
         .from("service_job")
         .select(
-          "diagnosis, proposed_amount, device_condition, accessories_received, intake_confirmed_at, quote_approved_at, repair_started_at, technical_completed_at, collection_confirmed_at, closed_at"
+          "updated_at, repair_outcome, repair_outcome_reason, diagnosis, proposed_amount, device_condition, accessories_received, intake_confirmed_at, quote_approved_at, repair_started_at, technical_completed_at, collection_confirmed_at, closed_at"
         )
         .eq("id", jobId)
         .maybeSingle(),
@@ -610,6 +620,8 @@ export default function RepairScannerPage() {
     if (!detailResponse.error && detailResponse.data) {
       const detail = detailResponse.data as JobDetail;
       setJobDetail(detail);
+      setRepairReason("");
+      setRepairOutcome("unsuccessful");
       setDiagnosis(detail.diagnosis ?? "");
       setProposedAmount(
         Number(detail.proposed_amount || 0) > 0
@@ -1558,6 +1570,7 @@ export default function RepairScannerPage() {
 
             {selectedJob && (
               <>
+                {isOwner && jobDetail && <OwnerJobCorrection key={selectedJob.id} jobId={selectedJob.id} updatedAt={jobDetail.updated_at} values={{...selectedJob,...jobDetail}} onSaved={()=>refreshCurrentJob("Owner correction saved and audited.")} />}
                 <div className={`${cardClass()} nexus-repair-job-summary`}>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
@@ -2011,7 +2024,7 @@ export default function RepairScannerPage() {
                     <div className={cardClass()}>
                       <h3 className="font-bold">Customer Collection</h3>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Once the invoice is fully paid, confirm handover once. Nexus will then close the job automatically.
+                        Confirm collection after settling any linked invoice. A verified not-repaired job with no work or parts lines can be returned without an invoice. Nexus then closes the job.
                       </p>
 
                       <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -2078,6 +2091,26 @@ export default function RepairScannerPage() {
                     </div>
                   </div>
                 )}
+
+                <div className={`${cardClass()} nexus-repair-action-card`}>
+                  <h3 className="font-bold">Repair outcome</h3>
+                  {jobDetail?.repair_outcome ? <div className="mt-3 rounded-xl border border-amber-500/40 p-4">
+                    <p className="font-semibold">Not repaired · {jobDetail.repair_outcome.replaceAll("_", " ")}</p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm">{jobDetail.repair_outcome_reason}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{selectedJob.status === "ready_for_collection" ? "Ready for customer collection. Record the collection confirmation to close this job." : "The outcome stays in the Not repaired queue. Any recorded charges still follow the invoice and payment workflow."}</p>
+                  </div> : can("repair.complete") && !["closed","collected","cancelled"].includes(selectedJob.status) ? <details className="mt-3 rounded-xl border p-3">
+                    <summary className="cursor-pointer py-2 font-semibold">Repair unsuccessful / Not repaired</summary>
+                    <p className="my-3 text-sm text-muted-foreground">Record why the device cannot be repaired. A job with no work or parts lines moves to collection without an invoice. Existing work, parts and charges are preserved.</p>
+                    <label className="block space-y-2 text-sm"><span>Outcome</span><select className={fieldClass()} value={repairOutcome} onChange={e=>setRepairOutcome(e.target.value)}>
+                      <option value="unsuccessful">Repair unsuccessful</option><option value="unrepairable">Unrepairable</option><option value="parts_unavailable">Parts unavailable</option><option value="uneconomical">Repair uneconomical</option><option value="customer_declined">Customer declined</option>
+                    </select></label>
+                    <label className="mt-3 block space-y-2 text-sm"><span>Diagnosis / reason *</span><textarea className={fieldClass()} value={repairReason} onChange={e=>setRepairReason(e.target.value)} /></label>
+                    <Button className="mt-3" disabled={busy || !repairReason.trim()} onClick={()=>void runAction(async()=>{
+                      const {error}=await supabase.rpc("record_service_job_unsuccessful",{p_job_id:selectedJob.id,p_outcome:repairOutcome,p_reason:repairReason.trim()});
+                      if(error) throw new Error(error.message);
+                    }, "Not-repaired outcome saved. Check the collection or billing step above.")}>Save not-repaired outcome</Button>
+                  </details> : <p className="mt-2 text-sm text-muted-foreground">No unsuccessful outcome recorded.</p>}
+                </div>
 
                 <div className={`${cardClass()} nexus-repair-audit-card`}>
                   <h3 className="font-bold">Job Audit Timeline</h3>

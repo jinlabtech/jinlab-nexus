@@ -19,7 +19,6 @@ import {
 
 import Sidebar from "@/components/Sidebar";
 import NexusMobileDrawer from "@/components/layout/NexusMobileDrawer";
-import NexusNavigationWarmup from "@/components/layout/NexusNavigationWarmup";
 import NexusNavigationMemory from "@/components/layout/NexusNavigationMemory";
 import NexusWorkspaceMemory from "@/components/layout/NexusWorkspaceMemory";
 
@@ -394,7 +393,6 @@ export default function NexusPersistentShell({
 
       <NexusWorkspaceMemory />
 
-      <NexusNavigationWarmup />
 
       <NexusDock />
 

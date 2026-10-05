@@ -1,0 +1,1436 @@
+/* =========================================================
+   JINLAB NEXUS — EXPERIENCE POLISH
+   One visual language across desktop + mobile.
+   ========================================================= */
+
+:root {
+  --nexus-radius-control:
+    13px;
+
+  --nexus-radius-card:
+    17px;
+
+  --nexus-radius-panel:
+    23px;
+
+  --nexus-motion:
+    cubic-bezier(
+      .2,
+      .82,
+      .2,
+      1
+    );
+}
+
+
+/* =========================================================
+   SOFTER GEOMETRY
+   No harsh application edges.
+   ========================================================= */
+
+.nexus-shell
+button:not(
+  [class*="rounded-full"]
+):not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  border-radius:
+    var(
+      --nexus-radius-control
+    ) !important;
+}
+
+
+.nexus-shell
+[role="button"]:not(
+  [class*="rounded-full"]
+):not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  border-radius:
+    var(
+      --nexus-radius-control
+    ) !important;
+}
+
+
+.nexus-shell
+[class~="rounded-md"]:not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  border-radius:
+    10px !important;
+}
+
+
+.nexus-shell
+[class~="rounded-lg"]:not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  border-radius:
+    13px !important;
+}
+
+
+.nexus-shell
+[class~="rounded-xl"]:not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  border-radius:
+    16px !important;
+}
+
+
+.nexus-shell
+[class~="rounded-2xl"]:not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  border-radius:
+    20px !important;
+}
+
+
+/*
+ * Inputs should visually belong to the same OS.
+ */
+.nexus-shell
+:is(
+  input,
+  select,
+  textarea
+):not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  border-radius:
+    12px !important;
+}
+
+
+/* =========================================================
+   CONTROL FEEL
+   ========================================================= */
+
+.nexus-shell
+:is(
+  button,
+  [role="button"],
+  a
+):not(
+  :where(
+    .nexus-document,
+    .nexus-document *
+  )
+) {
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+
+.nexus-shell
+button:not(:disabled),
+.nexus-shell
+[role="button"] {
+  transition:
+    transform
+      120ms
+      var(--nexus-motion),
+    background-color
+      160ms
+      ease,
+    border-color
+      160ms
+      ease,
+    box-shadow
+      180ms
+      ease !important;
+}
+
+
+.nexus-shell
+button:not(:disabled):active,
+.nexus-shell
+[role="button"]:active {
+  transform:
+    scale(.965);
+}
+
+
+/* =========================================================
+   CONSISTENT MODULE APP ART
+   ========================================================= */
+
+.nexus-module-hub-icon.nexus-icon {
+  width:
+    64px !important;
+
+  height:
+    64px !important;
+
+  flex:
+    0 0
+    64px;
+
+  border-radius:
+    19px !important;
+
+  transform-origin:
+    center;
+}
+
+
+.nexus-module-hub-item {
+  border-radius:
+    20px;
+
+  padding:
+    5px
+    2px;
+
+  transition:
+    transform
+      150ms
+      var(--nexus-motion),
+    background
+      180ms
+      ease;
+}
+
+
+.nexus-module-hub-item:active {
+  transform:
+    scale(.94);
+}
+
+
+.nexus-module-continue-icon.nexus-icon {
+  width:
+    48px !important;
+
+  height:
+    48px !important;
+
+  flex:
+    0 0
+    48px;
+
+  border-radius:
+    15px !important;
+}
+
+
+/* =========================================================
+   OPENING A PAGE
+   Gives every route the feeling of opening an app/window.
+   ========================================================= */
+
+@keyframes nexus-page-open {
+
+  from {
+    opacity:
+      .45;
+
+    transform:
+      translateY(7px)
+      scale(.992);
+
+    filter:
+      blur(2px);
+  }
+
+
+  55% {
+    opacity:
+      1;
+  }
+
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+    filter:
+      blur(0);
+  }
+
+}
+
+
+.nexus-page-enter {
+  transform-origin:
+    50%
+    10%;
+
+  animation:
+    nexus-page-open
+    260ms
+    var(--nexus-motion)
+    both;
+}
+
+
+/* =========================================================
+   FLOATING POPUPS
+   ========================================================= */
+
+@keyframes nexus-popup-open {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      translateY(18px)
+      scale(.955);
+  }
+
+
+  62% {
+    opacity:
+      1;
+
+    transform:
+      translateY(-2px)
+      scale(1.006);
+  }
+
+
+  100% {
+    opacity:
+      1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+@keyframes nexus-popup-light {
+
+  0% {
+    opacity:
+      .65;
+
+    transform:
+      translate3d(
+        -22px,
+        -12px,
+        0
+      )
+      scale(.72);
+  }
+
+
+  100% {
+    opacity:
+      0;
+
+    transform:
+      translate3d(
+        18px,
+        2px,
+        0
+      )
+      scale(1.25);
+  }
+
+}
+
+
+.nexus-mobile-modal-panel,
+.nexus-mobile-record-sheet
+> section,
+.nexus-launcher-glass,
+.nexus-shipping-connection-sheet,
+.nexus-shipping-editor {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  border-radius:
+    var(
+      --nexus-radius-panel
+    ) !important;
+
+  box-shadow:
+    0
+    24px
+    65px
+    rgb(8 24 40 / .20),
+    0
+    4px
+    14px
+    rgb(8 24 40 / .10)
+    !important;
+}
+
+
+.nexus-mobile-modal-panel::after,
+.nexus-mobile-record-sheet
+> section::after,
+.nexus-launcher-glass::after,
+.nexus-shipping-connection-sheet::after,
+.nexus-shipping-editor::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  z-index:
+    40;
+
+  top:
+    -55px;
+
+  left:
+    -35px;
+
+  width:
+    180px;
+
+  height:
+    145px;
+
+  pointer-events:
+    none;
+
+  border-radius:
+    999px;
+
+  background:
+    radial-gradient(
+      circle,
+      color-mix(
+        in srgb,
+        var(--primary)
+        24%,
+        white
+      ),
+      transparent
+      68%
+    );
+
+  animation:
+    nexus-popup-light
+    520ms
+    ease-out
+    both;
+}
+
+
+.nexus-mobile-record-sheet
+> section,
+.nexus-launcher-glass,
+.nexus-shipping-connection-sheet,
+.nexus-shipping-editor {
+  animation:
+    nexus-popup-open
+    270ms
+    var(--nexus-motion)
+    both;
+}
+
+
+/*
+ * Better visual depth behind an opened object.
+ */
+.nexus-mobile-modal-backdrop,
+.nexus-mobile-record-sheet,
+.nexus-shipping-sheet-backdrop {
+  backdrop-filter:
+    blur(5px)
+    saturate(105%);
+
+  -webkit-backdrop-filter:
+    blur(5px)
+    saturate(105%);
+}
+
+
+/* =========================================================
+   PHONE POPUPS — FLOAT, DON'T FEEL GLUED TO SCREEN
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-module-hub-icon.nexus-icon {
+    width:
+      52px !important;
+
+    height:
+      52px !important;
+
+    flex-basis:
+      52px;
+
+    border-radius:
+      16px !important;
+  }
+
+
+  .nexus-module-hub-item {
+    gap:
+      5px !important;
+
+    padding:
+      4px
+      1px;
+  }
+
+
+  .nexus-mobile-modal-backdrop {
+    align-items:
+      flex-end !important;
+
+    padding:
+      8px
+      8px
+      calc(
+        67px +
+        env(
+          safe-area-inset-bottom
+        )
+      )
+      !important;
+  }
+
+
+  .nexus-mobile-modal-panel {
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+
+    max-height:
+      78dvh !important;
+
+    border:
+      1px
+      solid
+      color-mix(
+        in srgb,
+        var(--border)
+        80%,
+        transparent
+      ) !important;
+
+    border-radius:
+      23px !important;
+  }
+
+
+  .nexus-mobile-modal-body {
+    max-height:
+      calc(
+        78dvh -
+        68px
+      ) !important;
+  }
+
+
+  /*
+   * Generic record details popup.
+   */
+  .nexus-mobile-record-sheet {
+    align-items:
+      flex-end;
+
+    padding:
+      8px
+      8px
+      calc(
+        67px +
+        env(
+          safe-area-inset-bottom
+        )
+      );
+  }
+
+
+  .nexus-mobile-record-sheet
+  > section {
+    width:
+      100% !important;
+
+    max-height:
+      76dvh;
+
+    margin:
+      0 !important;
+
+    border:
+      1px
+      solid
+      var(--border);
+
+    border-radius:
+      23px !important;
+  }
+
+
+  /*
+   * Shipping uses same floating popup language.
+   */
+  .nexus-shipping-connection-sheet,
+  .nexus-shipping-editor {
+    left:
+      8px !important;
+
+    right:
+      8px !important;
+
+    bottom:
+      calc(
+        67px +
+        env(
+          safe-area-inset-bottom
+        )
+      ) !important;
+
+    width:
+      auto !important;
+
+    max-height:
+      78dvh !important;
+
+    border:
+      1px
+      solid
+      var(--border) !important;
+
+    border-radius:
+      23px !important;
+  }
+
+
+  /*
+   * Search/application library opens like a floating OS panel.
+   */
+  .nexus-launcher-glass {
+    border-radius:
+      24px !important;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .nexus-page-enter,
+  .nexus-mobile-modal-panel,
+  .nexus-mobile-record-sheet
+  > section,
+  .nexus-launcher-glass,
+  .nexus-shipping-connection-sheet,
+  .nexus-shipping-editor,
+  .nexus-mobile-modal-panel::after,
+  .nexus-mobile-record-sheet
+  > section::after,
+  .nexus-launcher-glass::after,
+  .nexus-shipping-connection-sheet::after,
+  .nexus-shipping-editor::after {
+    animation:
+      none !important;
+
+    transition:
+      none !important;
+
+    filter:
+      none !important;
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS FLOATING OBJECT SYSTEM V2
+   Popups are independent of the taskbar.
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /* -------------------------------------------------------
+     SEARCH / APP LIBRARY
+     ------------------------------------------------------- */
+
+  .nexus-launcher-shell {
+    inset:
+      0 !important;
+
+    bottom:
+      auto !important;
+
+    width:
+      100% !important;
+
+    height:
+      100dvh !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      center !important;
+
+    padding:
+      64px
+      10px
+      calc(
+        72px +
+        env(
+          safe-area-inset-bottom
+        )
+      )
+      !important;
+  }
+
+
+  .nexus-launcher-glass {
+    width:
+      min(
+        100%,
+        560px
+      ) !important;
+
+    max-height:
+      74dvh !important;
+
+    margin:
+      auto !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        white 55%,
+        var(--border)
+      ) !important;
+
+    border-radius:
+      28px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background)
+        82%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(28px)
+      saturate(150%) !important;
+
+    backdrop-filter:
+      blur(28px)
+      saturate(150%) !important;
+
+    box-shadow:
+      0 28px 75px
+      rgb(5 20 35 / .23),
+      inset 0 1px 0
+      rgb(255 255 255 / .50)
+      !important;
+  }
+
+
+  /* -------------------------------------------------------
+     ACTION POPUPS
+     ------------------------------------------------------- */
+
+  .nexus-mobile-modal-backdrop {
+    align-items:
+      center !important;
+
+    justify-content:
+      center !important;
+
+    padding:
+      12px !important;
+
+    background:
+      rgb(4 14 24 / .22)
+      !important;
+
+    -webkit-backdrop-filter:
+      blur(8px)
+      saturate(110%);
+
+    backdrop-filter:
+      blur(8px)
+      saturate(110%);
+  }
+
+
+  .nexus-mobile-modal-panel {
+    width:
+      min(
+        100%,
+        560px
+      ) !important;
+
+    max-height:
+      80dvh !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        white 56%,
+        var(--border)
+      ) !important;
+
+    border-radius:
+      28px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background)
+        87%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(26px)
+      saturate(145%);
+
+    backdrop-filter:
+      blur(26px)
+      saturate(145%);
+
+    box-shadow:
+      0 32px 85px
+      rgb(4 18 30 / .27),
+      inset 0 1px 0
+      rgb(255 255 255 / .55)
+      !important;
+  }
+
+
+  .nexus-mobile-modal-body {
+    max-height:
+      calc(
+        80dvh -
+        70px
+      ) !important;
+  }
+
+
+  /* -------------------------------------------------------
+     RECORD DETAIL POPUPS
+     ------------------------------------------------------- */
+
+  .nexus-mobile-record-sheet {
+    align-items:
+      center !important;
+
+    justify-content:
+      center !important;
+
+    padding:
+      12px !important;
+
+    background:
+      rgb(4 14 24 / .22)
+      !important;
+
+    -webkit-backdrop-filter:
+      blur(8px);
+
+    backdrop-filter:
+      blur(8px);
+  }
+
+
+  .nexus-mobile-record-sheet
+  > section {
+    width:
+      min(
+        100%,
+        540px
+      ) !important;
+
+    max-height:
+      78dvh !important;
+
+    margin:
+      auto !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        white 52%,
+        var(--border)
+      ) !important;
+
+    border-radius:
+      28px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background)
+        89%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(24px);
+
+    backdrop-filter:
+      blur(24px);
+  }
+
+
+  /* -------------------------------------------------------
+     SHIPPING QUICK ACTIONS
+     Float independently from taskbar.
+     ------------------------------------------------------- */
+
+  .nexus-shipping-connection-sheet,
+  .nexus-shipping-editor {
+    top:
+      10dvh !important;
+
+    bottom:
+      auto !important;
+
+    left:
+      10px !important;
+
+    right:
+      10px !important;
+
+    width:
+      auto !important;
+
+    max-height:
+      78dvh !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        white 52%,
+        var(--border)
+      ) !important;
+
+    border-radius:
+      28px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background)
+        88%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(26px);
+
+    backdrop-filter:
+      blur(26px);
+
+    box-shadow:
+      0 30px 80px
+      rgb(4 18 30 / .25)
+      !important;
+  }
+
+
+  /* -------------------------------------------------------
+     NEXUS CORE — FLOATING CONTROL BUBBLE
+     ------------------------------------------------------- */
+
+  #nexus-core-helper {
+    position:
+      fixed !important;
+
+    top:
+      8dvh !important;
+
+    left:
+      10px !important;
+
+    right:
+      10px !important;
+
+    bottom:
+      auto !important;
+
+    width:
+      auto !important;
+
+    max-width:
+      520px !important;
+
+    height:
+      82dvh !important;
+
+    max-height:
+      760px !important;
+
+    margin:
+      0 auto !important;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        white 58%,
+        var(--border)
+      ) !important;
+
+    border-radius:
+      30px !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background)
+        84%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(32px)
+      saturate(155%);
+
+    backdrop-filter:
+      blur(32px)
+      saturate(155%);
+
+    box-shadow:
+      0 35px 100px
+      rgb(3 16 28 / .28),
+      inset 0 1px 0
+      rgb(255 255 255 / .62)
+      !important;
+
+    overflow:
+      hidden;
+  }
+
+
+  #nexus-core-helper
+  > header {
+    padding:
+      11px
+      13px !important;
+
+    background:
+      transparent !important;
+  }
+
+
+  .nexus-core-body {
+    display:
+      flex;
+
+    min-height:
+      0;
+
+    flex:
+      1;
+
+    flex-direction:
+      column;
+
+    overflow:
+      hidden;
+  }
+
+
+  .nexus-core-intelligence-panel {
+    min-height:
+      0;
+
+    overflow:
+      hidden;
+  }
+
+
+  /* -------------------------------------------------------
+     CORE WIDGETS
+     ------------------------------------------------------- */
+
+  .nexus-core-widgets {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      );
+
+    gap:
+      6px;
+
+    padding:
+      9px
+      10px
+      7px;
+  }
+
+
+  .nexus-core-widget {
+    position:
+      relative;
+
+    display:
+      flex;
+
+    min-width:
+      0;
+
+    min-height:
+      82px;
+
+    flex-direction:
+      column;
+
+    justify-content:
+      center;
+
+    padding:
+      9px;
+
+    overflow:
+      hidden;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        white 48%,
+        var(--border)
+      );
+
+    border-radius:
+      18px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--card)
+        64%,
+        transparent
+      );
+
+    box-shadow:
+      inset 0 1px 0
+      rgb(255 255 255 / .42);
+  }
+
+
+  .nexus-core-widget::before {
+    content:
+      "";
+
+    position:
+      absolute;
+
+    top:
+      -18px;
+
+    right:
+      -18px;
+
+    width:
+      55px;
+
+    height:
+      55px;
+
+    border-radius:
+      999px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--primary)
+        12%,
+        transparent
+      );
+
+    filter:
+      blur(4px);
+
+    pointer-events:
+      none;
+  }
+
+
+  .nexus-core-widget-kicker {
+    font-size:
+      8px;
+
+    font-weight:
+      700;
+
+    text-transform:
+      uppercase;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-core-clock {
+    margin-top:
+      2px;
+
+    font-size:
+      20px;
+
+    line-height:
+      1;
+
+    letter-spacing:
+      -.03em;
+  }
+
+
+  .nexus-core-widget-icon {
+    display:
+      flex;
+
+    width:
+      21px;
+
+    height:
+      21px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    margin-bottom:
+      3px;
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-core-widget-icon
+  svg {
+    width:
+      18px;
+
+    height:
+      18px;
+  }
+
+
+  .nexus-core-widget-value {
+    min-width:
+      0;
+
+    overflow:
+      hidden;
+
+    font-size:
+      11px;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+  }
+
+
+  .nexus-core-widget-detail {
+    margin-top:
+      2px;
+
+    overflow:
+      hidden;
+
+    color:
+      var(--muted-foreground);
+
+    font-size:
+      8.5px;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+  }
+
+
+  .nexus-core-widget-action {
+    display:
+      inline-flex;
+
+    width:
+      fit-content;
+
+    min-height:
+      22px !important;
+
+    align-items:
+      center;
+
+    gap:
+      3px;
+
+    margin-top:
+      3px;
+
+    padding:
+      2px
+      5px !important;
+
+    border:
+      0 !important;
+
+    background:
+      var(--primary)
+      / 0.08;
+
+    color:
+      var(--primary);
+
+    font-size:
+      8px;
+
+    font-weight:
+      700;
+  }
+
+
+  .nexus-core-widget-action
+  svg {
+    width:
+      9px;
+
+    height:
+      9px;
+  }
+
+
+  .nexus-core-live-dot {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    gap:
+      4px;
+
+    margin-top:
+      4px;
+
+    color:
+      var(--muted-foreground);
+
+    font-size:
+      8px;
+
+    font-weight:
+      700;
+  }
+
+
+  .nexus-core-live-dot
+  i {
+    width:
+      6px;
+
+    height:
+      6px;
+
+    border-radius:
+      999px;
+
+    background:
+      #20b26b;
+
+    box-shadow:
+      0 0 0 3px
+      rgb(32 178 107 / .12);
+  }
+
+
+  /* -------------------------------------------------------
+     NOTIFICATIONS
+     No floating notification swarm on phones.
+     Nexus Pulse/Core remains the central place.
+     ------------------------------------------------------- */
+
+  .nexus-arrival-notifications {
+    display:
+      none !important;
+  }
+
+}
+
+
+/* Small phones */
+
+@media screen and (max-width: 350px) {
+
+  .nexus-core-widgets {
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+
+  .nexus-core-intelligence-widget {
+    grid-column:
+      1 / -1;
+
+    min-height:
+      64px;
+  }
+
+}

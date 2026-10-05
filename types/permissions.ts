@@ -121,6 +121,15 @@ export type PermissionName =
   | "payroll.run"
   | "payroll.self"
 
+  | "repair.view"
+  | "repair.create"
+
+  | "hr.view"
+  | "hr.self"
+  | "hr.attendance.manage"
+  | "hr.employee.manage"
+  | "hr.documents.manage"
+
   | "audit.view"
 
   | "reports.view"
