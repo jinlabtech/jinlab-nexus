@@ -50,8 +50,6 @@ begin
 
 end;
 $$;
-
-
 alter table
 public.accounting_posting_exception
 add constraint
@@ -63,8 +61,6 @@ check (
     'sales_order_payment'
   )
 );
-
-
 -- ============================================================
 -- 2. POST SALES ORDER PAYMENT
 -- ============================================================
@@ -514,14 +510,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.post_sales_order_payment_to_ledger(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- 3. AUTOMATIC POSTING HANDLER
 --
@@ -577,14 +569,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.handle_sales_order_payment_accounting()
 from public, authenticated;
-
-
 -- ============================================================
 -- 4. TRIGGER
 -- ============================================================
@@ -592,8 +580,6 @@ from public, authenticated;
 drop trigger if exists
 sales_order_payment_accounting_trigger
 on public.sales_order_payment;
-
-
 create trigger
 sales_order_payment_accounting_trigger
 
@@ -604,8 +590,6 @@ for each row
 
 execute function
 public.handle_sales_order_payment_accounting();
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

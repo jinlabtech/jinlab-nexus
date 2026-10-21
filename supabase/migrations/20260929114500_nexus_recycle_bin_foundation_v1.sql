@@ -126,17 +126,12 @@ begin
   order by deleted_at desc;
 end;
 $$;
-
-
 revoke all
 on function public.owner_recycle_bin_items()
 from public, anon, authenticated;
-
 grant execute
 on function public.owner_recycle_bin_items()
 to authenticated;
-
-
 comment on function public.owner_recycle_bin_items()
 is
 'Owner-only unified recycle bin list for soft-deleted Nexus communication records.';

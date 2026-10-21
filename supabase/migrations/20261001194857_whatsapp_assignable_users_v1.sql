@@ -1,3 +1,4 @@
+
 create or replace function public.list_whatsapp_assignable_users()
 returns table(
   user_id uuid,
@@ -87,3 +88,4 @@ to authenticated;
 
 comment on function public.list_whatsapp_assignable_users()
 is 'Returns company users eligible for WhatsApp conversation assignment.';
+;

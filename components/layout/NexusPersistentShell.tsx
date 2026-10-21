@@ -4,6 +4,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
 } from "react";
 
 import {
@@ -85,11 +86,21 @@ function usesNexusShell(
 
 
 
+function subscribePhone(onChange: () => void) {
+  const media = window.matchMedia("(max-width: 767px)");
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+const phoneSnapshot = () => window.matchMedia("(max-width: 767px)").matches;
+const serverPhoneSnapshot = () => false;
+
 export default function NexusPersistentShell({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const phone = useSyncExternalStore(subscribePhone, phoneSnapshot, serverPhoneSnapshot);
 
   const pathname =
     usePathname();
@@ -286,11 +297,11 @@ export default function NexusPersistentShell({
             : "-translate-x-full"
         }`}
       >
-        <NexusMobileDrawer
+        {phone && sidebarOpen && <NexusMobileDrawer
           onNavigate={() =>
             setSidebarOpen(false)
           }
-        />
+        />}
       </aside>
 
 
@@ -378,6 +389,7 @@ export default function NexusPersistentShell({
       <NexusNavigationMemory />
 
       <NexusWorkspaceMemory />
+
 
 
       <NexusDock />

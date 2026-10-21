@@ -1,13 +1,10 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-
+import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+
+let openDialogs = 0;
+let originalOverflow = "";
 
 type ActionModalProps = {
   open: boolean;
@@ -16,170 +13,59 @@ type ActionModalProps = {
   onClose: () => void;
   children: ReactNode;
   maxWidth?: string;
+  className?: string;
+  dismissOnBackdrop?: boolean;
 };
 
-export default function ActionModal({
-  open,
-  title,
-  subtitle,
-  onClose,
-  children,
-  maxWidth = "max-w-3xl",
-}: ActionModalProps) {
-  const [mounted, setMounted] =
-    useState(open);
-
-  const [visible, setVisible] =
-    useState(false);
-
-  const panelRef =
-    useRef<HTMLDivElement | null>(
-      null
-    );
-
+export default function ActionModal({open,title,subtitle,onClose,children,maxWidth="max-w-3xl",className="",dismissOnBackdrop=true}:ActionModalProps) {
+  const panel = useRef<HTMLDivElement>(null);
+  const backdrop = useRef<HTMLDivElement>(null);
+  const close = useRef(onClose);
+  useEffect(() => { close.current = onClose; }, [onClose]);
   useEffect(() => {
-    let timer:
-      | ReturnType<typeof setTimeout>
-      | undefined;
-
-    if (open) {
-      setMounted(true);
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setVisible(true);
-
-          panelRef.current?.focus();
-        });
-      });
-    } else {
-      setVisible(false);
-
-      timer = setTimeout(() => {
-        setMounted(false);
-      }, 180);
+    if (!open) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (openDialogs++ === 0) {
+      originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
     }
-
+    const viewport = window.visualViewport;
+    const resize = () => {
+      backdrop.current?.style.setProperty("--popup-top", `${viewport?.offsetTop ?? 0}px`);
+      backdrop.current?.style.setProperty("--popup-height", `${viewport?.height ?? window.innerHeight}px`);
+    };
+    resize();
+    viewport?.addEventListener("resize", resize);
+    viewport?.addEventListener("scroll", resize);
+    panel.current?.focus({preventScroll:true});
     return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
+      viewport?.removeEventListener("resize", resize);
+      viewport?.removeEventListener("scroll", resize);
+      if (--openDialogs === 0) document.body.style.overflow = originalOverflow;
+      if (opener?.isConnected) opener.focus({preventScroll:true});
     };
   }, [open]);
 
-  useEffect(() => {
-    if (!mounted) {
-      return;
-    }
-
-    const previousOverflow =
-      document.body.style.overflow;
-
-    document.body.style.overflow =
-      "hidden";
-
-    function handleKeyDown(
-      event: KeyboardEvent
-    ) {
-      if (
-        event.key === "Escape" &&
-        open
-      ) {
-        onClose();
-      }
-    }
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-    return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
-    };
-  }, [
-    mounted,
-    open,
-    onClose,
-  ]);
-
-  if (
-    !mounted ||
-    typeof document === "undefined"
-  ) {
-    return null;
-  }
-
+  if (!open || typeof document === "undefined") return null;
   return createPortal(
-    <div
-      className={`nexus-mobile-modal-backdrop fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-3 transition-opacity duration-150 sm:p-5 ${
-        visible
-          ? "opacity-100"
-          : "opacity-0"
-      }`}
-      role="presentation"
-      onMouseDown={(event) => {
-        if (
-          event.target ===
-          event.currentTarget
-        ) {
-          onClose();
-        }
-      }}
-    >
-      <div
-        ref={panelRef}
-        tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className={`nexus-mobile-modal-panel max-h-[92vh] w-full ${maxWidth} overflow-hidden rounded-2xl border bg-background shadow-2xl outline-none transition-all duration-200 ease-out ${
-          visible
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-2 scale-[0.985] opacity-0"
-        }`}
-        onMouseDown={(event) => {
-          event.stopPropagation();
-        }}
-      >
-        <div className="nexus-mobile-modal-header sticky top-0 z-20 flex items-start justify-between gap-4 border-b bg-background/95 px-5 py-4 backdrop-blur sm:px-6">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Quick Action
-            </p>
-
-            <h2 className="mt-1 text-xl font-semibold">
-              {title}
-            </h2>
-
-            {subtitle && (
-              <p className="mt-1 text-sm text-muted-foreground">
-                {subtitle}
-              </p>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xl leading-none transition hover:bg-muted active:scale-95"
-            aria-label={`Close ${title}`}
-          >
-            ×
-          </button>
+    <div ref={backdrop} className={`nexus-mobile-modal-backdrop nexus-popup-layer fixed inset-0 z-[300] flex items-center justify-center bg-black/40 p-3 sm:p-5 ${className}`} role="presentation" onMouseDown={e=>{if(dismissOnBackdrop && e.target===e.currentTarget)close.current()}}>
+      <div ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title}
+        className={`nexus-mobile-modal-panel nexus-popup-panel w-full ${maxWidth} rounded-2xl border bg-background shadow-2xl outline-none`}
+        onKeyDown={e=>{
+          if(e.key==="Escape"){e.stopPropagation();close.current();return;}
+          if(e.key!=="Tab")return;
+          const targets=Array.from(panel.current?.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]')??[]).filter(el=>el.getClientRects().length>0 && el.getAttribute("aria-hidden")!=="true");
+          const first=targets[0],last=targets.at(-1);
+          if(!first){e.preventDefault();return;}
+          if(e.shiftKey && (document.activeElement===first || document.activeElement===panel.current)){e.preventDefault();last?.focus();}
+          else if(!e.shiftKey && (document.activeElement===last || document.activeElement===panel.current)){e.preventDefault();first.focus();}
+        }}>
+        <div className="nexus-mobile-modal-header flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3 sm:px-6">
+          <div className="min-w-0"><h2 className="text-lg font-semibold">{title}</h2>{subtitle&&<p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}</div>
+          <button type="button" onClick={onClose} className="flex size-11 shrink-0 items-center justify-center rounded-full border text-2xl" aria-label={`Close ${title}`}>×</button>
         </div>
-
-        <div className="nexus-mobile-modal-body max-h-[calc(92vh-88px)] overflow-y-auto p-4 sm:p-6">
-          {children}
-        </div>
+        <div className="nexus-mobile-modal-body min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
       </div>
-    </div>,
-    document.body
+    </div>, document.body
   );
 }

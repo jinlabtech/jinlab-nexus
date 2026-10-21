@@ -315,11 +315,9 @@ begin
 
 end;
 $$;
-
 revoke all
 on function public.get_public_payment_link(text)
 from public;
-
 grant execute
 on function public.get_public_payment_link(text)
 to anon, authenticated;

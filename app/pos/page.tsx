@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PosCheckoutShell from "@/components/pos/PosCheckoutShell";
 
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
@@ -2220,7 +2221,10 @@ export default function PosPage() {
   }
 
 
+  const checkoutInFlight = useRef(false);
+
   async function checkout() {
+    if (checkoutInFlight.current) return;
 
     if (
       workspace?.profile?.require_customer &&
@@ -2340,6 +2344,7 @@ export default function PosPage() {
 
     try {
 
+      checkoutInFlight.current = true;
       setCheckingOut(true);
 
       setErrorMessage("");
@@ -2536,6 +2541,7 @@ export default function PosPage() {
 
     } finally {
 
+      checkoutInFlight.current = false;
       setCheckingOut(false);
     }
   }
@@ -3219,45 +3225,9 @@ export default function PosPage() {
           )}
 
 
-          {/* MOBILE CART BACKDROP */}
-          {mobileCartOpen && (
-            <button
-              type="button"
-              aria-label="Close POS cart"
-              onClick={() =>
-                setMobileCartOpen(
-                  false
-                )
-              }
-              className="fixed inset-0 z-[60] bg-black/35 backdrop-blur-[1px] xl:hidden"
-            />
-          )}
-
-
-          <aside
-            className={
-              mobileCartOpen
-                ? "fixed inset-x-2 top-[64px] bottom-[calc(76px+env(safe-area-inset-bottom))] z-[70] overflow-y-auto rounded-2xl border bg-card shadow-2xl xl:sticky xl:top-4 xl:block xl:h-fit xl:overflow-visible xl:shadow-sm"
-                : "hidden rounded-2xl border bg-card shadow-sm xl:sticky xl:top-4 xl:block xl:h-fit"
-            }
-          >
-
-            <div className="flex justify-end border-b px-3 py-2 xl:hidden">
-
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileCartOpen(
-                    false
-                  )
-                }
-                className="rounded-lg px-3 py-2 text-xs font-semibold text-muted-foreground"
-              >
-                Continue shopping
-              </button>
-
-            </div>
-
+          <PosCheckoutShell open={mobileCartOpen} busy={checkingOut} onClose={()=>setMobileCartOpen(false)}>
+            {errorMessage && <p role="alert" className="m-4 rounded-xl border border-red-500/40 bg-background p-3 text-sm text-red-600">{errorMessage}</p>}
+            <fieldset disabled={checkingOut} className="min-w-0 border-0 p-0">
             <div className="border-b p-5">
 
               <div className="flex items-center justify-between">
@@ -3917,7 +3887,8 @@ export default function PosPage() {
 
             </div>
 
-          </aside>
+            </fieldset>
+          </PosCheckoutShell>
 
         </div>
 

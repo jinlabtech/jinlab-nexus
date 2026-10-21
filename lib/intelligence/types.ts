@@ -11,6 +11,7 @@ export type CoreSnapshot = {
   companyId: string; companyName: string; currency: string | null; asOf: string; checkedAt: string; coverage: Coverage[];
   inventory: InventoryFact[] | null; receivables: ReceivableFact[] | null; quotations: QuotationFact[] | null;
   purchasing: PurchaseFact[] | null; repairs: RepairFact[] | null; whatsapp: WhatsAppFact[] | null;
+  salesReport?: CoreSalesReport;
   controls: { openCount: number; oldestOpenDate: string | null } | null;
 };
 export type CoreFinding = {
@@ -21,8 +22,12 @@ export type CoreFinding = {
 export type CoreMetric = { id: string; label: string; value: string; detail: string; module: CoreModule };
 export type CoreAnalysis = {
   engine: "nexus-core"; version: "1.0"; companyName: string; currency: string | null; asOf: string; checkedAt: string;
+  salesReport?: CoreSalesReport; repairReport?: CoreRepairReport;
   headline: string; metrics: CoreMetric[]; findings: CoreFinding[]; coverage: Coverage[];
 };
 export type CoreMatch = { label: string; detail: string; href: string; module: CoreModule };
 export type CoreAnswer = { text: string; topic: CoreTopic; findings: CoreFinding[]; suggestions: string[]; matches: CoreMatch[] };
 export type CoreResponse = { analysis: CoreAnalysis; answer?: CoreAnswer };
+
+export type CoreSalesReport = { state: "ready" | "unavailable" | "forbidden"; detail: string; revenueMonth?: number; revenueYear?: number; cashMonth?: number; grossProfitMonth?: number; netProfitMonth?: number; postingExceptions?: number };
+export type CoreRepairReport = { total: number; jobs: RepairFact[]; truncated: boolean };

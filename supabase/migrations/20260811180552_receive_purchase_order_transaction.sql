@@ -237,7 +237,6 @@ begin
     );
 end;
 $$;
-
 revoke all
 on function public.receive_purchase_order(
     uuid,
@@ -247,7 +246,6 @@ on function public.receive_purchase_order(
     jsonb
 )
 from public;
-
 grant execute
 on function public.receive_purchase_order(
     uuid,
@@ -257,7 +255,6 @@ on function public.receive_purchase_order(
     jsonb
 )
 to authenticated;
-
 -- ============================================================
 -- END TRANSACTIONAL GOODS RECEIVING
--- ============================================================
+-- ============================================================;

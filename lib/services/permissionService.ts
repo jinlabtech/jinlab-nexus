@@ -1,3 +1,4 @@
+import { clientRequest } from "@/lib/clientRequest";
 import { supabase } from "@/lib/supabase";
 
 import type { PermissionName } from "@/types/permissions";
@@ -19,21 +20,24 @@ export async function hasPermission(
   return Boolean(data);
 }
 
+// Share simultaneous navigation checks, but never cache completed permissions.
+const pendingPermissions = new Map<string, Promise<PermissionName[]>>();
+
 export async function getCurrentUserPermissions(): Promise<PermissionName[]> {
-  const { data, error } = await supabase.rpc(
-    "get_current_user_permissions"
-  );
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const permissions =
-    data
-      ?.map((row: { permission_name: string }) =>
-        row.permission_name
-      )
-      .filter(Boolean) ?? [];
-
-  return permissions as PermissionName[];
+  const { data: { session }, error: sessionError } = await clientRequest(supabase.auth.getSession(), "Permissions are waiting for your sign-in session. Please retry.");
+  if (sessionError) throw new Error(sessionError.message);
+  if (!session) return [];
+  const key = session.access_token;
+  const pending = pendingPermissions.get(key);
+  if (pending) return pending;
+  const request = (async () => {
+    const { data, error } = await clientRequest(supabase.rpc("get_current_user_permissions")
+      .abortSignal(AbortSignal.timeout(15_000)), "Permissions could not be loaded in time. Please retry.");
+    if (error) throw new Error(error.message);
+    return (data?.map((row: { permission_name: string }) => row.permission_name)
+      .filter(Boolean) ?? []) as PermissionName[];
+  })();
+  pendingPermissions.set(key, request);
+  try { return await request; }
+  finally { if (pendingPermissions.get(key) === request) pendingPermissions.delete(key); }
 }

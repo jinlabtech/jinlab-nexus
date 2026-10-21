@@ -1,5 +1,8 @@
 "use client";
 
+// NEXUS STABLE HANDOVER MODAL
+import { createPortal } from "react-dom";
+
 import {
   useCallback,
   useEffect,
@@ -126,6 +129,7 @@ export default function DigitalRepairHandover({
     setReceiptNumber(data.receipt_number||"");setDetails({...details,verification_channel:"in_person",verified_at:new Date().toISOString()});setStep("verified");setMessage("Customer verified in person. Staff identity and reason recorded in Job Audit.");await onVerified?.();
   }catch(e){setError(e instanceof Error?e.message:"In-person verification failed.")}finally{setBusy(false)}}
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const hasSignatureRef = useRef(false);
   const drawingRef = useRef(false);
   const autoStartHandledRef = useRef(false);
 
@@ -166,7 +170,57 @@ export default function DigitalRepairHandover({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    if (!open && !signatureView) {
+      return;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+    };
+  }, [open, signatureView]);
+
+
+  useEffect(() => {
+    if (!open && !signatureView) {
+      return;
+    }
+
+    function onEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      if (signatureView) {
+        setSignatureView(null);
+      } else if (!busy) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener(
+      "keydown",
+      onEscape
+    );
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        onEscape
+      );
+    };
+  }, [open, signatureView, busy]);
+
+
   const begin = useCallback(async () => {
+    hasSignatureRef.current = false;
+    setHasSignature(false);
     setOpen(true);
     setBusy(true);
     setError("");
@@ -324,6 +378,8 @@ export default function DigitalRepairHandover({
       setEmail(updated.email);
     }
 
+    hasSignatureRef.current = false;
+    setHasSignature(false);
     setStep("signature");
   }
 
@@ -335,68 +391,249 @@ export default function DigitalRepairHandover({
       return;
     }
 
-    const frame =
-      window.requestAnimationFrame(() => {
-        const canvas =
-          canvasRef.current;
 
-        if (!canvas) return;
+    let disposed =
+      false;
 
-        const rect =
-          canvas.getBoundingClientRect();
 
-        const ratio =
-          window.devicePixelRatio || 1;
+    function configureCanvas(
+      preserve:
+        boolean
+    ) {
+      const canvas =
+        canvasRef.current;
 
-        canvas.width =
-          Math.max(
-            Math.round(
-              rect.width * ratio
-            ),
-            1
+      if (
+        !canvas ||
+        disposed
+      ) {
+        return;
+      }
+
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+
+      if (
+        rect.width <= 0 ||
+        rect.height <= 0
+      ) {
+        return;
+      }
+
+
+      const ratio =
+        Math.max(
+          window.devicePixelRatio ||
+            1,
+          1
+        );
+
+
+      const nextWidth =
+        Math.max(
+          Math.round(
+            rect.width *
+              ratio
+          ),
+          1
+        );
+
+
+      const nextHeight =
+        Math.max(
+          Math.round(
+            rect.height *
+              ratio
+          ),
+          1
+        );
+
+
+      if (
+        canvas.width ===
+          nextWidth &&
+        canvas.height ===
+          nextHeight
+      ) {
+        return;
+      }
+
+
+      let snapshot:
+        HTMLCanvasElement |
+        null =
+          null;
+
+
+      if (
+        preserve &&
+        hasSignatureRef.current &&
+        canvas.width >
+          1 &&
+        canvas.height >
+          1
+      ) {
+        snapshot =
+          document.createElement(
+            "canvas"
           );
 
-        canvas.height =
-          Math.max(
-            Math.round(
-              rect.height * ratio
-            ),
-            1
+        snapshot.width =
+          canvas.width;
+
+        snapshot.height =
+          canvas.height;
+
+
+        const snapshotContext =
+          snapshot.getContext(
+            "2d"
           );
 
-        const ctx =
-          canvas.getContext("2d");
 
-        if (!ctx) return;
-
-        ctx.setTransform(
-          ratio,
-          0,
-          0,
-          ratio,
+        snapshotContext?.drawImage(
+          canvas,
           0,
           0
         );
+      }
 
-        ctx.lineWidth = 2.2;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.strokeStyle = "#111827";
 
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(
+      canvas.width =
+        nextWidth;
+
+      canvas.height =
+        nextHeight;
+
+
+      const ctx =
+        canvas.getContext(
+          "2d"
+        );
+
+
+      if (!ctx) {
+        return;
+      }
+
+
+      ctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+      );
+
+
+      ctx.lineWidth =
+        2.2;
+
+      ctx.lineCap =
+        "round";
+
+      ctx.lineJoin =
+        "round";
+
+      ctx.strokeStyle =
+        "#111827";
+
+
+      ctx.fillStyle =
+        "#ffffff";
+
+      ctx.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+
+      if (
+        snapshot
+      ) {
+        ctx.drawImage(
+          snapshot,
+          0,
+          0,
+          snapshot.width,
+          snapshot.height,
           0,
           0,
           rect.width,
           rect.height
         );
+      }
+    }
 
-        setHasSignature(false);
-      });
 
-    return () =>
-      window.cancelAnimationFrame(frame);
-  }, [open, step]);
+    const firstFrame =
+      window.requestAnimationFrame(
+        () => {
+          configureCanvas(
+            false
+          );
+        }
+      );
+
+
+    const secondFrame =
+      window.requestAnimationFrame(
+        () => {
+          window.requestAnimationFrame(
+            () => {
+              configureCanvas(
+                true
+              );
+            }
+          );
+        }
+      );
+
+
+    const observer =
+      new ResizeObserver(
+        () => {
+          configureCanvas(
+            true
+          );
+        }
+      );
+
+
+    if (
+      canvasRef.current
+    ) {
+      observer.observe(
+        canvasRef.current
+      );
+    }
+
+
+    return () => {
+      disposed =
+        true;
+
+      observer.disconnect();
+
+      window.cancelAnimationFrame(
+        firstFrame
+      );
+
+      window.cancelAnimationFrame(
+        secondFrame
+      );
+    };
+
+  }, [
+    open,
+    step,
+  ]);
+
 
   function pointerPosition(
     event: ReactPointerEvent<HTMLCanvasElement>
@@ -463,6 +700,7 @@ export default function DigitalRepairHandover({
 
     ctx.stroke();
 
+    hasSignatureRef.current = true;
     setHasSignature(true);
   }
 
@@ -512,6 +750,7 @@ export default function DigitalRepairHandover({
       rect.height
     );
 
+    hasSignatureRef.current = false;
     setHasSignature(false);
   }
 
@@ -1177,13 +1416,18 @@ export default function DigitalRepairHandover({
         </div>
       </div>
 
-      {signatureView && <div role="dialog" aria-label="Saved customer signature" className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4"><div className="w-full max-w-xl space-y-3 rounded-2xl border bg-background p-5 text-foreground"><div className="flex justify-between"><h3 className="font-semibold">Signature: Captured</h3><Button onClick={()=>setSignatureView(null)}>Close</Button></div><p className="text-sm">Signed {new Date(signatureView.signedAt).toLocaleString()}</p>{ /* Private, expiring image URL is intentionally not passed through an image optimizer. */}
+      {signatureView && createPortal(<div role="dialog" aria-modal="true" aria-label="Saved customer signature" className="fixed inset-0 z-[190] flex items-center justify-center bg-black/60 p-4"><div className="w-full max-w-xl space-y-3 rounded-2xl border bg-background p-5 text-foreground"><div className="flex justify-between"><h3 className="font-semibold">Signature: Captured</h3><Button onClick={()=>setSignatureView(null)}>Close</Button></div><p className="text-sm">Signed {new Date(signatureView.signedAt).toLocaleString()}</p>{ /* Private, expiring image URL is intentionally not passed through an image optimizer. */}
 {/* eslint-disable-next-line @next/next/no-img-element */}
-<img src={signatureView.url} alt="Customer’s saved signature" className="max-h-64 w-full rounded border bg-white object-contain"/><p className="break-all text-xs">Reference: {signatureView.reference}<br/>SHA-256: {signatureView.sha256}</p><p className="text-xs text-muted-foreground">Private link expires after two minutes. Close and reopen to renew.</p></div></div>}
-      {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-2 sm:p-5">
-          <div className="nexus-repair-handover flex max-h-[calc(100dvh-2rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border bg-background text-foreground shadow-2xl">
-            <div className="flex items-start justify-between gap-4 border-b px-5 py-4">
+<img src={signatureView.url} alt="Customer’s saved signature" className="max-h-64 w-full rounded border bg-white object-contain"/><p className="break-all text-xs">Reference: {signatureView.reference}<br/>SHA-256: {signatureView.sha256}</p><p className="text-xs text-muted-foreground">Private link expires after two minutes. Close and reopen to renew.</p></div></div>, document.body)}
+      {open && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Digital device handover"
+          className="fixed inset-0 z-[180] flex items-center justify-center overflow-hidden bg-black/60 p-2 sm:p-5 md:p-6"
+        >
+          <div className="nexus-repair-handover relative flex min-h-0 max-h-[calc(100dvh-1rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border bg-background text-foreground shadow-2xl md:max-h-[88dvh] md:max-w-4xl">
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b bg-background px-5 py-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-blue-600">
                   JINLAB Nexus Digital Handover
@@ -1210,7 +1454,7 @@ export default function DigitalRepairHandover({
               </button>
             </div>
 
-            <div className="min-h-0 overflow-y-auto overscroll-contain p-5">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5 md:p-6">
               <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border bg-muted p-3 text-sm"><span>{details?.signed_at ? `Signature: Captured · ${new Date(details.signed_at).toLocaleString()}` : "Signature record"}</span><Button type="button" variant="outline" disabled={busy} onClick={()=>void viewSignature()}>View saved signature</Button>{details?.handover_id&&<span className="break-all text-xs text-muted-foreground">Reference: {details.handover_id}</span>}</div>
               {error && (
                 <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -1446,7 +1690,7 @@ export default function DigitalRepairHandover({
                   <div className="overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-white">
                     <canvas
                       ref={canvasRef}
-                      className="h-64 w-full cursor-crosshair touch-none bg-white"
+                      className="h-64 w-full cursor-crosshair touch-none bg-white md:h-56"
                       onPointerDown={
                         startDrawing
                       }
@@ -1692,7 +1936,8 @@ export default function DigitalRepairHandover({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

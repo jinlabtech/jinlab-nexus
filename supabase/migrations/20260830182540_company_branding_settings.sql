@@ -11,7 +11,6 @@ alter table public.company
     add column if not exists logo_path text,
     add column if not exists website text,
     add column if not exists document_footer text;
-
 -- VAT number should not remain active when VAT is disabled.
 create or replace function public.validate_company_tax_settings()
 returns trigger
@@ -26,17 +25,13 @@ begin
     return new;
 end;
 $$;
-
 drop trigger if exists company_validate_tax_settings
 on public.company;
-
 create trigger company_validate_tax_settings
 before insert or update
 on public.company
 for each row
 execute function public.validate_company_tax_settings();
-
-
 -- ============================================================
 -- COMPANY LOGO STORAGE
 -- ============================================================
@@ -64,8 +59,6 @@ do update set
     public = excluded.public,
     file_size_limit = excluded.file_size_limit,
     allowed_mime_types = excluded.allowed_mime_types;
-
-
 -- Logo path format:
 -- company_id/logo.ext
 --
@@ -75,7 +68,6 @@ do update set
 drop policy if exists
 "Users can view their company logos"
 on storage.objects;
-
 create policy
 "Users can view their company logos"
 on storage.objects
@@ -89,12 +81,9 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 drop policy if exists
 "Users can upload their company logos"
 on storage.objects;
-
 create policy
 "Users can upload their company logos"
 on storage.objects
@@ -108,12 +97,9 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 drop policy if exists
 "Users can update their company logos"
 on storage.objects;
-
 create policy
 "Users can update their company logos"
 on storage.objects
@@ -135,12 +121,9 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 drop policy if exists
 "Users can delete their company logos"
 on storage.objects;
-
 create policy
 "Users can delete their company logos"
 on storage.objects
@@ -154,7 +137,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

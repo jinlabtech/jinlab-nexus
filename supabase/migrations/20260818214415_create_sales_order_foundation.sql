@@ -1,4 +1,3 @@
-
 -- ============================================================
 -- SHARED RLS HELPER
 -- ============================================================
@@ -15,12 +14,9 @@ as $$
     where user_id = auth.uid()
     limit 1;
 $$;
-
 grant execute
 on function public.current_company_id()
 to authenticated;
-
-
 -- ============================================================
 -- JINLAB Nexus
 -- Sales Order Foundation
@@ -77,7 +73,6 @@ create table if not exists public.sales_order (
     created_at timestamptz default now(),
     updated_at timestamptz default now()
 );
-
 ---------------------------------------------------------------
 -- SALES ORDER ITEM
 ---------------------------------------------------------------
@@ -117,17 +112,12 @@ create table if not exists public.sales_order_item (
 
     created_at timestamptz default now()
 );
-
 create index if not exists idx_sales_order_company
 on public.sales_order(company_id);
-
 create index if not exists idx_sales_order_customer
 on public.sales_order(customer_id);
-
 create index if not exists idx_sales_order_item_order
 on public.sales_order_item(sales_order_id);
-
-
 -- ============================================================
 -- SALES ORDER NUMBER GENERATOR
 -- ============================================================
@@ -166,7 +156,6 @@ begin
 
 end;
 $$;
-
 -- ============================================================
 -- SALES ORDER ITEM TOTALS
 -- ============================================================
@@ -241,11 +230,9 @@ begin
 
 end;
 $$;
-
 drop trigger if exists
 sales_order_item_totals_trigger
 on public.sales_order_item;
-
 create trigger
 sales_order_item_totals_trigger
 before insert or update
@@ -253,8 +240,6 @@ on public.sales_order_item
 for each row
 execute function
 public.calculate_sales_order_item_totals();
-
-
 -- ============================================================
 -- SALES ORDER TOTALS
 -- ============================================================
@@ -305,7 +290,6 @@ begin
 
 end;
 $$;
-
 -- ============================================================
 -- TRIGGER
 -- ============================================================
@@ -335,11 +319,9 @@ begin
 
 end;
 $$;
-
 drop trigger if exists
 sales_order_refresh_totals
 on public.sales_order_item;
-
 create trigger
 sales_order_refresh_totals
 
@@ -353,18 +335,14 @@ for each row
 
 execute function
 public.sales_order_totals_trigger();
-
-
 -- ============================================================
 -- ROW LEVEL SECURITY
 -- ============================================================
 
 alter table public.sales_order
 enable row level security;
-
 alter table public.sales_order_item
 enable row level security;
-
 ---------------------------------------------------------------
 -- SALES ORDER
 ---------------------------------------------------------------
@@ -375,21 +353,18 @@ for select
 using (
     company_id = public.current_company_id()
 );
-
 create policy "Users can create company sales orders"
 on public.sales_order
 for insert
 with check (
     company_id = public.current_company_id()
 );
-
 create policy "Users can update company sales orders"
 on public.sales_order
 for update
 using (
     company_id = public.current_company_id()
 );
-
 create policy "Users can delete draft company sales orders"
 on public.sales_order
 for delete
@@ -397,7 +372,6 @@ using (
     company_id = public.current_company_id()
     and status='draft'
 );
-
 ---------------------------------------------------------------
 -- SALES ORDER ITEMS
 ---------------------------------------------------------------
@@ -413,7 +387,6 @@ using (
         and so.company_id = public.current_company_id()
     )
 );
-
 create policy "Users can create company sales order items"
 on public.sales_order_item
 for insert
@@ -425,7 +398,6 @@ with check (
         and so.company_id = public.current_company_id()
     )
 );
-
 create policy "Users can update company sales order items"
 on public.sales_order_item
 for update
@@ -437,7 +409,6 @@ using (
         and so.company_id = public.current_company_id()
     )
 );
-
 create policy "Users can delete company sales order items"
 on public.sales_order_item
 for delete
@@ -449,8 +420,6 @@ using (
         and so.company_id = public.current_company_id()
     )
 );
-
-
 -- ============================================================
 -- PERMISSIONS
 -- ============================================================
@@ -464,7 +433,6 @@ values
 ('sales.confirm'),
 ('sales.invoice')
 on conflict do nothing;
-
 insert into public.role_permissions (role_id, permission_id)
 select
     r.id,
@@ -481,7 +449,6 @@ on p.permission_name in (
 )
 where r.role_name='owner'
 on conflict do nothing;
-
 insert into public.role_permissions (role_id, permission_id)
 select
     r.id,
@@ -496,7 +463,6 @@ on p.permission_name in (
 )
 where r.role_name='manager'
 on conflict do nothing;
-
 insert into public.role_permissions (role_id, permission_id)
 select
     r.id,
@@ -506,4 +472,3 @@ join public.permissions p
 on p.permission_name='sales.view'
 where r.role_name='staff'
 on conflict do nothing;
-

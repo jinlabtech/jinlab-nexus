@@ -15,8 +15,6 @@
 alter table public.sales_order
 add column if not exists
 payment_basis text;
-
-
 do $$
 begin
   if not exists (
@@ -41,14 +39,10 @@ begin
   end if;
 end;
 $$;
-
-
 comment on column
 public.sales_order.payment_basis
 is
 'Commercial payment basis: credit, cash or prepaid. Historical records may be null.';
-
-
 -- ============================================================
 -- 2. OVERRIDE PERMISSION
 -- ============================================================
@@ -63,8 +57,6 @@ on conflict (
   permission_name
 )
 do nothing;
-
-
 insert into public.role_permissions (
   role_id,
   permission_id
@@ -85,8 +77,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 3. CREDIT HOLD OVERRIDE AUDIT TABLE
 --
@@ -128,8 +118,6 @@ public.sales_credit_hold_override (
     sales_order_id
   )
 );
-
-
 create index if not exists
 sales_credit_hold_override_customer_idx
 on public.sales_credit_hold_override (
@@ -137,18 +125,12 @@ on public.sales_credit_hold_override (
   customer_id,
   approved_at desc
 );
-
-
 alter table
 public.sales_credit_hold_override
 enable row level security;
-
-
 drop policy if exists
 "company users view sales credit overrides"
 on public.sales_credit_hold_override;
-
-
 create policy
 "company users view sales credit overrides"
 on public.sales_credit_hold_override
@@ -158,18 +140,12 @@ using (
   company_id =
     public.current_company_id()
 );
-
-
 grant select
 on public.sales_credit_hold_override
 to authenticated;
-
-
 revoke insert, update, delete
 on public.sales_credit_hold_override
 from authenticated;
-
-
 -- ============================================================
 -- 4. SET SALES ORDER PAYMENT BASIS
 --
@@ -254,8 +230,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.set_sales_order_payment_basis(
@@ -263,8 +237,6 @@ public.set_sales_order_payment_basis(
   text
 )
 from public;
-
-
 grant execute
 on function
 public.set_sales_order_payment_basis(
@@ -272,8 +244,6 @@ public.set_sales_order_payment_basis(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 5. APPROVE CREDIT HOLD OVERRIDE
 -- ============================================================
@@ -482,8 +452,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.approve_sales_credit_hold_override(
@@ -491,8 +459,6 @@ public.approve_sales_credit_hold_override(
   text
 )
 from public;
-
-
 grant execute
 on function
 public.approve_sales_credit_hold_override(
@@ -500,8 +466,6 @@ public.approve_sales_credit_hold_override(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 6. SALES ORDER CREDIT CONTROL TRIGGER
 --
@@ -646,13 +610,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 enforce_sales_order_credit_control_trigger
 on public.sales_order;
-
-
 create trigger
 enforce_sales_order_credit_control_trigger
 before insert or update
@@ -660,8 +620,6 @@ on public.sales_order
 for each row
 execute function
 public.enforce_sales_order_credit_control();
-
-
 -- ============================================================
 -- 7. READ CREDIT CONTROL STATUS FOR UI
 -- ============================================================
@@ -828,20 +786,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_sales_order_credit_control(uuid)
 from public;
-
-
 grant execute
 on function
 public.get_sales_order_credit_control(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

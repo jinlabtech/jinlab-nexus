@@ -60,13 +60,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 journal_entry_validate_financial_year
 on public.journal_entry;
-
-
 create trigger
 journal_entry_validate_financial_year
 before update

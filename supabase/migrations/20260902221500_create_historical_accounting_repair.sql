@@ -49,33 +49,23 @@ public.accounting_historical_repair_log (
   details jsonb
     not null default '{}'::jsonb
 );
-
-
 create index if not exists
 accounting_historical_repair_company_idx
 on public.accounting_historical_repair_log (
   company_id,
   repaired_at desc
 );
-
-
 create index if not exists
 accounting_historical_repair_invoice_idx
 on public.accounting_historical_repair_log (
   invoice_id
 );
-
-
 alter table
 public.accounting_historical_repair_log
 enable row level security;
-
-
 drop policy if exists
 "accounting users view historical repair log"
 on public.accounting_historical_repair_log;
-
-
 create policy
 "accounting users view historical repair log"
 on public.accounting_historical_repair_log
@@ -89,18 +79,12 @@ using (
     'accounting.view'
   )
 );
-
-
 grant select
 on public.accounting_historical_repair_log
 to authenticated;
-
-
 revoke insert, update, delete
 on public.accounting_historical_repair_log
 from authenticated;
-
-
 -- ============================================================
 -- 2. PREVIEW ONE INVOICE REPAIR
 -- ============================================================
@@ -501,19 +485,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.preview_invoice_accounting_repair(uuid)
 from public;
-
 grant execute
 on function
 public.preview_invoice_accounting_repair(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- 3. REPAIR ONE INVOICE
 --
@@ -937,19 +916,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.repair_invoice_accounting_history(uuid)
 from public;
-
 grant execute
 on function
 public.repair_invoice_accounting_history(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

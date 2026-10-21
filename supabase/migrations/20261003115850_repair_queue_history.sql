@@ -131,3 +131,4 @@ $function$;
 revoke all on function public.get_service_job_queue(text,text,integer) from public;
 revoke all on function public.get_service_job_queue(text,text,integer) from anon;
 grant execute on function public.get_service_job_queue(text,text,integer) to authenticated;;
+;

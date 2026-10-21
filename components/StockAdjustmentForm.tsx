@@ -18,6 +18,9 @@ import type {
 type StockAdjustmentFormProps = {
   item: InventoryItem;
   branches: Branch[];
+  branchesLoading?: boolean;
+  branchesError?: string;
+  onRetryBranches?: () => void;
   onSave: (
     data: StockAdjustmentData
   ) => Promise<void>;
@@ -53,6 +56,9 @@ const movementOptions: {
 export default function StockAdjustmentForm({
   item,
   branches,
+  branchesLoading = false,
+  branchesError = "",
+  onRetryBranches,
   onSave,
   onCancel,
 }: StockAdjustmentFormProps) {
@@ -161,14 +167,14 @@ export default function StockAdjustmentForm({
             Branch
           </span>
 
-          <SearchableSelect searchLabel="Branches"
+          <SearchableSelect searchLabel="Branches" required disabled={saving || branchesLoading || branches.length === 0}
             value={branchId}
             onValueChange={(selectedValue) =>
               setBranchId(
                 selectedValue
               )
             }
-            className="h-10 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="min-h-11 w-full rounded-md border bg-background px-3 text-base outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">
               Select branch
@@ -186,6 +192,12 @@ export default function StockAdjustmentForm({
             )}
           </SearchableSelect>
         </label>
+
+        {branchesLoading && <p role="status" className="text-sm text-muted-foreground">Loading branches…</p>}
+        {!branchesLoading && (branchesError || branches.length === 0) && <div role="alert" className="rounded-lg border p-3 text-sm">
+          <p>{branchesError || "No branches are available for this company."}</p>
+          {onRetryBranches && <Button type="button" variant="outline" className="mt-2" onClick={onRetryBranches}>Retry branches</Button>}
+        </div>}
 
         <label className="grid gap-2">
           <span className="text-sm font-medium">
@@ -259,7 +271,7 @@ export default function StockAdjustmentForm({
         <div className="flex flex-wrap gap-3">
           <Button
             type="submit"
-            disabled={saving}
+            disabled={saving || branchesLoading || !branches.some(branch => branch.id === branchId)}
           >
             {saving
               ? "Saving..."

@@ -21,8 +21,6 @@ values
   ('settings.audit.view'),
   ('settings.subscription.manage')
 on conflict (permission_name) do nothing;
-
-
 -- ============================================================
 -- OWNER
 -- Complete company Settings authority.
@@ -56,8 +54,6 @@ where
     'settings.subscription.manage'
   )
 on conflict do nothing;
-
-
 -- ============================================================
 -- ADMIN
 -- Strong operational administration.
@@ -85,8 +81,6 @@ join public.permissions p
   )
 where r.role_name = 'admin'
 on conflict do nothing;
-
-
 -- ============================================================
 -- MANAGER
 -- Limited operational configuration.

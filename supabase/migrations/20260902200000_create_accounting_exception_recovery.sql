@@ -142,19 +142,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.retry_accounting_posting_exception(uuid)
 from public;
-
 grant execute
 on function
 public.retry_accounting_posting_exception(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- 2. AUTOMATICALLY RESOLVE EXCEPTION AFTER SUCCESSFUL POST
 -- ============================================================
@@ -201,8 +196,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.resolve_matching_accounting_exception(
@@ -212,8 +205,6 @@ public.resolve_matching_accounting_exception(
   text
 )
 from public, authenticated;
-
-
 -- ============================================================
 -- 3. RESOLVE WHEN JOURNAL IS SUCCESSFULLY POSTED
 -- ============================================================
@@ -255,13 +246,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 journal_entry_resolve_accounting_exception
 on public.journal_entry;
-
-
 create trigger
 journal_entry_resolve_accounting_exception
 after update of status
@@ -269,8 +256,6 @@ on public.journal_entry
 for each row
 execute function
 public.accounting_journal_resolve_exception();
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

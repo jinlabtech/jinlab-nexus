@@ -34,11 +34,15 @@ type LayoutEntry = {
 type Props = {
   items: NexusWidgetItem[];
   storageKey?: string;
+  eyebrow?: string;
+  description?: string;
 };
 
 export default function NexusWidgetBoard({
   items,
   storageKey = "nexus.dashboard.widget-layout.v1",
+  eyebrow = "My Nexus",
+  description = "Arrange your live workspace.",
 }: Props) {
   const itemIds = items
     .map((item) => item.id)
@@ -294,11 +298,11 @@ export default function NexusWidgetBoard({
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-            My Nexus
+            {eyebrow}
           </p>
 
           <p className="mt-1 text-xs text-muted-foreground">
-            Arrange your live workspace.
+            {description}
           </p>
         </div>
 

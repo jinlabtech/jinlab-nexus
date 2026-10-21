@@ -59,8 +59,6 @@ create table if not exists public.quotation_share_link (
 
   updated_at timestamptz not null default now()
 );
-
-
 -- Only one active customer link per quotation.
 create unique index if not exists
 quotation_share_link_active_unique_idx
@@ -68,48 +66,35 @@ on public.quotation_share_link (
   quotation_id
 )
 where status = 'active';
-
-
 create index if not exists
 quotation_share_link_company_idx
 on public.quotation_share_link (
   company_id
 );
-
-
 create index if not exists
 quotation_share_link_quotation_idx
 on public.quotation_share_link (
   quotation_id
 );
-
-
 create index if not exists
 quotation_share_link_token_idx
 on public.quotation_share_link (
   token
 );
-
-
 create index if not exists
 quotation_share_link_customer_idx
 on public.quotation_share_link (
   customer_id
 );
-
-
 drop trigger if exists
 quotation_share_link_set_updated_at
 on public.quotation_share_link;
-
 create trigger
 quotation_share_link_set_updated_at
 before update
 on public.quotation_share_link
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 2. QUOTATION DELIVERY HISTORY
 -- ============================================================
@@ -180,30 +165,22 @@ create table if not exists public.quotation_delivery (
 
   created_at timestamptz not null default now()
 );
-
-
 create index if not exists
 quotation_delivery_company_idx
 on public.quotation_delivery (
   company_id
 );
-
-
 create index if not exists
 quotation_delivery_quotation_idx
 on public.quotation_delivery (
   quotation_id,
   created_at desc
 );
-
-
 create index if not exists
 quotation_delivery_share_link_idx
 on public.quotation_delivery (
   share_link_id
 );
-
-
 -- ============================================================
 -- 3. CUSTOMER ACTION HISTORY
 -- ============================================================
@@ -245,48 +222,35 @@ create table if not exists public.quotation_customer_action (
 
   created_at timestamptz not null default now()
 );
-
-
 create index if not exists
 quotation_customer_action_company_idx
 on public.quotation_customer_action (
   company_id
 );
-
-
 create index if not exists
 quotation_customer_action_quotation_idx
 on public.quotation_customer_action (
   quotation_id,
   occurred_at desc
 );
-
-
 create index if not exists
 quotation_customer_action_link_idx
 on public.quotation_customer_action (
   share_link_id
 );
-
-
 -- ============================================================
 -- 4. ROW LEVEL SECURITY
 -- ============================================================
 
 alter table public.quotation_share_link
 enable row level security;
-
 alter table public.quotation_delivery
 enable row level security;
-
 alter table public.quotation_customer_action
 enable row level security;
-
-
 drop policy if exists
 "Users can view company quotation share links"
 on public.quotation_share_link;
-
 create policy
 "Users can view company quotation share links"
 on public.quotation_share_link
@@ -299,12 +263,9 @@ using (
     where user_id = auth.uid()
   )
 );
-
-
 drop policy if exists
 "Users can view company quotation deliveries"
 on public.quotation_delivery;
-
 create policy
 "Users can view company quotation deliveries"
 on public.quotation_delivery
@@ -317,12 +278,9 @@ using (
     where user_id = auth.uid()
   )
 );
-
-
 drop policy if exists
 "Users can view company quotation customer actions"
 on public.quotation_customer_action;
-
 create policy
 "Users can view company quotation customer actions"
 on public.quotation_customer_action
@@ -335,49 +293,36 @@ using (
     where user_id = auth.uid()
   )
 );
-
-
 -- Anonymous users never receive direct table access.
 revoke all
 on public.quotation_share_link
 from anon;
-
 revoke all
 on public.quotation_delivery
 from anon;
-
 revoke all
 on public.quotation_customer_action
 from anon;
-
-
 -- Authenticated users may inspect history,
 -- but writes go through controlled RPCs.
 revoke insert, update, delete
 on public.quotation_share_link
 from authenticated;
-
 revoke insert, update, delete
 on public.quotation_delivery
 from authenticated;
-
 revoke insert, update, delete
 on public.quotation_customer_action
 from authenticated;
-
 grant select
 on public.quotation_share_link
 to authenticated;
-
 grant select
 on public.quotation_delivery
 to authenticated;
-
 grant select
 on public.quotation_customer_action
 to authenticated;
-
-
 -- ============================================================
 -- 5. CREATE / REUSE SECURE SHARE LINK
 -- ============================================================
@@ -506,23 +451,18 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.create_quotation_share_link(
   uuid,
   timestamptz
 )
 from public;
-
 grant execute
 on function public.create_quotation_share_link(
   uuid,
   timestamptz
 )
 to authenticated;
-
-
 -- ============================================================
 -- 6. RECORD QUOTATION DELIVERY
 -- ============================================================
@@ -668,8 +608,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.record_quotation_delivery(
   uuid,
@@ -679,7 +617,6 @@ on function public.record_quotation_delivery(
   jsonb
 )
 from public;
-
 grant execute
 on function public.record_quotation_delivery(
   uuid,
@@ -689,8 +626,6 @@ on function public.record_quotation_delivery(
   jsonb
 )
 to authenticated;
-
-
 -- ============================================================
 -- 7. CANCEL SHARE LINK
 -- ============================================================
@@ -743,17 +678,12 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.cancel_quotation_share_link(uuid)
 from public;
-
 grant execute
 on function public.cancel_quotation_share_link(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

@@ -104,6 +104,19 @@ export async function loadCoreSnapshot(actor: Actor, now = new Date()): Promise<
   ]).catch(() => null) : Promise.resolve(null);
   const financialCompany = actor.permissions.has("accounting.view") ? Promise.resolve(actor.db.rpc("current_settings_company_id")).then(({ data, error }) => !error && data === actor.companyId).catch(() => false) : Promise.resolve(false);
   await Promise.all([
+    (async () => {
+      if (!actor.permissions.has("accounting.view")) {
+        snapshot.salesReport = { state: "forbidden", detail: "Accounting permission is required for sales totals." }; return;
+      }
+      try {
+        if (!await financialCompany) throw new Error("Finance company mismatch");
+        const { data, error } = await actor.db.rpc("get_accounting_kpi_dashboard", { p_as_of_date: snapshot.asOf, p_branch_id: null });
+        const result = row(data);
+        if (error || result.ok !== true) throw new Error("Sales report unavailable");
+        const k = row(result.kpis);
+        snapshot.salesReport = { state: "ready", detail: "Posted-ledger revenue and profit, month to date. Cash collected is shown separately. Gross profit includes only posted cost of sales.", revenueMonth: num(k.revenue_mtd), revenueYear: num(k.revenue_ytd), cashMonth: num(k.cash_collected_mtd), grossProfitMonth: num(k.gross_profit_mtd), netProfitMonth: num(k.net_profit_mtd), postingExceptions: num(k.open_posting_exceptions) };
+      } catch { snapshot.salesReport = { state: "unavailable", detail: "Sales totals could not be checked. Open Accounting performance or refresh." }; }
+    })(),
     (async () => { if (actor.permissions.has("company.view")) { const { data, error } = await actor.db.from("company").select("company_name").eq("id", actor.companyId).maybeSingle(); if (!error && typeof data?.company_name === "string") snapshot.companyName = data.company_name; } })().catch(() => {}),
     (async () => { if (actor.permissions.has("settings.finance.view")) { const { data, error } = await actor.db.from("company_finance_settings").select("base_currency").eq("company_id", actor.companyId).maybeSingle(); if (!error) settingsCurrency = validCurrency(data?.base_currency); } })().catch(() => {}),
     (async () => { snapshot.inventory = await source<InventoryFact[] | null>("inventory", async () => {

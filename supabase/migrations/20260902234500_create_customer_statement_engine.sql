@@ -892,8 +892,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_customer_account_statement(
@@ -902,7 +900,6 @@ public.get_customer_account_statement(
   date
 )
 from public;
-
 grant execute
 on function
 public.get_customer_account_statement(
@@ -911,8 +908,6 @@ public.get_customer_account_statement(
   date
 )
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

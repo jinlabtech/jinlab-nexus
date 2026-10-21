@@ -22,8 +22,6 @@
 alter table public.sales_order
 drop constraint if exists
 sales_order_payment_basis_check;
-
-
 -- ============================================================
 -- 2. MIGRATE EXISTING SALES ORDERS
 --
@@ -36,19 +34,13 @@ sales_order_payment_basis_check;
 alter table public.sales_order
 disable trigger
 enforce_sales_order_credit_control_trigger;
-
-
 update public.sales_order
 set payment_basis = 'immediate'
 where payment_basis = 'cash';
-
-
 -- Restore normal protection immediately after migration.
 alter table public.sales_order
 enable trigger
 enforce_sales_order_credit_control_trigger;
-
-
 -- ============================================================
 -- 3. INSTALL CORRECT PAYMENT BASIS CHECK
 -- ============================================================
@@ -64,14 +56,10 @@ check (
     'prepaid'
   )
 );
-
-
 comment on column
 public.sales_order.payment_basis
 is
 'Commercial payment basis: credit, immediate or prepaid. This is separate from the actual payment method such as cash, EFT or card.';
-
-
 -- ============================================================
 -- 4. REPLACE PAYMENT BASIS SETTER
 -- ============================================================
@@ -156,8 +144,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.set_sales_order_payment_basis(
@@ -165,8 +151,6 @@ public.set_sales_order_payment_basis(
   text
 )
 from public;
-
-
 grant execute
 on function
 public.set_sales_order_payment_basis(
@@ -174,8 +158,6 @@ public.set_sales_order_payment_basis(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

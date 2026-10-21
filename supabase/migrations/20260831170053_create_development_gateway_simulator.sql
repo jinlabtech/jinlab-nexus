@@ -92,21 +92,16 @@ begin
 
 end;
 $$;
-
-
 -- Development simulator must NEVER be public.
 revoke all
 on function public.simulate_gateway_payment_success(uuid)
 from public;
-
 revoke all
 on function public.simulate_gateway_payment_success(uuid)
 from anon;
-
 revoke all
 on function public.simulate_gateway_payment_success(uuid)
 from authenticated;
-
 grant execute
 on function public.simulate_gateway_payment_success(uuid)
 to service_role;

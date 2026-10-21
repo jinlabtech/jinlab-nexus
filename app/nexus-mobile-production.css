@@ -7538,3 +7538,929 @@
   }
 
 }
+
+
+/* =========================================================
+   MOBILE POPUP CONTENT RECOVERY
+   Keep glass, restore readable View / record content
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-mobile-modal-panel {
+    color:
+      var(--foreground) !important;
+  }
+
+
+  .nexus-mobile-modal-body {
+    position:
+      relative;
+
+    z-index:
+      1;
+
+    color:
+      var(--foreground) !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 91%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(22px)
+      saturate(125%);
+
+    backdrop-filter:
+      blur(22px)
+      saturate(125%);
+  }
+
+
+  .nexus-mobile-modal-body
+  > * {
+    position:
+      relative;
+
+    z-index:
+      2;
+
+    visibility:
+      visible;
+  }
+
+
+  .nexus-mobile-record-sheet {
+    position:
+      relative;
+
+    z-index:
+      2;
+
+    color:
+      var(--foreground) !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 94%,
+        transparent
+      ) !important;
+
+    border-color:
+      color-mix(
+        in srgb,
+        var(--border) 85%,
+        transparent
+      ) !important;
+
+    -webkit-backdrop-filter:
+      blur(18px)
+      saturate(120%);
+
+    backdrop-filter:
+      blur(18px)
+      saturate(120%);
+  }
+
+
+  .nexus-mobile-record-sheet
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    strong,
+    label,
+    td,
+    th
+  ) {
+    color:
+      var(--foreground);
+  }
+
+
+  .nexus-mobile-record-sheet
+  :is(
+    p,
+    small
+  ) {
+    opacity:
+      1;
+  }
+
+
+  .nexus-mobile-modal-body
+  :is(
+    input,
+    textarea,
+    select
+  ) {
+    color:
+      var(--foreground) !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 94%,
+        transparent
+      ) !important;
+  }
+
+
+  .nexus-mobile-modal-body
+  table {
+    color:
+      var(--foreground);
+  }
+
+}
+
+
+/* =========================================================
+   NEXUS MOBILE AWARENESS
+   Live app badges + contextual Nexus Coach
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  .nexus-phone-app-icon {
+    position:
+      relative;
+  }
+
+
+  .nexus-phone-app-badge {
+    position:
+      absolute;
+
+    right:
+      -4px;
+
+    top:
+      -4px;
+
+    display:
+      inline-flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    min-width:
+      19px;
+
+    height:
+      19px;
+
+    padding:
+      0
+      5px;
+
+    border:
+      2px solid
+      var(--background);
+
+    border-radius:
+      999px;
+
+    background:
+      var(--primary);
+
+    color:
+      var(--primary-foreground);
+
+    font-size:
+      9px;
+
+    font-weight:
+      800;
+
+    line-height:
+      1;
+
+    box-shadow:
+      0 3px 10px
+      rgba(0,0,0,.16);
+
+    animation:
+      nexus-phone-badge-arrive
+      320ms
+      cubic-bezier(.16,.84,.24,1)
+      both;
+  }
+
+
+  .nexus-phone-app-badge[data-danger="true"] {
+    background:
+      var(--destructive);
+
+    color:
+      var(--destructive-foreground);
+  }
+
+
+  @keyframes nexus-phone-badge-arrive {
+    from {
+      opacity:
+        0;
+
+      scale:
+        .55;
+    }
+
+    70% {
+      opacity:
+        1;
+
+      scale:
+        1.1;
+    }
+
+    to {
+      opacity:
+        1;
+
+      scale:
+        1;
+    }
+  }
+
+
+  .nexus-phone-live-awareness {
+    position:
+      absolute;
+
+    left:
+      67px;
+
+    bottom:
+      10px;
+
+    display:
+      inline-flex;
+
+    align-items:
+      center;
+
+    gap:
+      5px;
+
+    font-size:
+      9px;
+
+    font-weight:
+      650;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-phone-live-awareness
+  > span {
+    width:
+      6px;
+
+    height:
+      6px;
+
+    border-radius:
+      999px;
+
+    background:
+      var(--primary);
+
+    box-shadow:
+      0
+      0
+      0
+      3px
+      color-mix(
+        in srgb,
+        var(--primary) 10%,
+        transparent
+      );
+  }
+
+
+  .nexus-phone-live-awareness[data-alert="true"]
+  > span {
+    background:
+      var(--destructive);
+
+    box-shadow:
+      0
+      0
+      0
+      3px
+      color-mix(
+        in srgb,
+        var(--destructive) 12%,
+        transparent
+      );
+  }
+
+
+  .nexus-context-coach {
+    position:
+      fixed;
+
+    left:
+      12px;
+
+    right:
+      12px;
+
+    bottom:
+      calc(
+        83px +
+        env(
+          safe-area-inset-bottom
+        )
+      );
+
+    z-index:
+      82;
+
+    pointer-events:
+      none;
+  }
+
+
+  .nexus-context-coach-pill,
+  .nexus-context-coach-card {
+    pointer-events:
+      auto;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 72%,
+        transparent
+      );
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 78%,
+        transparent
+      );
+
+    color:
+      var(--foreground);
+
+    -webkit-backdrop-filter:
+      blur(28px)
+      saturate(150%);
+
+    backdrop-filter:
+      blur(28px)
+      saturate(150%);
+
+    box-shadow:
+      0
+      14px
+      42px
+      rgba(0,0,0,.14);
+  }
+
+
+  .nexus-context-coach-pill {
+    display:
+      grid;
+
+    grid-template-columns:
+      38px
+      minmax(0,1fr)
+      20px;
+
+    align-items:
+      center;
+
+    gap:
+      10px;
+
+    width:
+      100%;
+
+    min-height:
+      58px;
+
+    padding:
+      8px
+      11px;
+
+    border-radius:
+      19px;
+
+    text-align:
+      left;
+
+    animation:
+      nexus-context-coach-arrive
+      360ms
+      cubic-bezier(.16,.84,.24,1)
+      both;
+
+    transition:
+      scale
+      120ms
+      ease;
+  }
+
+
+  .nexus-context-coach-pill:active {
+    scale:
+      .975;
+  }
+
+
+  @keyframes nexus-context-coach-arrive {
+    from {
+      opacity:
+        0;
+
+      transform:
+        translate3d(
+          0,
+          14px,
+          0
+        )
+        scale(.98);
+    }
+
+    to {
+      opacity:
+        1;
+
+      transform:
+        none;
+    }
+  }
+
+
+  .nexus-context-coach-bulb {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      38px;
+
+    height:
+      38px;
+
+    border-radius:
+      13px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--primary) 12%,
+        transparent
+      );
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-context-coach-bulb
+  svg {
+    width:
+      17px;
+
+    height:
+      17px;
+  }
+
+
+  .nexus-context-coach-pill
+  small {
+    display:
+      block;
+
+    margin-bottom:
+      2px;
+
+    font-size:
+      8px;
+
+    font-weight:
+      800;
+
+    letter-spacing:
+      .14em;
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-context-coach-pill
+  strong {
+    display:
+      block;
+
+    overflow:
+      hidden;
+
+    text-overflow:
+      ellipsis;
+
+    white-space:
+      nowrap;
+
+    font-size:
+      11px;
+  }
+
+
+  .nexus-context-coach-spark {
+    width:
+      16px;
+
+    height:
+      16px;
+
+    color:
+      var(--primary);
+
+    opacity:
+      .7;
+  }
+
+
+  .nexus-context-coach-card {
+    width:
+      100%;
+
+    padding:
+      14px;
+
+    border-radius:
+      22px;
+
+    animation:
+      nexus-context-coach-expand
+      260ms
+      cubic-bezier(.16,.84,.24,1)
+      both;
+  }
+
+
+  @keyframes nexus-context-coach-expand {
+    from {
+      opacity:
+        0;
+
+      transform:
+        translate3d(
+          0,
+          10px,
+          0
+        )
+        scale(.97);
+    }
+
+    to {
+      opacity:
+        1;
+
+      transform:
+        none;
+    }
+  }
+
+
+  .nexus-context-coach-card-top {
+    display:
+      grid;
+
+    grid-template-columns:
+      38px
+      minmax(0,1fr)
+      34px;
+
+    align-items:
+      center;
+
+    gap:
+      10px;
+  }
+
+
+  .nexus-context-coach-card-top
+  p {
+    margin:
+      0;
+
+    font-size:
+      8px;
+
+    font-weight:
+      800;
+
+    letter-spacing:
+      .14em;
+
+    color:
+      var(--primary);
+  }
+
+
+  .nexus-context-coach-card-top
+  h3 {
+    margin:
+      2px
+      0
+      0;
+
+    font-size:
+      14px;
+  }
+
+
+  .nexus-context-coach-card-top
+  > button {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      34px;
+
+    height:
+      34px;
+
+    border:
+      1px solid
+      var(--border);
+
+    border-radius:
+      11px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 65%,
+        transparent
+      );
+  }
+
+
+  .nexus-context-coach-card-top
+  > button
+  svg {
+    width:
+      15px;
+
+    height:
+      15px;
+  }
+
+
+  .nexus-context-coach-copy {
+    margin-top:
+      13px;
+
+    padding:
+      13px;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--border) 70%,
+        transparent
+      );
+
+    border-radius:
+      15px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 65%,
+        transparent
+      );
+  }
+
+
+  .nexus-context-coach-copy
+  strong {
+    display:
+      block;
+
+    font-size:
+      12px;
+
+    line-height:
+      1.35;
+  }
+
+
+  .nexus-context-coach-copy
+  p {
+    margin:
+      7px
+      0
+      0;
+
+    font-size:
+      10px;
+
+    line-height:
+      1.5;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  .nexus-context-coach-action {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      space-between;
+
+    width:
+      100%;
+
+    min-height:
+      42px;
+
+    margin-top:
+      9px;
+
+    padding:
+      0
+      12px;
+
+    border-radius:
+      13px;
+
+    background:
+      var(--primary);
+
+    color:
+      var(--primary-foreground);
+
+    font-size:
+      11px;
+
+    font-weight:
+      700;
+  }
+
+
+  .nexus-context-coach-action
+  svg {
+    width:
+      15px;
+
+    height:
+      15px;
+  }
+
+
+  .nexus-context-coach-controls {
+    display:
+      grid;
+
+    grid-template-columns:
+      36px
+      minmax(0,1fr)
+      36px;
+
+    align-items:
+      center;
+
+    gap:
+      8px;
+
+    margin-top:
+      10px;
+  }
+
+
+  .nexus-context-coach-controls
+  button {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    width:
+      36px;
+
+    height:
+      36px;
+
+    border:
+      1px solid
+      var(--border);
+
+    border-radius:
+      11px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--background) 68%,
+        transparent
+      );
+  }
+
+
+  .nexus-context-coach-controls
+  svg {
+    width:
+      15px;
+
+    height:
+      15px;
+  }
+
+
+  .nexus-context-coach-controls
+  span {
+    text-align:
+      center;
+
+    font-size:
+      9px;
+
+    color:
+      var(--muted-foreground);
+  }
+
+
+  /*
+   * POPUP HARDENING
+   *
+   * Keep glass transparency around the record,
+   * but never allow the record itself to disappear.
+   */
+
+  .nexus-mobile-modal-body,
+  .nexus-mobile-record-sheet,
+  .nexus-mobile-record-card {
+    opacity:
+      1 !important;
+
+    visibility:
+      visible !important;
+
+    color:
+      var(--foreground) !important;
+  }
+
+
+  .nexus-mobile-record-sheet {
+    background:
+      color-mix(
+        in srgb,
+        var(--card) 95%,
+        transparent
+      ) !important;
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .nexus-phone-app-badge,
+  .nexus-context-coach-pill,
+  .nexus-context-coach-card {
+    animation:
+      none !important;
+  }
+
+}

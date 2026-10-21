@@ -77,45 +77,34 @@ create table if not exists public.customer (
         customer_number
     )
 );
-
-
 -- ============================================================
 -- 2. INDEXES
 -- ============================================================
 
 create index if not exists customer_company_idx
     on public.customer(company_id);
-
 create index if not exists customer_name_idx
     on public.customer(customer_name);
-
 create index if not exists customer_phone_idx
     on public.customer(phone);
-
 create index if not exists customer_email_idx
     on public.customer(email);
-
 create index if not exists customer_active_idx
     on public.customer(
         company_id,
         is_active
     );
-
-
 -- ============================================================
 -- 3. UPDATED_AT TRIGGER
 -- ============================================================
 
 drop trigger if exists customer_set_updated_at
 on public.customer;
-
 create trigger customer_set_updated_at
 before update
 on public.customer
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 4. CUSTOMER NUMBER GENERATOR
 -- ============================================================
@@ -159,16 +148,12 @@ begin
         );
 end;
 $$;
-
-
 -- ============================================================
 -- 5. ROW LEVEL SECURITY
 -- ============================================================
 
 alter table public.customer
 enable row level security;
-
-
 create policy "Users can view company customers"
 on public.customer
 for select
@@ -180,8 +165,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can create company customers"
 on public.customer
 for insert
@@ -198,8 +181,6 @@ with check (
             auth.uid()
     )
 );
-
-
 create policy "Users can update company customers"
 on public.customer
 for update
@@ -218,8 +199,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can delete company customers"
 on public.customer
 for delete
@@ -231,8 +210,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 -- ============================================================
 -- 6. CUSTOMER PERMISSIONS
 -- ============================================================
@@ -249,8 +226,6 @@ on conflict (
     permission_name
 )
 do nothing;
-
-
 -- ============================================================
 -- 7. OWNER
 -- ============================================================
@@ -273,8 +248,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 8. ADMIN
 -- ============================================================
@@ -300,8 +273,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 9. MANAGER
 -- ============================================================
@@ -326,8 +297,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 10. EMPLOYEE / CASHIER
 -- ============================================================
@@ -354,8 +323,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 11. TECHNICIAN / VIEWER
 -- ============================================================
@@ -380,8 +347,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- END CUSTOMER FOUNDATION
--- ============================================================
+-- ============================================================;

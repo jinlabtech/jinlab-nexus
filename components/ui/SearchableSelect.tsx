@@ -28,6 +28,7 @@ export default function SearchableSelect({ children, value, onValueChange, searc
   const generatedId = useId();
   const inputId = id || generatedId;
   const input = useRef<HTMLInputElement>(null);
+  const container = useRef<HTMLSpanElement>(null);
   const results = useRef<HTMLSpanElement>(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -43,6 +44,17 @@ export default function SearchableSelect({ children, value, onValueChange, searc
     input.current?.setCustomValidity(required && (!selected || !selected.value || selected.disabled) ? `Select ${searchLabel.toLowerCase()}.` : "");
   }, [required, selected, searchLabel]);
 
+  useEffect(() => {
+    if (!open) return;
+    // Touch browsers can blur the input with no relatedTarget before firing click.
+    // Only an actual outside interaction should dismiss the results in that case.
+    const outside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !container.current?.contains(event.target)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside, true);
+    return () => document.removeEventListener("pointerdown", outside, true);
+  }, [open]);
+
   function choose(option: Option) {
     if (disabled || option.disabled) return;
     onValueChange(option.value);
@@ -57,7 +69,7 @@ export default function SearchableSelect({ children, value, onValueChange, searc
     if (index < 0) input.current?.focus();
     else buttons[Math.min(index, buttons.length - 1)]?.focus();
   }
-  return <span className="block min-w-0 space-y-1.5" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
+  return <span ref={container} className="block min-w-0 space-y-1.5" onBlur={(event) => { if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
     <input type="hidden" name={name} value={value ?? ""} disabled={disabled} />
     <input ref={input} id={inputId} type="search" autoComplete="off" value={query} disabled={disabled} title={title}
       aria-label={ariaLabel || `Search ${searchLabel.toLowerCase()}`} aria-describedby={[describedBy, `${inputId}-selected`].filter(Boolean).join(" ")}
@@ -65,7 +77,7 @@ export default function SearchableSelect({ children, value, onValueChange, searc
       onFocus={() => setOpen(true)} onChange={(event) => { setQuery(event.target.value); setLimit(8); setOpen(true); }}
       onKeyDown={(event) => {
         if (event.key === "ArrowDown" && open) { event.preventDefault(); move(1); }
-        if (event.key === "Escape") { event.preventDefault(); setOpen(false); }
+        if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); setOpen(false); }
         if (event.key === "Enter" && open) { event.preventDefault(); const first = matches.find((option) => !option.disabled); if (first) choose(first); }
       }} />
     <span id={`${inputId}-selected`} className="block break-words text-xs text-muted-foreground">{selected ? `Selected: ${selected.label}` : "No selection"}{required ? " · Required" : ""}</span>
@@ -74,10 +86,10 @@ export default function SearchableSelect({ children, value, onValueChange, searc
       <span role="status" className="block px-3 py-2 text-xs text-muted-foreground">{matches.length ? `${matches.length} match${matches.length === 1 ? "" : "es"}` : "No matches. Try another search."}</span>
       <span className="block max-h-56 overflow-y-auto">
         {matches.slice(0, limit).map((option) => <button key={option.value} type="button" data-result disabled={option.disabled} aria-pressed={option.value === String(value ?? "")}
-          className="block w-full whitespace-normal break-words border-t px-3 py-2 text-left text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 disabled:opacity-50"
+          className="block min-h-11 w-full touch-manipulation whitespace-normal break-words border-t px-3 py-2 text-left text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 disabled:opacity-50"
           onClick={(event) => { event.preventDefault(); choose(option); }} onKeyDown={(event) => {
             if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); move(event.key === "ArrowDown" ? 1 : -1, event.currentTarget); }
-            if (event.key === "Escape") { event.preventDefault(); input.current?.focus(); setOpen(false); }
+            if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); input.current?.focus(); setOpen(false); }
           }}>{option.label}{option.value === String(value ?? "") ? " ✓" : ""}</button>)}
       </span>
       {matches.length > limit && <button type="button" className="w-full border-t px-3 py-2 text-left text-sm font-medium text-blue-700" onClick={(event) => { event.preventDefault(); setLimit((current) => current + 20); }}>Show more results</button>}

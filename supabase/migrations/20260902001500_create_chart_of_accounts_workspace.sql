@@ -169,19 +169,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_chart_of_accounts()
 from public;
-
 grant execute
 on function
 public.get_chart_of_accounts()
 to authenticated;
-
-
 -- ============================================================
 -- 2. CREATE CUSTOM ACCOUNT
 -- Normal balance is derived automatically.
@@ -377,8 +372,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.create_accounting_account(
   text,
@@ -390,7 +383,6 @@ on function public.create_accounting_account(
   boolean
 )
 from public;
-
 grant execute
 on function public.create_accounting_account(
   text,
@@ -402,8 +394,6 @@ on function public.create_accounting_account(
   boolean
 )
 to authenticated;
-
-
 -- ============================================================
 -- 3. UPDATE ACCOUNT
 --
@@ -623,8 +613,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.update_accounting_account(
   uuid,
@@ -637,7 +625,6 @@ on function public.update_accounting_account(
   boolean
 )
 from public;
-
 grant execute
 on function public.update_accounting_account(
   uuid,
@@ -650,8 +637,6 @@ on function public.update_accounting_account(
   boolean
 )
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

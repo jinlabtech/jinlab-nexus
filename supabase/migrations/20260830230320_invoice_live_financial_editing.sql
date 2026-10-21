@@ -31,19 +31,14 @@ create table if not exists public.invoice_change_log (
     created_at timestamptz not null
         default now()
 );
-
 create index if not exists
 invoice_change_log_invoice_idx
 on public.invoice_change_log(invoice_id);
-
 create index if not exists
 invoice_change_log_company_idx
 on public.invoice_change_log(company_id);
-
 alter table public.invoice_change_log
 enable row level security;
-
-
 -- ============================================================
 -- READ POLICY
 -- ============================================================
@@ -51,7 +46,6 @@ enable row level security;
 drop policy if exists
 "invoice_change_log_company_read"
 on public.invoice_change_log;
-
 create policy
 "invoice_change_log_company_read"
 on public.invoice_change_log
@@ -64,8 +58,6 @@ using (
         where up.user_id = auth.uid()
     )
 );
-
-
 -- ============================================================
 -- DO NOT ALLOW DIRECT CLIENT INSERT/UPDATE/DELETE
 -- Writes happen through RPC only.
@@ -74,8 +66,6 @@ using (
 revoke insert, update, delete
 on public.invoice_change_log
 from authenticated;
-
-
 -- ============================================================
 -- CONTROLLED FINANCIAL EDIT RPC
 -- ============================================================
@@ -327,8 +317,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.update_invoice_item_financials(
     uuid,
@@ -338,7 +326,6 @@ on function public.update_invoice_item_financials(
     text
 )
 from public;
-
 grant execute
 on function public.update_invoice_item_financials(
     uuid,

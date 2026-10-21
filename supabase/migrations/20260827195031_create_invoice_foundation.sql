@@ -86,8 +86,6 @@ create table if not exists public.invoice (
         invoice_number
     )
 );
-
-
 -- ============================================================
 -- 2. INVOICE ITEMS
 -- ============================================================
@@ -150,34 +148,24 @@ create table if not exists public.invoice_item (
 
     created_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 3. INDEXES
 -- ============================================================
 
 create index if not exists invoice_company_idx
     on public.invoice(company_id);
-
 create index if not exists invoice_customer_idx
     on public.invoice(customer_id);
-
 create index if not exists invoice_sales_order_idx
     on public.invoice(sales_order_id);
-
 create index if not exists invoice_status_idx
     on public.invoice(status);
-
 create index if not exists invoice_date_idx
     on public.invoice(invoice_date desc);
-
 create index if not exists invoice_item_invoice_idx
     on public.invoice_item(invoice_id);
-
 create index if not exists invoice_item_company_idx
     on public.invoice_item(company_id);
-
-
 -- ============================================================
 -- 4. INVOICE NUMBER GENERATOR
 -- ============================================================
@@ -230,8 +218,6 @@ begin
         );
 end;
 $$;
-
-
 -- ============================================================
 -- 5. ITEM CALCULATIONS
 -- ============================================================
@@ -311,18 +297,13 @@ begin
     return new;
 end;
 $$;
-
-
 drop trigger if exists invoice_item_calculate_totals
 on public.invoice_item;
-
 create trigger invoice_item_calculate_totals
 before insert or update
 on public.invoice_item
 for each row
 execute function public.calculate_invoice_item_totals();
-
-
 -- ============================================================
 -- 6. HEADER TOTALS
 -- ============================================================
@@ -398,8 +379,6 @@ begin
         target_invoice_id;
 end;
 $$;
-
-
 create or replace function public.invoice_item_refresh_parent()
 returns trigger
 language plpgsql
@@ -422,18 +401,13 @@ begin
     return new;
 end;
 $$;
-
-
 drop trigger if exists invoice_item_refresh_totals
 on public.invoice_item;
-
 create trigger invoice_item_refresh_totals
 after insert or update or delete
 on public.invoice_item
 for each row
 execute function public.invoice_item_refresh_parent();
-
-
 -- ============================================================
 -- 7. ROW LEVEL SECURITY
 -- No helper dependency: direct user_profile lookup
@@ -441,11 +415,8 @@ execute function public.invoice_item_refresh_parent();
 
 alter table public.invoice
 enable row level security;
-
 alter table public.invoice_item
 enable row level security;
-
-
 create policy "Users can view company invoices"
 on public.invoice
 for select
@@ -457,8 +428,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can create company invoices"
 on public.invoice
 for insert
@@ -470,8 +439,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can update company invoices"
 on public.invoice
 for update
@@ -490,8 +457,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can delete draft company invoices"
 on public.invoice
 for delete
@@ -504,8 +469,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can view company invoice items"
 on public.invoice_item
 for select
@@ -517,8 +480,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can create company invoice items"
 on public.invoice_item
 for insert
@@ -530,8 +491,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can update company invoice items"
 on public.invoice_item
 for update
@@ -550,8 +509,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can delete company invoice items"
 on public.invoice_item
 for delete
@@ -563,8 +520,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 -- ============================================================
 -- 8. PERMISSIONS
 -- ============================================================
@@ -583,8 +538,6 @@ on conflict (
     permission_name
 )
 do nothing;
-
-
 -- OWNER
 insert into public.role_permissions (
     role_id,
@@ -604,8 +557,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ADMIN
 insert into public.role_permissions (
     role_id,
@@ -630,8 +581,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- MANAGER
 insert into public.role_permissions (
     role_id,
@@ -655,8 +604,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- END INVOICE FOUNDATION
--- ============================================================
+-- ============================================================;

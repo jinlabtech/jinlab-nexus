@@ -32,8 +32,6 @@ as $$
       and p.permission_name = requested_permission
   );
 $$;
-
-
 -- ============================================================
 -- 2. CURRENT COMPANY HELPER
 -- ============================================================
@@ -50,8 +48,6 @@ as $$
   where user_id = auth.uid()
   limit 1;
 $$;
-
-
 -- ============================================================
 -- 3. AUDIT HELPER
 -- ============================================================
@@ -84,8 +80,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 4. UPDATE COMPANY PROFILE
 -- ============================================================
@@ -202,8 +196,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 5. UPDATE DOCUMENT / BRANDING SETTINGS
 -- ============================================================
@@ -320,8 +312,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 6. UPDATE FINANCE SETTINGS
 -- ============================================================
@@ -466,8 +456,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 7. UPDATE NEXUS ACCOUNTANT / ACCOUNTING AUTOMATION
 -- ============================================================
@@ -630,8 +618,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 8. UPDATE BRANCH POLICIES
 -- ============================================================
@@ -744,8 +730,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 9. UPDATE SECURITY SETTINGS
 -- ============================================================
@@ -834,8 +818,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 10. EXECUTION SECURITY
 -- Do not leave SECURITY DEFINER RPCs executable by everyone.
@@ -844,35 +826,29 @@ $$;
 revoke all on function
 public.current_user_has_permission(text)
 from public;
-
 revoke all on function
 public.current_settings_company_id()
 from public;
-
 revoke all on function
 public.log_settings_change(uuid,text,text,jsonb)
 from public;
-
 revoke all on function
 public.update_company_profile_settings(
   text,text,text,text,text,text,text,text,text,text,text,text,text,text
 )
 from public;
-
 revoke all on function
 public.update_company_document_settings(
   text,boolean,boolean,boolean,boolean,boolean,boolean,
   text,text,text,text,text
 )
 from public;
-
 revoke all on function
 public.update_company_finance_settings(
   text,integer,text,boolean,text,numeric,boolean,
   integer,integer,boolean,numeric,text,date
 )
 from public;
-
 revoke all on function
 public.update_company_accounting_settings(
   boolean,boolean,boolean,boolean,boolean,boolean,boolean,
@@ -880,52 +856,43 @@ public.update_company_accounting_settings(
   boolean,boolean,boolean,boolean,text
 )
 from public;
-
 revoke all on function
 public.update_company_branch_settings(
   boolean,boolean,text,boolean,boolean,boolean,boolean,
   text,boolean,boolean
 )
 from public;
-
 revoke all on function
 public.update_company_security_settings(
   boolean,boolean,boolean,boolean,boolean,boolean,integer
 )
 from public;
-
-
 -- Authenticated application users may CALL these functions.
 -- The functions themselves perform the authoritative permission checks.
 
 grant execute on function
 public.current_user_has_permission(text)
 to authenticated;
-
 grant execute on function
 public.current_settings_company_id()
 to authenticated;
-
 grant execute on function
 public.update_company_profile_settings(
   text,text,text,text,text,text,text,text,text,text,text,text,text,text
 )
 to authenticated;
-
 grant execute on function
 public.update_company_document_settings(
   text,boolean,boolean,boolean,boolean,boolean,boolean,
   text,text,text,text,text
 )
 to authenticated;
-
 grant execute on function
 public.update_company_finance_settings(
   text,integer,text,boolean,text,numeric,boolean,
   integer,integer,boolean,numeric,text,date
 )
 to authenticated;
-
 grant execute on function
 public.update_company_accounting_settings(
   boolean,boolean,boolean,boolean,boolean,boolean,boolean,
@@ -933,17 +900,14 @@ public.update_company_accounting_settings(
   boolean,boolean,boolean,boolean,text
 )
 to authenticated;
-
 grant execute on function
 public.update_company_branch_settings(
   boolean,boolean,text,boolean,boolean,boolean,boolean,
   text,boolean,boolean
 )
 to authenticated;
-
 grant execute on function
 public.update_company_security_settings(
   boolean,boolean,boolean,boolean,boolean,boolean,integer
 )
 to authenticated;
-

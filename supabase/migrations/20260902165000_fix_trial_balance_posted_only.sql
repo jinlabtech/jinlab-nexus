@@ -259,13 +259,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_trial_balance(date)
 from public;
-
 grant execute
 on function
 public.get_trial_balance(date)

@@ -1,5 +1,7 @@
 "use client";
 
+import { getBrowserUser } from "@/lib/services/browserSessionService";
+
 import {
   useEffect,
   useState,
@@ -99,7 +101,7 @@ export default function Navbar({
 
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await getBrowserUser();
 
       if (!user || cancelled) return;
 
@@ -128,7 +130,7 @@ export default function Navbar({
       }
     }
 
-    void loadCompanyLogo();
+    void loadCompanyLogo().catch(() => {});
 
     return () => {
       cancelled = true;
@@ -152,8 +154,7 @@ export default function Navbar({
               user,
             },
           } =
-            await supabase.auth
-              .getUser();
+            await getBrowserUser();
 
 
           if (
@@ -263,7 +264,16 @@ export default function Navbar({
         {resolvedCompanyLogoUrl ? (
           <div
             data-nexus-company-logo-frame="true"
-            className="flex h-[58px] w-[94px] shrink-0 items-center justify-center overflow-hidden sm:h-[96px] sm:w-[220px] sm:overflow-visible"
+            data-nexus-jinlab-brand={
+              companyName.trim().toUpperCase() === "JINLAB"
+                ? "true"
+                : "false"
+            }
+            className={
+              companyName.trim().toUpperCase() === "JINLAB"
+                ? "flex h-12 w-28 shrink-0 items-center justify-start overflow-visible sm:h-14 sm:w-40"
+                : "flex h-[58px] w-[94px] shrink-0 items-center justify-center overflow-hidden sm:h-[96px] sm:w-[220px] sm:overflow-visible"
+            }
           >
 
             <img
@@ -272,7 +282,7 @@ export default function Navbar({
               alt={`${companyName || "Company"} logo`}
               className={
                 companyName.trim().toUpperCase() === "JINLAB"
-                  ? "block h-full w-full object-contain object-center mix-blend-multiply"
+                  ? "block h-full w-full object-contain object-center"
                   : "block max-h-[82px] max-w-[210px] object-contain object-left"
               }
             />

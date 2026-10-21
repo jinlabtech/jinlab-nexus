@@ -28,6 +28,8 @@ import {
 import { createAuditLog } from "@/lib/services/auditLogService";
 
 import { supabase } from "@/lib/supabase";
+import { getBrowserUser } from "@/lib/services/browserSessionService";
+import { clientRequest } from "@/lib/clientRequest";
 
 import type {
   Customer,
@@ -36,6 +38,8 @@ import type {
 
 export default function CustomersPage() {
   const router = useRouter();
+  const [initialising, setInitialising] = useState(true);
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   const [
     currentCompanyId,
@@ -91,98 +95,62 @@ export default function CustomersPage() {
 
   const {
     can,
-    loading:
-      permissionsLoading,
+    refreshPermissions,
     errorMessage:
       permissionsError,
   } = usePermissions();
 
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
     async function initialisePage() {
-      const {
-        data: { user },
-        error: userError,
-      } =
-        await supabase.auth.getUser();
+      try {
+        const authStart = performance.now();
 
-      if (
-        userError ||
-        !user
-      ) {
-        router.replace(
-          "/login"
+        const { data: { user }, error } = await getBrowserUser();
+
+        if (process.env.NODE_ENV === "development") {
+          console.info(
+            `[Nexus timing] Customers authentication: ${Math.round(
+              performance.now() - authStart
+            )}ms`
+          );
+        }
+        if (cancelled) return;
+        if (error) throw new Error(error.message);
+        if (!user) { router.replace("/login"); return; }
+        const { data: profile, error: profileError } = await clientRequest(
+          supabase.from("user_profile").select("full_name, company_id")
+            .eq("user_id", user.id).abortSignal(controller.signal).single(),
+          "Your company profile is taking too long to load. Please retry."
         );
-        return;
-      }
-
-      const {
-        data: profile,
-        error: profileError,
-      } = await supabase
-        .from(
-          "user_profile"
-        )
-        .select(
-          "full_name, company_id"
-        )
-        .eq(
-          "user_id",
-          user.id
-        )
-        .single();
-
-      if (
-        profileError ||
-        !profile
-      ) {
-        setPageError(
-          profileError?.message ??
-            "Profile could not be loaded."
-        );
-        return;
-      }
-
-      setUserName(
-        profile.full_name
-      );
-
-      if (
-        !profile.company_id
-      ) {
-        setPageError(
-          "Your account is not linked to a company."
-        );
-        return;
-      }
-
-      setCurrentCompanyId(
-        profile.company_id
-      );
-
-      const {
-        data: company,
-      } = await supabase
-        .from("company")
-        .select(
-          "company_name"
-        )
-        .eq(
-          "id",
-          profile.company_id
-        )
-        .single();
-
-      if (
-        company?.company_name
-      ) {
-        setCompanyName(
-          company.company_name
-        );
+        if (cancelled) return;
+        if (profileError || !profile?.company_id) throw new Error(profileError?.message || "Your account is not linked to a company.");
+        setUserName(profile.full_name);
+        setCurrentCompanyId(profile.company_id);
+        setInitialising(false);
+        // Branding is optional and must never block customer records.
+        const { data: company } = await clientRequest(
+          supabase.from("company").select("company_name").eq("id", profile.company_id)
+            .abortSignal(controller.signal).single(), "Company name unavailable."
+        ).catch(() => ({ data: null }));
+        if (!cancelled && company?.company_name) setCompanyName(company.company_name);
+      } catch (error) {
+        if (!cancelled) setPageError(error instanceof Error ? error.message : "Customers could not be opened.");
+      } finally {
+        if (!cancelled) setInitialising(false);
       }
     }
+    void initialisePage();
+    return () => { cancelled = true; controller.abort(); };
+  }, [router, loadAttempt]);
 
-    initialisePage();
-  }, [router]);
+  function retryLoading() {
+    setPageError("");
+    void refreshPermissions();
+    if (currentCompanyId) void refreshCustomers();
+    else { setInitialising(true); setLoadAttempt(attempt => attempt + 1); }
+  }
 
   function openAddForm() {
     setEditingCustomer(null);
@@ -510,6 +478,7 @@ export default function CustomersPage() {
         {visibleError && (
           <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             {visibleError}
+            <Button type="button" variant="outline" className="ml-3" onClick={retryLoading}>Retry loading</Button>
           </div>
         )}
 
@@ -572,13 +541,15 @@ export default function CustomersPage() {
           />
         </section>
 
-        {loading ||
-        permissionsLoading ? (
+        {initialising || loading ? (
           <div className="rounded-xl border p-10 text-center">
             Loading customers...
           </div>
         ) : (
           <DataTable
+            key={searchTerm}
+            pageSize={25}
+            compact
             headers={[
               "Customer",
               "Type",
@@ -589,7 +560,7 @@ export default function CustomersPage() {
               "Actions",
             ]}
             rows={rows}
-            emptyMessage="No customers yet."
+            emptyMessage={visibleError ? "Customer records are unavailable. Use Retry loading above." : "No customers yet."}
           />
         )}
         {can("customer.create") && !showForm && (

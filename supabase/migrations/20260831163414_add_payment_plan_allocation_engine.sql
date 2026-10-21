@@ -390,8 +390,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- Automatically rebuild relevant payment plan
 -- whenever an invoice payment changes.
@@ -505,13 +503,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 invoice_payment_sync_payment_plan
 on public.invoice_payment;
-
-
 create trigger
 invoice_payment_sync_payment_plan
 
@@ -521,8 +515,6 @@ on public.invoice_payment
 for each row
 execute function
 public.invoice_payment_plan_sync();
-
-
 -- ============================================================
 -- Rebuild existing plans once
 -- ============================================================

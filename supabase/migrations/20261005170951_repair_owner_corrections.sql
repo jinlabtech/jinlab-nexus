@@ -34,3 +34,4 @@ end;
 $$;
 revoke all on function public.correct_service_job_details(uuid,jsonb,text,timestamptz) from public,anon;
 grant execute on function public.correct_service_job_details(uuid,jsonb,text,timestamptz) to authenticated;
+;

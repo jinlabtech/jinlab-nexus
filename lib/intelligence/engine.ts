@@ -169,7 +169,8 @@ export function analyzeCore(snapshot: CoreSnapshot): CoreAnalysis {
   const headline = count
     ? `${count} rule-based finding${count === 1 ? "" : "s"} for review.${count > ANALYSIS_LIMIT ? ` Showing the first ${ANALYSIS_LIMIT} by priority.` : ""}`
     : "No configured rule flagged the available records.";
-  return { engine: "nexus-core", version: "1.0", companyName: snapshot.companyName, currency: snapshot.currency, asOf: snapshot.asOf, checkedAt: snapshot.checkedAt, headline: `${headline}${unavailable || partial ? ` Coverage: ${unavailable} unavailable or restricted; ${partial} partial. This is not an all-clear.` : ""}`, metrics: inspected.metrics, findings: inspected.findings.slice(0, ANALYSIS_LIMIT), coverage: inspected.coverage };
+  const openJobs = inspected.usable("repairs") ? unique(snapshot.repairs).filter(item => !["collected", "cancelled", "canceled", "closed"].includes(status(item.status))).sort((a,b) => a.updatedAt.localeCompare(b.updatedAt)) : null;
+  return { ...(snapshot.salesReport ? { salesReport: snapshot.salesReport } : {}), ...(openJobs ? { repairReport: { total: openJobs.length, jobs: openJobs.slice(0, 100), truncated: openJobs.length > 100 } } : {}), engine: "nexus-core", version: "1.0", companyName: snapshot.companyName, currency: snapshot.currency, asOf: snapshot.asOf, checkedAt: snapshot.checkedAt, headline: `${headline}${unavailable || partial ? ` Coverage: ${unavailable} unavailable or restricted; ${partial} partial. This is not an all-clear.` : ""}`, metrics: inspected.metrics, findings: inspected.findings.slice(0, ANALYSIS_LIMIT), coverage: inspected.coverage };
 }
 
 function topicFor(question: string): CoreModule | null {

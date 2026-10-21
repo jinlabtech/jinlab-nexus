@@ -212,6 +212,39 @@ export async function addRepairJobLine(input: {
   return data;
 }
 
+export async function correctRepairJobLine(input: {
+  lineId: string;
+  lineType: "labour" | "service" | "software" | "part" | "other";
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  inventoryItemId?: string | null;
+  reason: string;
+}) {
+  const { data, error } = await supabase.rpc(
+    "correct_service_job_line",
+    {
+      p_line_id: input.lineId,
+      p_line_type: input.lineType,
+      p_description: input.description.trim(),
+      p_quantity: input.quantity,
+      p_unit_price: input.unitPrice,
+      p_inventory_item_id:
+        input.lineType === "part"
+          ? input.inventoryItemId || null
+          : null,
+      p_reason: input.reason.trim(),
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+
 export async function completeRepairTechnical(jobId: string) {
   const { data, error } = await supabase.rpc(
     "complete_service_job_technical",

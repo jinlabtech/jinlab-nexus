@@ -49,3 +49,4 @@ end;$$;
 create trigger shipping_guard_draft before update on public.courier_shipment for each row execute function public.shipping_guard_draft();
 revoke all on function public.shipping_store_credentials(uuid,text,text,jsonb),public.shipping_read_credentials(uuid,text),public.shipping_reserve_booking(uuid,uuid,timestamptz),public.shipping_guard_draft() from public,anon,authenticated;
 grant execute on function public.shipping_store_credentials(uuid,text,text,jsonb),public.shipping_read_credentials(uuid,text),public.shipping_reserve_booking(uuid,uuid,timestamptz) to service_role;
+;

@@ -1,5 +1,7 @@
 "use client";
 
+import { getBrowserUser } from "@/lib/services/browserSessionService";
+
 import {
   useEffect,
 } from "react";
@@ -237,8 +239,7 @@ export default function NexusThemeProvider({
             user,
           },
         } =
-          await supabase.auth
-            .getUser();
+          await getBrowserUser();
 
 
         if (
@@ -288,7 +289,7 @@ export default function NexusThemeProvider({
       }
 
 
-      void loadCompanyTheme();
+      void loadCompanyTheme().catch(() => {});
 
 
       const {
@@ -308,7 +309,7 @@ export default function NexusThemeProvider({
 
                 window.setTimeout(
                   () => {
-                    void loadCompanyTheme();
+                    void loadCompanyTheme().catch(() => {});
                   },
                   0
                 );

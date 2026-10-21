@@ -132,6 +132,8 @@ export default function InventoryPage() {
   const {
     branches,
     loading: branchesLoading,
+    errorMessage: branchesError,
+    refreshBranches,
   } = useBranches(
     currentCompanyId
   );
@@ -1225,6 +1227,9 @@ export default function InventoryPage() {
             <StockAdjustmentForm
               item={stockItem}
               branches={branches}
+              branchesLoading={branchesLoading}
+              branchesError={branchesError}
+              onRetryBranches={() => { void refreshBranches(); }}
               onSave={
                 saveStockAdjustment
               }
@@ -1611,6 +1616,9 @@ export default function InventoryPage() {
             <div className="hidden md:block">
 
               <DataTable
+                key={searchTerm}
+                pageSize={25}
+                compact
                 headers={[
                   "Item",
                   "Category",

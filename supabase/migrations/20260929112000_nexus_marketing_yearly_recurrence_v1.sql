@@ -6,7 +6,6 @@
 alter table public.marketing_campaign_series
   drop constraint if exists
     marketing_campaign_series_recurrence_type_check;
-
 alter table public.marketing_campaign_series
   add constraint
     marketing_campaign_series_recurrence_type_check
@@ -18,8 +17,6 @@ alter table public.marketing_campaign_series
       'yearly'
     )
   );
-
-
 create or replace function public.marketing_compute_next_series_run(
   p_recurrence_type text,
   p_interval integer,

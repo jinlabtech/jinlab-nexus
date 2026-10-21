@@ -19,16 +19,12 @@ check (
     'approved'
   )
 );
-
 alter table public.journal_entry
 add column approved_by uuid
 references auth.users(id)
 on delete set null;
-
 alter table public.journal_entry
 add column approved_at timestamptz;
-
-
 -- Only one reversal is allowed for one posted journal.
 create unique index if not exists
 journal_entry_single_reversal_idx
@@ -37,8 +33,6 @@ on public.journal_entry (
   reversal_of_entry_id
 )
 where reversal_of_entry_id is not null;
-
-
 -- ============================================================
 -- 2. JOURNAL NUMBER SEQUENCE
 -- ============================================================
@@ -62,19 +56,13 @@ public.accounting_journal_sequence (
     sequence_year
   )
 );
-
-
 alter table
 public.accounting_journal_sequence
 enable row level security;
-
-
 -- Sequence is internal only.
 revoke all
 on public.accounting_journal_sequence
 from anon, authenticated;
-
-
 create or replace function
 public.next_journal_entry_number(
   p_company_id uuid,
@@ -129,8 +117,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.next_journal_entry_number(
@@ -138,8 +124,6 @@ public.next_journal_entry_number(
   date
 )
 from public;
-
-
 -- ============================================================
 -- 3. DEFAULT CHART OF ACCOUNTS
 -- ============================================================
@@ -524,14 +508,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.ensure_default_chart_of_accounts(uuid)
 from public;
-
-
 -- Seed all existing Nexus companies.
 do $$
 declare
@@ -548,8 +528,6 @@ begin
   end loop;
 end;
 $$;
-
-
 -- Automatically seed new companies.
 create or replace function
 public.seed_company_accounting_accounts()
@@ -569,12 +547,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 company_seed_accounting_accounts
 on public.company;
-
 create trigger
 company_seed_accounting_accounts
 after insert
@@ -582,8 +557,6 @@ on public.company
 for each row
 execute function
 public.seed_company_accounting_accounts();
-
-
 -- ============================================================
 -- 4. ACCOUNTING PERIOD GENERATOR
 -- ============================================================
@@ -690,8 +663,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.ensure_accounting_periods(
@@ -699,8 +670,6 @@ public.ensure_accounting_periods(
   date
 )
 from public;
-
-
 -- Generate current periods for existing companies.
 do $$
 declare
@@ -718,8 +687,6 @@ begin
   end loop;
 end;
 $$;
-
-
 -- ============================================================
 -- 5. STRENGTHEN JOURNAL LINE COMPANY VALIDATION
 -- ============================================================
@@ -794,8 +761,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- 6. CREATE MANUAL JOURNAL DRAFT
 -- Atomic header + lines.
@@ -1145,8 +1110,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.create_manual_journal(
   date,
@@ -1156,7 +1119,6 @@ on function public.create_manual_journal(
   jsonb
 )
 from public;
-
 grant execute
 on function public.create_manual_journal(
   date,
@@ -1166,8 +1128,6 @@ on function public.create_manual_journal(
   jsonb
 )
 to authenticated;
-
-
 -- ============================================================
 -- 7. APPROVE MANUAL JOURNAL
 -- ============================================================
@@ -1254,19 +1214,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.approve_journal_entry(uuid)
 from public;
-
 grant execute
 on function
 public.approve_journal_entry(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- 8. POST JOURNAL
 -- Critical accounting boundary.
@@ -1480,19 +1435,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.post_journal_entry(uuid)
 from public;
-
 grant execute
 on function
 public.post_journal_entry(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- 9. REVERSAL ENGINE
 -- Posted entries are never edited.
@@ -1697,8 +1647,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.reverse_journal_entry(
   uuid,
@@ -1706,7 +1654,6 @@ on function public.reverse_journal_entry(
   text
 )
 from public;
-
 grant execute
 on function public.reverse_journal_entry(
   uuid,
@@ -1714,8 +1661,6 @@ on function public.reverse_journal_entry(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 10. ACCOUNTING PERIOD STATUS CONTROL
 -- ============================================================
@@ -1810,8 +1755,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.set_accounting_period_status(
@@ -1819,7 +1762,6 @@ public.set_accounting_period_status(
   text
 )
 from public;
-
 grant execute
 on function
 public.set_accounting_period_status(
@@ -1827,8 +1769,6 @@ public.set_accounting_period_status(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 11. ACCOUNTING APPROVAL PERMISSION
 -- ============================================================
@@ -1844,8 +1784,6 @@ on conflict (
   permission_name
 )
 do nothing;
-
-
 -- Owner / Admin receive approval authority.
 insert into public.role_permissions (
   role_id,
@@ -1867,8 +1805,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- END ACCOUNTING POSTING ENGINE
--- ============================================================
+-- ============================================================;

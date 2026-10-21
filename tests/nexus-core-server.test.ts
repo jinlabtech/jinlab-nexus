@@ -13,7 +13,7 @@ const OTHER_COMPANY = "b1000000-0000-4000-8000-000000000001";
 const USER = "a0000000-0000-4000-8000-000000000001";
 const TOKEN = "mock-owner-session";
 const NOW = new Date("2026-09-15T22:30:00.000Z");
-const ALL = ["inventory.view", "accounting.view", "quotation.view", "sales.view", "invoice.view", "purchasing.view", "repair.view", "company.view", "settings.finance.view"];
+const ALL = ["inventory.view", "accounting.view", "quotation.view", "sales.view", "invoice.view", "purchasing.view", "repair.view", "company.view", "settings.finance.view", "whatsapp.view"];
 type Row = Record<string, unknown>;
 type Call = { url: URL; method: string; headers: Headers; body: Record<string, unknown> | null };
 type MockOptions = {
@@ -40,6 +40,7 @@ function mockedNetwork(t: TestContext, options: MockOptions = {}) {
   Object.assign(process.env, values);
   const calls: Call[] = [];
   const tables: Record<string, Row[]> = {
+    whatsapp_conversation: [],
     inventory_item: [{ id: "item-a", item_name: "Charging port", sku: "PORT-A", minimum_stock: "10" }],
     branch_stock: [{ id: "stock-a", inventory_item_id: "item-a", quantity: "3" }],
     purchase_order: [{ id: "po-a", purchase_order_number: "PO-1", status: "approved", expected_date: "2026-09-15" }],
@@ -74,6 +75,7 @@ function mockedNetwork(t: TestContext, options: MockOptions = {}) {
     if (name === "current_user_has_permission") return response(allowed.has(String(call.body?.requested_permission)));
     if (name === "company") return response({ company_name: "Mock Nexus Company" });
     if (name === "company_finance_settings") return response({ base_currency: "ZAR" });
+    if (name === "get_accounting_kpi_dashboard") return response({ok:true,kpis:{revenue_mtd:"1200.50",revenue_ytd:2400,cash_collected_mtd:700,gross_profit_mtd:600,net_profit_mtd:300,open_posting_exceptions:2}});
     if (name === "get_accounting_exception_summary") return response({ ok: true, open_count: 2, oldest_open_date: "2026-09-13" });
     if (name === "get_debtor_ageing") return response({
       ok: true, currency: "ZAR", summary: { open_invoice_count: options.badAgeing ? 2 : 1 },
@@ -147,7 +149,7 @@ test("explicit module permission denials produce forbidden coverage and zero sou
   const authCount = calls.length;
   const snapshot = await loadCoreSnapshot(actor, NOW);
   assert.equal(calls.length, authCount);
-  assert.equal(snapshot.coverage.length, 6);
+  assert.equal(snapshot.coverage.length, 7);
   assert.equal(snapshot.coverage.every(item => item.state === "forbidden" && item.records === null), true);
   for (const name of ["inventory", "receivables", "quotations", "purchasing", "repairs", "controls"] as const) assert.equal(snapshot[name], null);
 });
@@ -160,7 +162,7 @@ test("allowed reads stay on Supabase with the user token and no admin/model keys
   assert.equal(snapshot.quotations?.[0].converted, true);
   assert.equal(snapshot.controls?.openCount, 2);
   assert.equal(snapshot.asOf, "2026-09-16");
-  const readRpcs = new Set(["current_company_id", "current_settings_company_id", "current_user_has_permission", "get_debtor_ageing", "get_accounting_exception_summary"]);
+  const readRpcs = new Set(["current_company_id", "current_settings_company_id", "current_user_has_permission", "get_debtor_ageing", "get_accounting_exception_summary", "get_accounting_kpi_dashboard"]);
   for (const call of calls) {
     assert.equal(call.url.origin, ORIGIN);
     assert.equal(call.headers.get("authorization"), `Bearer ${TOKEN}`);
@@ -303,7 +305,7 @@ test("HTTP GET returns structured core analysis without any model API key", asyn
   const result = await response.json();
   assert.equal(result.analysis.engine, "nexus-core");
   assert.equal(result.analysis.companyName, "Mock Nexus Company");
-  assert.equal(result.analysis.coverage.length, 6);
+  assert.equal(result.analysis.coverage.length, 7);
   assert.equal(Array.isArray(result.analysis.findings), true);
   assert.equal("answer" in result, false);
   assert.equal(calls.every(call => call.url.origin === ORIGIN), true);
@@ -404,4 +406,31 @@ test("HTTP partial failures remain unavailable in analysis and never claim healt
     assert.equal(result.analysis.metrics.some((item: { module: string }) => item.module === area), false);
   }
   assert.equal(result.analysis.coverage.find((item: { module: string }) => item.module === "receivables")?.state, "ready");
+});
+
+
+test("sales report uses permitted accounting totals and distinguishes cash", async (t) => {
+  const calls = mockedNetwork(t);
+  const actor = await authenticateCore(new Request(ORIGIN, {headers:{authorization:`Bearer ${TOKEN}`}}));
+  const data = await loadCoreSnapshot(actor,NOW);
+  assert.equal(data.salesReport?.state,"ready");
+  assert.equal(data.salesReport?.revenueMonth,1200.5);
+  assert.equal(data.salesReport?.cashMonth,700);
+  assert.equal(data.salesReport?.postingExceptions,2);
+  assert.equal(calls.find(c=>c.url.pathname.endsWith("get_accounting_kpi_dashboard"))?.body?.p_as_of_date,"2026-09-16");
+});
+test("sales report does not query accounting without permission", async (t) => {
+  const calls = mockedNetwork(t,{permissions:["repair.view"]});
+  const actor = await authenticateCore(new Request(ORIGIN,{headers:{authorization:`Bearer ${TOKEN}`}}));
+  const data=await loadCoreSnapshot(actor,NOW);
+  assert.equal(data.salesReport?.state,"forbidden");
+  assert.equal(calls.some(c=>c.url.pathname.endsWith("get_accounting_kpi_dashboard")),false);
+});
+test("sales report withholds totals for inconsistent finance company", async (t) => {
+  const calls=mockedNetwork(t,{financialCompany:OTHER_COMPANY});
+  const actor=await authenticateCore(new Request(ORIGIN,{headers:{authorization:`Bearer ${TOKEN}`}}));
+  const data=await loadCoreSnapshot(actor,NOW);
+  assert.equal(data.salesReport?.state,"unavailable");
+  assert.equal(data.salesReport?.revenueMonth,undefined);
+  assert.equal(calls.some(c=>c.url.pathname.endsWith("get_accounting_kpi_dashboard")),false);
 });

@@ -72,8 +72,6 @@ create table if not exists public.quotation (
         quotation_number
     )
 );
-
-
 -- ============================================================
 -- 2. QUOTATION ITEMS
 -- ============================================================
@@ -127,51 +125,37 @@ create table if not exists public.quotation_item (
 
     created_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 3. INDEXES
 -- ============================================================
 
 create index if not exists quotation_company_idx
     on public.quotation(company_id);
-
 create index if not exists quotation_customer_idx
     on public.quotation(customer_id);
-
 create index if not exists quotation_branch_idx
     on public.quotation(branch_id);
-
 create index if not exists quotation_status_idx
     on public.quotation(status);
-
 create index if not exists quotation_date_idx
     on public.quotation(quotation_date desc);
-
 create index if not exists quotation_item_quotation_idx
     on public.quotation_item(quotation_id);
-
 create index if not exists quotation_item_company_idx
     on public.quotation_item(company_id);
-
 create index if not exists quotation_item_inventory_idx
     on public.quotation_item(inventory_item_id);
-
-
 -- ============================================================
 -- 4. UPDATED_AT TRIGGER
 -- ============================================================
 
 drop trigger if exists quotation_set_updated_at
 on public.quotation;
-
 create trigger quotation_set_updated_at
 before update
 on public.quotation
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 5. LINE TOTAL CALCULATION
 -- ============================================================
@@ -214,18 +198,13 @@ begin
     return new;
 end;
 $$;
-
-
 drop trigger if exists quotation_item_calculate_totals
 on public.quotation_item;
-
 create trigger quotation_item_calculate_totals
 before insert or update
 on public.quotation_item
 for each row
 execute function public.calculate_quotation_item_totals();
-
-
 -- ============================================================
 -- 6. HEADER TOTAL RECALCULATION
 -- ============================================================
@@ -279,8 +258,6 @@ begin
         target_quotation_id;
 end;
 $$;
-
-
 create or replace function public.quotation_item_recalculate_parent()
 returns trigger
 language plpgsql
@@ -313,18 +290,13 @@ begin
     return new;
 end;
 $$;
-
-
 drop trigger if exists quotation_item_recalculate_after_change
 on public.quotation_item;
-
 create trigger quotation_item_recalculate_after_change
 after insert or update or delete
 on public.quotation_item
 for each row
 execute function public.quotation_item_recalculate_parent();
-
-
 -- ============================================================
 -- 7. QUOTATION NUMBER GENERATOR
 -- ============================================================
@@ -368,19 +340,14 @@ begin
         );
 end;
 $$;
-
-
 -- ============================================================
 -- 8. ROW LEVEL SECURITY
 -- ============================================================
 
 alter table public.quotation
 enable row level security;
-
 alter table public.quotation_item
 enable row level security;
-
-
 create policy "Users can view company quotations"
 on public.quotation
 for select
@@ -392,8 +359,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can create company quotations"
 on public.quotation
 for insert
@@ -405,8 +370,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can update company quotations"
 on public.quotation
 for update
@@ -425,8 +388,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can delete company quotations"
 on public.quotation
 for delete
@@ -438,8 +399,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can view company quotation items"
 on public.quotation_item
 for select
@@ -451,8 +410,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can create company quotation items"
 on public.quotation_item
 for insert
@@ -464,8 +421,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can update company quotation items"
 on public.quotation_item
 for update
@@ -484,8 +439,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
-
 create policy "Users can delete company quotation items"
 on public.quotation_item
 for delete
@@ -497,8 +450,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 -- ============================================================
 -- 9. QUOTATION PERMISSIONS
 -- ============================================================
@@ -517,8 +468,6 @@ on conflict (
     permission_name
 )
 do nothing;
-
-
 -- OWNER
 insert into public.role_permissions (
     role_id,
@@ -538,8 +487,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ADMIN
 insert into public.role_permissions (
     role_id,
@@ -565,8 +512,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- MANAGER
 insert into public.role_permissions (
     role_id,
@@ -591,8 +536,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- EMPLOYEE / CASHIER
 insert into public.role_permissions (
     role_id,
@@ -617,8 +560,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- TECHNICIAN / VIEWER
 insert into public.role_permissions (
     role_id,
@@ -640,8 +581,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- END QUOTATION FOUNDATION
--- ============================================================
+-- ============================================================;
