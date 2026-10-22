@@ -22,7 +22,7 @@ Parties, acquisition evidence, costs and audit entries are append-only. No purge
 
 ## Release and recovery
 
-Migration: `supabase/migrations/20261020203940_secondhand_trading_secure_mvp.sql`. It adds private tables, functions and guards; it does not rewrite or delete existing business records. The guard triggers only affect devices controlled by this module. Do not apply all historical repository migrations to production: existing deployment history includes independent releases.
+Migration: `supabase/migrations/20261022140243_secondhand_trading_secure_mvp.sql`. It adds private tables, functions and guards; it does not rewrite or delete existing business records. The guard triggers only affect devices controlled by this module. Do not apply all historical repository migrations to production: existing deployment history includes independent releases.
 
 The pre-change schema metadata snapshot includes table definitions, constraints, grants, policies, functions, triggers, indexes and permission records. It is an inspection/recovery reference, not a complete restorable database/data backup. Confirm managed backups before routine trading.
 
