@@ -1,4 +1,8 @@
 export type PermissionName =
+  | "secondhand.view"
+  | "secondhand.manage"
+  | "secondhand.approve"
+  | "secondhand.export"
   | "shipping.view"
   | "shipping.manage"
   | "shipping.dispatch"

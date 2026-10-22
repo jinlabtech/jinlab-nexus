@@ -31,11 +31,19 @@ export async function getCurrentUserPermissions(): Promise<PermissionName[]> {
   const pending = pendingPermissions.get(key);
   if (pending) return pending;
   const request = (async () => {
-    const { data, error } = await clientRequest(supabase.rpc("get_current_user_permissions")
-      .abortSignal(AbortSignal.timeout(15_000)), "Permissions could not be loaded in time. Please retry.");
+    const [{ data, error }, secondhand] = await Promise.all([
+      clientRequest(supabase.rpc("get_current_user_permissions")
+        .abortSignal(AbortSignal.timeout(15_000)), "Permissions could not be loaded in time. Please retry."),
+      // Dedicated branch grants are authoritative for this sensitive module.
+      // Fail closed without hiding existing Nexus modules during a rollout.
+      Promise.resolve(supabase.rpc("sh_navigation_access")
+        .abortSignal(AbortSignal.timeout(8_000))).catch(() => ({ data: false, error: true })),
+    ]);
     if (error) throw new Error(error.message);
-    return (data?.map((row: { permission_name: string }) => row.permission_name)
-      .filter(Boolean) ?? []) as PermissionName[];
+    const permissions = (data?.map((row: { permission_name: string }) => row.permission_name)
+      .filter((name: string) => Boolean(name) && !name.startsWith("secondhand.")) ?? []) as PermissionName[];
+    if (!secondhand.error && secondhand.data === true) permissions.push("secondhand.view");
+    return permissions;
   })();
   pendingPermissions.set(key, request);
   try { return await request; }

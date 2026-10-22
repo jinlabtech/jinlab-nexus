@@ -4,6 +4,7 @@ import type {
 
 
 export type NexusAppId =
+  | "secondhand"
   | "whatsapp"
   | "sales"
   | "inventory"
@@ -84,6 +85,18 @@ export type NexusNavigationItem = {
 
 export const nexusApps:
   NexusAppItem[] = [
+
+  {
+    id: "secondhand",
+    label: "Second-Hand Goods",
+    href: "/second-hand",
+    activeRoot: "/second-hand",
+    icon: "inventory",
+    permission: "secondhand.view",
+    dockable: true,
+    mobile: true,
+    keywords: ["second hand", "trade in", "acquisitions", "used devices", "register"],
+  },
 
   {
     id: "whatsapp",

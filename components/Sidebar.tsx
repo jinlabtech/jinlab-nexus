@@ -80,6 +80,12 @@ const recycleBinItem: NavigationItem = {
 
 const navigationGroups: NavigationGroup[] = [
   {
+    key: "secondhand",
+    name: "Second-Hand Goods",
+    icon: <Package className="h-4 w-4" />,
+    items: [{ name: "Trading Register", href: "/second-hand", permission: "secondhand.view" }],
+  },
+  {
     key: "email",
     name: "Email",
     icon: (

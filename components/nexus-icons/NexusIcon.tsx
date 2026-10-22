@@ -64,6 +64,8 @@ export function nexusIconForRoute(
       ) ||
     "/";
 
+  if (path.startsWith("/second-hand")) return "inventory";
+
 
   if (
     path === "/dashboard"
