@@ -71,10 +71,7 @@ export default function PurchasingRecommendationsPage() {
 		setSelectedBranchId,
 	] = useState("");
 
-	const [
-		recommendations,
-		setRecommendations,
-	] = useState<Recommendation[]>([]);
+	const [recommendationEdits, setRecommendationEdits] = useState<Record<string, Partial<Pick<Recommendation, "selected" | "suggestedQuantity">>>>({});
 
 	const [
 		creating,
@@ -123,95 +120,95 @@ export default function PurchasingRecommendationsPage() {
 			permissionsError,
 	} = usePermissions();
 
-	useEffect(() => {
-		async function initialisePage() {
-			const {
-				data: { user },
-				error: userError,
-			} =
-				await supabase.auth.getUser();
+  useEffect(() => {
+    async function initialisePage() {
+      const {
+        data: { user },
+        error: userError,
+      } =
+        await supabase.auth.getUser();
 
-			if (
-				userError ||
-				!user
-			) {
-				router.replace(
-					"/login"
-				);
+      if (
+        userError ||
+        !user
+      ) {
+        router.replace(
+          "/login"
+        );
 
-				return;
-			}
+        return;
+      }
 
-			const {
-				data: profile,
-				error: profileError,
-			} = await supabase
-				.from(
-					"user_profile"
-				)
-				.select(
-					"full_name, company_id"
-				)
-				.eq(
-					"user_id",
-					user.id
-				)
-				.single();
+      const {
+        data: profile,
+        error: profileError,
+      } = await supabase
+        .from(
+          "user_profile"
+        )
+        .select(
+          "full_name, company_id"
+        )
+        .eq(
+          "user_id",
+          user.id
+        )
+        .single();
 
-			if (
-				profileError ||
-				!profile
-			) {
-				setPageError(
-					profileError?.message ??
-						"Profile could not be loaded."
-				);
+      if (
+        profileError ||
+        !profile
+      ) {
+        setPageError(
+          profileError?.message ??
+          "Profile could not be loaded."
+        );
 
-				return;
-			}
+        return;
+      }
 
-			setUserName(
-				profile.full_name
-			);
+      setUserName(
+        profile.full_name
+      );
 
-			if (
-				!profile.company_id
-			) {
-				setPageError(
-					"Your account is not linked to a company."
-				);
+      if (
+        !profile.company_id
+      ) {
+        setPageError(
+          "Your account is not linked to a company."
+        );
 
-				return;
-			}
+        return;
+      }
 
-			setCurrentCompanyId(
-				profile.company_id
-			);
+      setCurrentCompanyId(
+        profile.company_id
+      );
 
-			const {
-				data: company,
-			} = await supabase
-				.from("company")
-				.select(
-					"company_name"
-				)
-				.eq(
-					"id",
-					profile.company_id
-				)
-				.single();
+      const {
+        data: company,
+      } = await supabase
+        .from("company")
+        .select(
+          "company_name"
+        )
+        .eq(
+          "id",
+          profile.company_id
+        )
+        .single();
 
-			if (
-				company?.company_name
-			) {
-				setCompanyName(
-					company.company_name
-				);
-			}
-		}
+      if (
+        company?.company_name
+      ) {
+        setCompanyName(
+          company.company_name
+        );
+      }
+    }
 
-		initialisePage();
-	}, [router]);
+    initialisePage();
+  }, [router]);
 
 	const stockByItem =
 		useMemo(() => {
@@ -240,80 +237,74 @@ export default function PurchasingRecommendationsPage() {
 			return map;
 		}, [branchStock]);
 
-	useEffect(() => {
-		const rows =
-			items
-				.map(
-					(
-						item
-					): Recommendation | null => {
-						const currentStock =
-							stockByItem.get(
-								item.id
-							) ?? 0;
+  const recommendations = useMemo(() => {
+    const rows =
+      items
+        .map(
+          (
+            item
+          ): Recommendation | null => {
+            const currentStock =
+              stockByItem.get(
+                item.id
+              ) ?? 0;
 
-						if (
-							currentStock >
-							item.minimum_stock
-						) {
-							return null;
-						}
+            if (
+              currentStock >
+              item.minimum_stock
+            ) {
+              return null;
+            }
 
-						const target =
-							Math.max(
-								item.minimum_stock *
-									2,
+            const target =
+              Math.max(
+                item.minimum_stock *
+                2,
 
-								item.minimum_stock +
-									1,
+                item.minimum_stock +
+                1,
 
-								1
-							);
+                1
+              );
 
-						return {
-							itemId:
-								item.id,
+            return {
+              itemId:
+                item.id,
 
-							itemName:
-								item.item_name,
+              itemName:
+                item.item_name,
 
-							sku:
-								item.sku,
+              sku:
+                item.sku,
 
-							supplierId:
-								item.supplier_id,
+              supplierId:
+                item.supplier_id,
 
-							currentStock,
+              currentStock,
 
-							minimumStock:
-								item.minimum_stock,
+              minimumStock:
+                item.minimum_stock,
 
-							suggestedQuantity:
-								Math.max(
-									target -
-										currentStock,
-									1
-								),
+              suggestedQuantity:
+                Math.max(
+                  target -
+                  currentStock,
+                  1
+                ),
 
-							selected:
-								false,
-						};
-					}
-				)
-				.filter(
-					(
-						row
-					): row is Recommendation =>
-						row !== null
-				);
-
-		setRecommendations(
-			rows
-		);
-	}, [
-		items,
-		stockByItem,
-	]);
+              selected:
+                false,
+            };
+          }
+        )
+        .filter(
+          (
+            row
+          ): row is Recommendation =>
+            row !== null
+        );
+    return rows.map(row => ({ ...row, ...recommendationEdits[row.itemId] }));
+  }, [items, stockByItem, recommendationEdits]);
 
 	const visibleRecommendations =
 		useMemo(() => {
@@ -339,54 +330,17 @@ export default function PurchasingRecommendationsPage() {
 				row.selected
 		);
 
-	function toggleItem(
-		itemId: string
-	) {
-		setRecommendations(
-			(current) =>
-				current.map(
-					(row) =>
-						row.itemId ===
-						itemId
-							? {
-									...row,
 
-									selected:
-										!row.selected,
-								}
-							: row
-				)
-		);
-	}
+  function toggleItem(itemId: string) {
+    const row = recommendations.find(item => item.itemId === itemId);
+    if (!row) return;
+    setRecommendationEdits(current => ({ ...current, [itemId]: { ...current[itemId], selected: !row.selected } }));
+  }
 
-	function changeQuantity(
-		itemId: string,
-		value: string
-	) {
-		const number =
-			Number(value);
-
-		setRecommendations(
-			(current) =>
-				current.map(
-					(row) =>
-						row.itemId ===
-						itemId
-							? {
-									...row,
-
-									suggestedQuantity:
-										Number.isInteger(
-											number
-										) &&
-										number > 0
-											? number
-											: 1,
-								}
-							: row
-				)
-		);
-	}
+  function changeQuantity(itemId: string, value: string) {
+    const quantity = Number(value);
+    setRecommendationEdits(current => ({ ...current, [itemId]: { ...current[itemId], suggestedQuantity: Number.isInteger(quantity) && quantity > 0 ? quantity : 1 } }));
+  }
 
 	async function createRecommendedPO() {
 		if (

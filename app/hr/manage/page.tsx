@@ -465,8 +465,6 @@ export default function HrManagementPage() {
 
 
   async function loadMain() {
-    setError("");
-
     const {
       data: {
         user,
@@ -474,6 +472,7 @@ export default function HrManagementPage() {
     } =
       await supabase.auth.getUser();
 
+    setError("");
 
     if (!user) {
       router.push(
@@ -568,6 +567,7 @@ export default function HrManagementPage() {
       nextWorkspace.employees.length >
         0
     ) {
+      setBusy("load-employee");
       setSelectedEmployeeId(
         nextWorkspace.employees[0].id
       );
@@ -575,190 +575,171 @@ export default function HrManagementPage() {
   }
 
 
-  async function loadEmployee(
+  function loadEmployee(
     employeeId:
       string
   ) {
     if (!employeeId) {
-      setDetails(
-        null
-      );
-
       return;
     }
-
-
-    setBusy(
-      "load-employee"
-    );
-
-    setError(
-      ""
-    );
-
-
-    try {
-      const {
+    return Promise.resolve(
+      supabase.rpc(
+        "get_hr_employee_management",
+        {
+          p_employee_id: employeeId,
+        }
+      )
+    )
+      .then(({
         data,
         error:
           rpcError,
-      } =
-        await supabase.rpc(
-          "get_hr_employee_management",
-          {
-            p_employee_id:
-              employeeId,
-          }
+      }) => {
+        if (rpcError) {
+          throw rpcError;
+        }
+
+
+        const result =
+          data as EmployeeManagement;
+
+
+        setDetails(
+          result
         );
 
 
-      if (rpcError) {
-        throw rpcError;
-      }
+        setEmployeeForm({
+          first_name:
+            result.employee.first_name ??
+            "",
+
+          last_name:
+            result.employee.last_name ??
+            "",
+
+          email:
+            result.employee.email ??
+            "",
+
+          phone:
+            result.employee.phone ??
+            "",
+
+          user_id:
+            result.employee.user_id ??
+            "",
+
+          primary_branch_id:
+            result.employee.primary_branch_id ??
+            "",
+
+          department_id:
+            result.employee.department_id ??
+            "",
+
+          position_id:
+            result.employee.position_id ??
+            "",
+
+          manager_employee_id:
+            result.employee.manager_employee_id ??
+            "",
+
+          employment_type:
+            result.employee.employment_type,
+
+          status:
+            result.employee.status,
+
+          hire_date:
+            result.employee.hire_date ??
+            "",
+
+          end_date:
+            result.employee.end_date ??
+            "",
+
+          standard_hours_per_week:
+            String(
+              result.employee.standard_hours_per_week ??
+              45
+            ),
+
+          internal_notes:
+            result.employee.internal_notes ??
+            "",
+        });
 
 
-      const result =
-        data as EmployeeManagement;
+        const rows =
+          dayNames.map(
+            (
+              _,
+              index
+            ) => {
+              const day =
+                index +
+                1;
+
+              const existing =
+                result.availability.find(
+                  (
+                    item
+                  ) =>
+                    item.day_of_week ===
+                    day
+                );
 
 
-      setDetails(
-        result
-      );
+              if (existing) {
+                return existing;
+              }
 
 
-      setEmployeeForm({
-        first_name:
-          result.employee.first_name ??
-          "",
+              return {
+                day_of_week:
+                  day,
 
-        last_name:
-          result.employee.last_name ??
-          "",
+                is_available:
+                  day <=
+                  5,
 
-        email:
-          result.employee.email ??
-          "",
+                available_from:
+                  day <=
+                  5
+                    ? "08:00"
+                    : null,
 
-        phone:
-          result.employee.phone ??
-          "",
+                available_to:
+                  day <=
+                  5
+                    ? "17:30"
+                    : null,
 
-        user_id:
-          result.employee.user_id ??
-          "",
-
-        primary_branch_id:
-          result.employee.primary_branch_id ??
-          "",
-
-        department_id:
-          result.employee.department_id ??
-          "",
-
-        position_id:
-          result.employee.position_id ??
-          "",
-
-        manager_employee_id:
-          result.employee.manager_employee_id ??
-          "",
-
-        employment_type:
-          result.employee.employment_type,
-
-        status:
-          result.employee.status,
-
-        hire_date:
-          result.employee.hire_date ??
-          "",
-
-        end_date:
-          result.employee.end_date ??
-          "",
-
-        standard_hours_per_week:
-          String(
-            result.employee.standard_hours_per_week ??
-            45
-          ),
-
-        internal_notes:
-          result.employee.internal_notes ??
-          "",
-      });
-
-
-      const rows =
-        dayNames.map(
-          (
-            _,
-            index
-          ) => {
-            const day =
-              index +
-              1;
-
-            const existing =
-              result.availability.find(
-                (
-                  item
-                ) =>
-                  item.day_of_week ===
-                  day
-              );
-
-
-            if (existing) {
-              return existing;
+                notes:
+                  null,
+              };
             }
+          );
 
 
-            return {
-              day_of_week:
-                day,
-
-              is_available:
-                day <=
-                5,
-
-              available_from:
-                day <=
-                5
-                  ? "08:00"
-                  : null,
-
-              available_to:
-                day <=
-                5
-                  ? "17:30"
-                  : null,
-
-              notes:
-                null,
-            };
-          }
+        setAvailability(
+          rows
         );
-
-
-      setAvailability(
-        rows
-      );
-
-    } catch (
-      caught
-    ) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Unable to load employee management information."
-      );
-
-    } finally {
-      setBusy(
-        ""
-      );
-    }
+      })
+      .catch((caught: unknown) => {
+        setError(
+          caught instanceof Error
+            ? caught.message
+            : "Unable to load employee management information."
+        );
+      })
+      .finally(() => {
+        setBusy(
+          ""
+        );
+      });
   }
 
 
@@ -1440,10 +1421,14 @@ export default function HrManagementPage() {
                 onValueChange={
                   (
                     selectedValue
-                  ) =>
+                  ) => {
+                    if (!selectedValue || selectedValue === selectedEmployeeId) return;
+                    setBusy("load-employee");
+                    setError("");
                     setSelectedEmployeeId(
                       selectedValue
-                    )
+                    );
+                  }
                 }
                 className={
                   inputClass

@@ -215,7 +215,7 @@ export default function PublicPaymentPage() {
       const link =
         data.payment_link;
 
-      let amount =
+      const amount =
         link.link_type ===
         "customer_entered"
           ? Number(customerAmount)

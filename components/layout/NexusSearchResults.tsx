@@ -115,6 +115,9 @@ type RecordResult = {
 };
 
 
+const emptyRecordData: NexusRecordSearch = {};
+const emptyFiles: NexusFile[] = [];
+
 export default function NexusSearchResults({
   query,
   onOpen,
@@ -131,28 +134,28 @@ export default function NexusSearchResults({
 
 
   const [
-    recordData,
+    recordState,
     setRecordData,
   ] =
     useState<NexusRecordSearch>({});
 
 
   const [
-    files,
+    fileState,
     setFiles,
   ] =
     useState<NexusFile[]>([]);
 
 
   const [
-    searching,
+    requestSearching,
     setSearching,
   ] =
     useState(false);
 
 
   const [
-    searchError,
+    requestError,
     setSearchError,
   ] =
     useState("");
@@ -162,6 +165,14 @@ export default function NexusSearchResults({
     query
       .trim();
 
+
+  const [completedTerm, setCompletedTerm] = useState<string | null>(null);
+  const eligible = term.length >= 2 && !loading;
+  const current = eligible && completedTerm === term;
+  const recordData = current ? recordState : emptyRecordData;
+  const files = current ? fileState : emptyFiles;
+  const searching = eligible && (requestSearching || !current);
+  const searchError = current ? requestError : "";
 
   const routeResults =
     useMemo(
@@ -302,11 +313,6 @@ export default function NexusSearchResults({
         loading
       ) {
 
-        setRecordData({});
-        setFiles([]);
-        setSearching(false);
-        setSearchError("");
-
         return;
       }
 
@@ -444,6 +450,7 @@ export default function NexusSearchResults({
             }
 
 
+            setCompletedTerm(term);
             setSearching(false);
 
           },

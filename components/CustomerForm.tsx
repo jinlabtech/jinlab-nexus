@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useEffect,
   useState,
 } from "react";
 
@@ -25,77 +24,81 @@ type CustomerFormProps = {
   onCancel: () => void;
 };
 
-export default function CustomerForm({
+export default function CustomerForm(props: CustomerFormProps) {
+  return <CustomerFormFields key={props.customer?.id ?? "new"} {...props} />;
+}
+
+function CustomerFormFields({
   customer,
   onSave,
   onCancel,
 }: CustomerFormProps) {
   const [customerType, setCustomerType] =
     useState<CustomerType>(
-      "individual"
+      customer?.customer_type ?? "individual"
     );
 
   const [customerName, setCustomerName] =
-    useState("");
+    useState(customer?.customer_name ?? "");
 
   const [contactPerson, setContactPerson] =
-    useState("");
+    useState(customer?.contact_person ?? "");
 
   const [email, setEmail] =
-    useState("");
+    useState(customer?.email ?? "");
 
   const [phone, setPhone] =
-    useState("");
+    useState(customer?.phone ?? "");
 
   const [
     alternativePhone,
     setAlternativePhone,
-  ] = useState("");
+  ] = useState(customer?.alternative_phone ?? "");
 
   const [
     registrationNumber,
     setRegistrationNumber,
-  ] = useState("");
+  ] = useState(customer?.registration_number ?? "");
 
   const [vatNumber, setVatNumber] =
-    useState("");
+    useState(customer?.vat_number ?? "");
 
   const [
     addressLine1,
     setAddressLine1,
-  ] = useState("");
+  ] = useState(customer?.address_line_1 ?? "");
 
   const [
     addressLine2,
     setAddressLine2,
-  ] = useState("");
+  ] = useState(customer?.address_line_2 ?? "");
 
   const [city, setCity] =
-    useState("");
+    useState(customer?.city ?? "");
 
   const [province, setProvince] =
-    useState("KwaZulu-Natal");
+    useState(customer?.province ?? "KwaZulu-Natal");
 
   const [
     postalCode,
     setPostalCode,
-  ] = useState("");
+  ] = useState(customer?.postal_code ?? "");
 
   const [country, setCountry] =
-    useState("South Africa");
+    useState(customer?.country ?? "South Africa");
 
   const [
     creditLimit,
     setCreditLimit,
-  ] = useState("0");
+  ] = useState(customer ? String(customer.credit_limit) : "0");
 
   const [
     paymentTermsDays,
     setPaymentTermsDays,
-  ] = useState("0");
+  ] = useState(customer ? String(customer.payment_terms_days) : "0");
 
   const [notes, setNotes] =
-    useState("");
+    useState(customer?.notes ?? "");
 
   const [saving, setSaving] =
     useState(false);
@@ -107,97 +110,6 @@ export default function CustomerForm({
 
   const isEditing =
     Boolean(customer);
-
-  useEffect(() => {
-    setCustomerType(
-      customer?.customer_type ??
-        "individual"
-    );
-
-    setCustomerName(
-      customer?.customer_name ??
-        ""
-    );
-
-    setContactPerson(
-      customer?.contact_person ??
-        ""
-    );
-
-    setEmail(
-      customer?.email ?? ""
-    );
-
-    setPhone(
-      customer?.phone ?? ""
-    );
-
-    setAlternativePhone(
-      customer?.alternative_phone ??
-        ""
-    );
-
-    setRegistrationNumber(
-      customer?.registration_number ??
-        ""
-    );
-
-    setVatNumber(
-      customer?.vat_number ??
-        ""
-    );
-
-    setAddressLine1(
-      customer?.address_line_1 ??
-        ""
-    );
-
-    setAddressLine2(
-      customer?.address_line_2 ??
-        ""
-    );
-
-    setCity(
-      customer?.city ?? ""
-    );
-
-    setProvince(
-      customer?.province ??
-        "KwaZulu-Natal"
-    );
-
-    setPostalCode(
-      customer?.postal_code ??
-        ""
-    );
-
-    setCountry(
-      customer?.country ??
-        "South Africa"
-    );
-
-    setCreditLimit(
-      customer
-        ? String(
-            customer.credit_limit
-          )
-        : "0"
-    );
-
-    setPaymentTermsDays(
-      customer
-        ? String(
-            customer.payment_terms_days
-          )
-        : "0"
-    );
-
-    setNotes(
-      customer?.notes ?? ""
-    );
-
-    setErrorMessage("");
-  }, [customer]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

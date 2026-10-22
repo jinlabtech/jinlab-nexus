@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useMemo,
   useState,
 } from "react";
@@ -147,7 +149,11 @@ function statusClass(
 }
 
 
-export default function DebtorCollectionQueue({
+export default function DebtorCollectionQueue(props: Props) {
+  return <DebtorCollectionQueueContent key={props.asOfDate} {...props} />;
+}
+
+function DebtorCollectionQueueContent({
   asOfDate,
   canManage,
 }: Props) {
@@ -249,42 +255,42 @@ export default function DebtorCollectionQueue({
     useState("");
 
 
+  const requestVersion = useRef(0);
+
+  const fetchData = useCallback(() => {
+    const version = ++requestVersion.current;
+    return getDebtorCollectionQueue(asOfDate).then((result) => {
+      if (version !== requestVersion.current)
+        return;
+      setItems(result.items ??
+        []);
+      setSummary(result.summary);
+    }).catch((error) => {
+      if (version !== requestVersion.current)
+        return;
+      setErrorMessage(error instanceof Error
+        ? error.message
+        : "Collection action queue could not be loaded.");
+    }).finally(() => {
+      if (version === requestVersion.current) {
+        setLoading(false);
+      }
+    });
+  }, [asOfDate]);
+
   async function loadData() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
-
-      const result =
-        await getDebtorCollectionQueue(
-          asOfDate
-        );
-
-      setItems(
-        result.items ??
-        []
-      );
-
-      setSummary(
-        result.summary
-      );
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Collection action queue could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    setErrorMessage("");
+    await fetchData();
   }
 
 
   useEffect(() => {
-    void loadData();
-  }, [
-    asOfDate,
-  ]);
+    void fetchData();
+    return () => {
+      requestVersion.current += 1;
+    };
+  }, [fetchData]);
 
 
   const visibleItems =

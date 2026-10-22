@@ -365,7 +365,7 @@ export default function SplitTenderPanel({
   }
 
 
-  function useRemaining(
+  function applyRemaining(
     index: number
   ) {
 
@@ -589,7 +589,7 @@ export default function SplitTenderPanel({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          useRemaining(
+                          applyRemaining(
                             index
                           )
                         }

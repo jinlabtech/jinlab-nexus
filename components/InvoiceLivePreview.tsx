@@ -15,7 +15,6 @@ import type {
 
 import {
   Fragment,
-  useEffect,
   useState,
 } from "react";
 
@@ -74,7 +73,11 @@ function status(value: string) {
     .join(" ");
 }
 
-export default function InvoiceLivePreview({
+export default function InvoiceLivePreview(props: Props) {
+  return <InvoiceLivePreviewEditor key={props.invoice.id} {...props} />;
+}
+
+function InvoiceLivePreviewEditor({
   invoice,
   items,
   customer,
@@ -289,9 +292,6 @@ export default function InvoiceLivePreview({
     setDraftValue("");
   }
 
-  useEffect(() => {
-    cancelEdit();
-  }, [invoice.id]);
   return (
     <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
       <div className="flex items-center justify-between border-b bg-neutral-50 px-5 py-3">

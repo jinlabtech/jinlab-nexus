@@ -3,6 +3,7 @@
 import ActionModal from "@/components/ui/ActionModal";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -192,7 +193,7 @@ export default function PurchaseOrderDetailPage() {
       ) {
         setPageError(
           profileError?.message ??
-            "Profile could not be loaded."
+          "Profile could not be loaded."
         );
         return;
       }
@@ -238,49 +239,54 @@ export default function PurchaseOrderDetailPage() {
 
     initialisePage();
   }, [router]);
-
-  async function refreshOrder() {
+  const fetchOrder = useCallback(() => {
     if (
       !currentCompanyId ||
       !purchaseOrderId
     ) {
       return;
     }
-
-    setLoadingOrder(true);
-    setPageError("");
-
-    try {
-      const result =
-        await getPurchaseOrder(
-          purchaseOrderId,
-          currentCompanyId
+    return getPurchaseOrder(
+      purchaseOrderId,
+      currentCompanyId
+    )
+      .then(async (result) => {
+        setOrder(
+          result.order
         );
 
-      setOrder(
-        result.order
-      );
+        setOrderItems(
+          result.items
+        );
+      })
+      .catch((error) => {
+        setPageError(
+          error instanceof Error
+            ? error.message
+            : "Purchase order could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoadingOrder(false);
+      });
+  }, [currentCompanyId, purchaseOrderId]);
 
-      setOrderItems(
-        result.items
-      );
-    } catch (error) {
-      setPageError(
-        error instanceof Error
-          ? error.message
-          : "Purchase order could not be loaded."
-      );
-    } finally {
-      setLoadingOrder(false);
+  function refreshOrder() {
+    if (
+      !currentCompanyId ||
+      !purchaseOrderId
+    ) {
+      return;
     }
+    setLoadingOrder(true);
+    setPageError("");
+    return fetchOrder();
   }
 
   useEffect(() => {
-    refreshOrder();
-  }, [
-    currentCompanyId,
-    purchaseOrderId,
-  ]);
+    void fetchOrder();
+  }, [fetchOrder]);
+
 
   const inventoryMap =
     useMemo(() => {

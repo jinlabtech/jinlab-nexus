@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -196,121 +197,102 @@ export default function PosReceiptsPage() {
     useState(
       ""
     );
+  const fetchReceipts = useCallback(() => {
 
-
-  async function loadReceipts() {
-
-    setLoading(
-      true
-    );
-
-    setErrorMessage(
-      ""
-    );
-
-
-    try {
-
-      const {
+    return supabase.auth.getUser()
+      .then(async ({
         data: {
           user,
         },
         error:
-          userError,
-      } =
-        await supabase.auth.getUser();
+        userError,
+      }) => {
+        if (
+          userError ||
+          !user
+        ) {
 
+          router.replace(
+            "/login"
+          );
 
-      if (
-        userError ||
-        !user
-      ) {
-
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
-          profile,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "full_name, company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .maybeSingle();
-
-
-      if (
-        profile
-          ?.full_name
-      ) {
-
-        setUserName(
-          profile.full_name
-        );
-      }
-
-
-      if (
-        profile
-          ?.company_id
-      ) {
+          return;
+        }
 
         const {
           data:
-            company,
+          profile,
         } =
           await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "full_name, company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
             .maybeSingle();
 
-
         if (
-          company
-            ?.company_name
+          profile
+            ?.full_name
         ) {
 
-          setCompanyName(
-            company.company_name
+          setUserName(
+            profile.full_name
           );
         }
 
-      }
+        if (
+          profile
+            ?.company_id
+        ) {
+
+          const {
+            data:
+            company,
+          } =
+            await supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .maybeSingle();
 
 
-      const {
-        data:
+          if (
+            company
+              ?.company_name
+          ) {
+
+            setCompanyName(
+              company.company_name
+            );
+          }
+
+        }
+
+        const {
+          data:
           saleData,
-        error:
+          error:
           saleError,
-      } =
-        await supabase
-          .from(
-            "pos_sale"
-          )
-          .select(
-            `
+        } =
+          await supabase
+            .from(
+              "pos_sale"
+            )
+            .select(
+              `
               id,
               sale_number,
               invoice_id,
@@ -322,294 +304,283 @@ export default function PosReceiptsPage() {
               status,
               created_at
             `
-          )
-          .order(
-            "created_at",
-            {
-              ascending:
-                false,
-            }
-          )
-          .limit(
-            250
-          );
+            )
+            .order(
+              "created_at",
+              {
+                ascending:
+                  false,
+              }
+            )
+            .limit(
+              250
+            );
 
+        if (
+          saleError
+        ) {
 
-      if (
-        saleError
-      ) {
+          throw saleError;
+        }
 
-        throw saleError;
-      }
-
-
-      const sales =
-        (
-          saleData ??
-          []
-        ) as
+        const sales =
+          (
+            saleData ??
+            []
+          ) as
           PosSaleRow[];
 
+        const customerIds =
+          [
+            ...new Set(
+              sales.map(
+                (
+                  sale
+                ) =>
+                  sale.customer_id
+              )
+            ),
+          ];
 
-      const customerIds =
-        [
-          ...new Set(
-            sales.map(
-              (
-                sale
-              ) =>
-                sale.customer_id
-            )
-          ),
-        ];
+        const branchIds =
+          [
+            ...new Set(
+              sales.map(
+                (
+                  sale
+                ) =>
+                  sale.branch_id
+              )
+            ),
+          ];
 
+        const invoiceIds =
+          [
+            ...new Set(
+              sales.map(
+                (
+                  sale
+                ) =>
+                  sale.invoice_id
+              )
+            ),
+          ];
 
-      const branchIds =
-        [
-          ...new Set(
-            sales.map(
-              (
-                sale
-              ) =>
-                sale.branch_id
-            )
-          ),
-        ];
-
-
-      const invoiceIds =
-        [
-          ...new Set(
-            sales.map(
-              (
-                sale
-              ) =>
-                sale.invoice_id
-            )
-          ),
-        ];
-
-
-      let customerRows:
-        {
-          id: string;
-          customer_name: string;
-        }[] =
-        [];
-
-
-      let branchRows:
-        {
-          id: string;
-          branch_name: string;
-        }[] =
-        [];
-
-
-      let invoiceRows:
-        {
-          id: string;
-          invoice_number: string;
-        }[] =
-        [];
-
-
-      if (
-        customerIds.length >
-        0
-      ) {
-
-        const {
-          data,
-        } =
-          await supabase
-            .from(
-              "customer"
-            )
-            .select(
-              "id, customer_name"
-            )
-            .in(
-              "id",
-              customerIds
-            );
-
-
-        customerRows =
-          (
-            data ??
-            []
-          ) as {
+        let customerRows:
+          {
             id: string;
             customer_name: string;
-          }[];
+          }[] =
+          [];
 
-      }
-
-
-      if (
-        branchIds.length >
-        0
-      ) {
-
-        const {
-          data,
-        } =
-          await supabase
-            .from(
-              "branch"
-            )
-            .select(
-              "id, branch_name"
-            )
-            .in(
-              "id",
-              branchIds
-            );
-
-
-        branchRows =
-          (
-            data ??
-            []
-          ) as {
+        let branchRows:
+          {
             id: string;
             branch_name: string;
-          }[];
+          }[] =
+          [];
 
-      }
-
-
-      if (
-        invoiceIds.length >
-        0
-      ) {
-
-        const {
-          data,
-        } =
-          await supabase
-            .from(
-              "invoice"
-            )
-            .select(
-              "id, invoice_number"
-            )
-            .in(
-              "id",
-              invoiceIds
-            );
-
-
-        invoiceRows =
-          (
-            data ??
-            []
-          ) as {
+        let invoiceRows:
+          {
             id: string;
             invoice_number: string;
-          }[];
+          }[] =
+          [];
 
-      }
+        if (
+          customerIds.length >
+          0
+        ) {
+
+          const {
+            data,
+          } =
+            await supabase
+              .from(
+                "customer"
+              )
+              .select(
+                "id, customer_name"
+              )
+              .in(
+                "id",
+                customerIds
+              );
 
 
-      const customerMap =
-        new Map(
-          customerRows.map(
+          customerRows =
             (
-              row
-            ) => [
-              row.id,
-              row.customer_name,
-            ]
+              data ??
+              []
+            ) as {
+              id: string;
+              customer_name: string;
+            }[];
+
+        }
+
+        if (
+          branchIds.length >
+          0
+        ) {
+
+          const {
+            data,
+          } =
+            await supabase
+              .from(
+                "branch"
+              )
+              .select(
+                "id, branch_name"
+              )
+              .in(
+                "id",
+                branchIds
+              );
+
+
+          branchRows =
+            (
+              data ??
+              []
+            ) as {
+              id: string;
+              branch_name: string;
+            }[];
+
+        }
+
+        if (
+          invoiceIds.length >
+          0
+        ) {
+
+          const {
+            data,
+          } =
+            await supabase
+              .from(
+                "invoice"
+              )
+              .select(
+                "id, invoice_number"
+              )
+              .in(
+                "id",
+                invoiceIds
+              );
+
+
+          invoiceRows =
+            (
+              data ??
+              []
+            ) as {
+              id: string;
+              invoice_number: string;
+            }[];
+
+        }
+
+        const customerMap =
+          new Map(
+            customerRows.map(
+              (
+                row
+              ) => [
+                  row.id,
+                  row.customer_name,
+                ]
+            )
+          );
+
+        const branchMap =
+          new Map(
+            branchRows.map(
+              (
+                row
+              ) => [
+                  row.id,
+                  row.branch_name,
+                ]
+            )
+          );
+
+        const invoiceMap =
+          new Map(
+            invoiceRows.map(
+              (
+                row
+              ) => [
+                  row.id,
+                  row.invoice_number,
+                ]
+            )
+          );
+
+        setReceipts(
+          sales.map(
+            (
+              sale
+            ) => ({
+              ...sale,
+
+              customer_name:
+                customerMap.get(
+                  sale.customer_id
+                ) ??
+                "Walk-in customer",
+
+              branch_name:
+                branchMap.get(
+                  sale.branch_id
+                ) ??
+                "Branch",
+
+              invoice_number:
+                invoiceMap.get(
+                  sale.invoice_id
+                ) ??
+                "—",
+            })
           )
         );
+      })
+      .catch((error) => {
 
-
-      const branchMap =
-        new Map(
-          branchRows.map(
-            (
-              row
-            ) => [
-              row.id,
-              row.branch_name,
-            ]
-          )
+        setErrorMessage(
+          error instanceof
+            Error
+            ? error.message
+            : "Unable to load POS receipts."
         );
 
+      })
+      .finally(() => {
 
-      const invoiceMap =
-        new Map(
-          invoiceRows.map(
-            (
-              row
-            ) => [
-              row.id,
-              row.invoice_number,
-            ]
-          )
+        setLoading(
+          false
         );
 
+      });
+  }, [router]);
 
-      setReceipts(
-        sales.map(
-          (
-            sale
-          ) => ({
-            ...sale,
+  function loadReceipts() {
 
-            customer_name:
-              customerMap.get(
-                sale.customer_id
-              ) ??
-              "Walk-in customer",
-
-            branch_name:
-              branchMap.get(
-                sale.branch_id
-              ) ??
-              "Branch",
-
-            invoice_number:
-              invoiceMap.get(
-                sale.invoice_id
-              ) ??
-              "—",
-          })
-        )
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof
-        Error
-          ? error.message
-          : "Unable to load POS receipts."
-      );
-
-    } finally {
-
-      setLoading(
-        false
-      );
-
-    }
-
+    setLoading(
+      true
+    );
+    setErrorMessage(
+      ""
+    );
+    return fetchReceipts();
   }
 
+  useEffect(() => {
+    void fetchReceipts();
+  }, [fetchReceipts]);
 
-  useEffect(
-    () => {
-
-      void loadReceipts();
-
-    },
-    []
-  );
 
 
   const filteredReceipts =

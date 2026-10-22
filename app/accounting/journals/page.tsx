@@ -345,178 +345,173 @@ export default function JournalsPage() {
     useState("");
 
 
-  async function loadData(
+  function loadData(
     silent = false
   ) {
-    try {
-      if (silent) {
-        setRefreshing(
-          true
-        );
-      } else {
-        setLoading(
-          true
-        );
-      }
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (silent) {
+          setRefreshing(
+            true
+          );
+        } else {
+          setLoading(
+            true
+          );
+        }
 
-      setErrorMessage("");
-
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
-
-      if (!user) {
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
+        setErrorMessage("");
 
 
-      const {
-        data: profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
+        if (!user) {
+          router.replace(
+            "/login"
+          );
+
+          return;
+        }
 
 
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const currentCompanyId =
-        profile.company_id;
-
-      setCompanyId(
-        currentCompanyId
-      );
-
-
-      const [
-        companyResult,
-        accountResult,
-        journalResult,
-        branchResult,
-        trialResult,
-      ] =
-        await Promise.all([
-          supabase
+        const {
+          data: profile,
+          error:
+            profileError,
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
+              "user_id",
+              user.id
+            )
+            .single();
+
+
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
+
+
+        const currentCompanyId =
+          profile.company_id;
+
+        setCompanyId(
+          currentCompanyId
+        );
+
+
+        const [
+          companyResult,
+          accountResult,
+          journalResult,
+          branchResult,
+          trialResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                currentCompanyId
+              )
+              .single(),
+
+            getChartOfAccounts(),
+
+            getJournalEntries(
               currentCompanyId
-            )
-            .single(),
-
-          getChartOfAccounts(),
-
-          getJournalEntries(
-            currentCompanyId
-          ),
-
-          supabase
-            .from(
-              "branch"
-            )
-            .select(
-              "id, branch_name"
-            )
-            .eq(
-              "company_id",
-              currentCompanyId
-            )
-            .order(
-              "branch_name"
             ),
 
-          getTrialBalance(
-            trialDate
-          ),
-        ]);
+            supabase
+              .from(
+                "branch"
+              )
+              .select(
+                "id, branch_name"
+              )
+              .eq(
+                "company_id",
+                currentCompanyId
+              )
+              .order(
+                "branch_name"
+              ),
+
+            getTrialBalance(
+              trialDate
+            ),
+          ]);
 
 
-      if (
-        companyResult.error
-      ) {
-        throw new Error(
+        if (
+          companyResult.error
+        ) {
+          throw new Error(
+            companyResult
+              .error.message
+          );
+        }
+
+
+        if (
+          branchResult.error
+        ) {
+          throw new Error(
+            branchResult
+              .error.message
+          );
+        }
+
+
+        setCompanyName(
           companyResult
-            .error.message
+            .data.company_name
         );
-      }
 
-
-      if (
-        branchResult.error
-      ) {
-        throw new Error(
-          branchResult
-            .error.message
+        setAccounts(
+          accountResult
         );
-      }
 
+        setJournals(
+          journalResult
+        );
 
-      setCompanyName(
-        companyResult
-          .data.company_name
-      );
+        setBranches(
+          (
+            branchResult.data ??
+            []
+          ) as BranchOption[]
+        );
 
-      setAccounts(
-        accountResult
-      );
-
-      setJournals(
-        journalResult
-      );
-
-      setBranches(
-        (
-          branchResult.data ??
-          []
-        ) as BranchOption[]
-      );
-
-      setTrialBalance(
-        trialResult
-      );
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Accounting journals could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+        setTrialBalance(
+          trialResult
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Accounting journals could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   }
 
 
@@ -528,7 +523,6 @@ export default function JournalsPage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
@@ -1066,7 +1060,7 @@ export default function JournalsPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>

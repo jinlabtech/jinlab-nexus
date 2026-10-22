@@ -3,7 +3,6 @@
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
-  useEffect,
   useState,
 } from "react";
 
@@ -36,7 +35,11 @@ type QuotationFormProps = {
   onCancel: () => void;
 };
 
-export default function QuotationForm({
+export default function QuotationForm(props: QuotationFormProps) {
+  return <QuotationFormFields key={props.quotation?.id ?? "new"} {...props} />;
+}
+
+function QuotationFormFields({
   quotation,
   customers,
   branches,
@@ -46,33 +49,33 @@ export default function QuotationForm({
   const [
     customerId,
     setCustomerId,
-  ] = useState("");
+  ] = useState(quotation?.customer_id ?? "");
 
   const [
     branchId,
     setBranchId,
-  ] = useState("");
+  ] = useState(quotation?.branch_id ?? "");
 
   const [
     validUntil,
     setValidUntil,
-  ] = useState("");
+  ] = useState(quotation?.valid_until ?? "");
 
   const [
     customerReference,
     setCustomerReference,
-  ] = useState("");
+  ] = useState(quotation?.customer_reference ?? "");
 
   const [
     notes,
     setNotes,
-  ] = useState("");
+  ] = useState(quotation?.notes ?? "");
 
   const [
     terms,
     setTerms,
   ] = useState(
-    "Quotation valid until the stated expiry date. Prices are subject to availability."
+    quotation?.terms ?? "Quotation valid until the stated expiry date. Prices are subject to availability."
   );
 
   const [
@@ -87,40 +90,6 @@ export default function QuotationForm({
 
   const isEditing =
     Boolean(quotation);
-
-  useEffect(() => {
-    setCustomerId(
-      quotation?.customer_id ??
-        ""
-    );
-
-    setBranchId(
-      quotation?.branch_id ??
-        ""
-    );
-
-    setValidUntil(
-      quotation?.valid_until ??
-        ""
-    );
-
-    setCustomerReference(
-      quotation?.customer_reference ??
-        ""
-    );
-
-    setNotes(
-      quotation?.notes ??
-        ""
-    );
-
-    setTerms(
-      quotation?.terms ??
-        "Quotation valid until the stated expiry date. Prices are subject to availability."
-    );
-
-    setErrorMessage("");
-  }, [quotation]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

@@ -434,167 +434,154 @@ export default function ExpensesPage() {
     useState("");
 
 
-  async function loadWorkspace(
+  function loadWorkspace(
     silent = false
   ) {
-
-    try {
-
-      if (silent) {
-        setRefreshing(
-          true
-        );
-      } else {
-        setLoading(
-          true
-        );
-      }
-
-
-      setErrorMessage(
-        ""
-      );
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (silent) {
+          setRefreshing(
+            true
+          );
+        } else {
+          setLoading(
+            true
+          );
+        }
 
 
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
-
-
-      if (!user) {
-        router.replace(
-          "/login"
+        setErrorMessage(
+          ""
         );
 
-        return;
-      }
 
 
-      const {
-        data:
-          profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
+        if (!user) {
+          router.replace(
+            "/login"
+          );
+
+          return;
+        }
 
 
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        workspaceResult,
-      ] =
-        await Promise.all([
-          supabase
+        const {
+          data:
+            profile,
+          error:
+            profileError,
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
-
-          supabase.rpc(
-            "get_accounting_expense_workspace",
-            {
-              p_from_date:
-                null,
-
-              p_to_date:
-                localDate(),
-            }
-          ),
-        ]);
+            .single();
 
 
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
 
-      if (
-        workspaceResult.error
-      ) {
-        throw workspaceResult.error;
-      }
+        const [
+          companyResult,
+          workspaceResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
+
+            supabase.rpc(
+              "get_accounting_expense_workspace",
+              {
+                p_from_date:
+                  null,
+
+                p_to_date:
+                  localDate(),
+              }
+            ),
+          ]);
 
 
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
 
 
-      const next =
-        workspaceResult.data as Workspace;
+        if (
+          workspaceResult.error
+        ) {
+          throw workspaceResult.error;
+        }
 
 
-      setWorkspace(
-        next
-      );
-
-
-      if (
-        !categoryId &&
-        next.categories.length >
-          0
-      ) {
-        setCategoryId(
-          next.categories[0].id
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
         );
-      }
 
-    } catch (
-      error
-    ) {
 
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Expenses could not be loaded."
-      );
+        const next =
+          workspaceResult.data as Workspace;
 
-    } finally {
 
-      setLoading(
-        false
-      );
+        setWorkspace(
+          next
+        );
 
-      setRefreshing(
-        false
-      );
-    }
+
+        if (
+          !categoryId &&
+          next.categories.length >
+            0
+        ) {
+          setCategoryId(
+            next.categories[0].id
+          );
+        }
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Expenses could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(
+          false
+        );
+
+        setRefreshing(
+          false
+        );
+      });
   }
 
 
@@ -611,9 +598,6 @@ export default function ExpensesPage() {
       if (
         !canView
       ) {
-        setLoading(
-          false
-        );
 
         return;
       }
@@ -937,7 +921,7 @@ export default function ExpensesPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
 
     return (

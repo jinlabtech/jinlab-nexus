@@ -3,6 +3,7 @@
 import ActionModal from "@/components/ui/ActionModal";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -270,7 +271,7 @@ export default function QuotationDetailPage() {
       ) {
         setPageError(
           profileError?.message ??
-            "Profile could not be loaded."
+          "Profile could not be loaded."
         );
 
         return;
@@ -317,97 +318,99 @@ export default function QuotationDetailPage() {
 
     initialisePage();
   }, [router]);
-
-  async function refreshQuotation(
-    silent = false
-  ) {
+  const fetchQuotation = useCallback((silent: boolean) => {
     if (
       !currentCompanyId ||
       !quotationId
     ) {
       return;
     }
+    return getQuotation(
+      quotationId,
+      currentCompanyId
+    )
+      .then(async (result) => {
+        setQuotation(
+          result.quotation
+        );
 
+        setQuotationItems(
+          result.items
+        );
+
+        const [
+          shareLinks,
+          deliveries,
+          actions,
+        ] = await Promise.all([
+          getQuotationShareLinks(
+            quotationId,
+            currentCompanyId
+          ),
+
+          getQuotationDeliveries(
+            quotationId,
+            currentCompanyId
+          ),
+
+          getQuotationCustomerActions(
+            quotationId,
+            currentCompanyId
+          ),
+        ]);
+
+        setActiveShareLink(
+          shareLinks.find(
+            (link) =>
+              link.status ===
+              "active"
+          ) ?? null
+        );
+
+        setQuotationDeliveries(
+          deliveries
+        );
+
+        setCustomerActions(
+          actions
+        );
+      })
+      .catch((error) => {
+        setPageError(
+          error instanceof Error
+            ? error.message
+            : "Quotation could not be loaded."
+        );
+      })
+      .finally(() => {
+        if (!silent) {
+          setLoadingQuotation(
+            false
+          );
+        }
+      });
+  }, [currentCompanyId, quotationId]);
+
+  function refreshQuotation(silent = false) {
+    if (
+      !currentCompanyId ||
+      !quotationId
+    ) {
+      return;
+    }
     if (!silent) {
       setLoadingQuotation(
         true
       );
     }
-
     setPageError("");
-
-    try {
-      const result =
-        await getQuotation(
-          quotationId,
-          currentCompanyId
-        );
-
-      setQuotation(
-        result.quotation
-      );
-
-      setQuotationItems(
-        result.items
-      );
-
-      const [
-        shareLinks,
-        deliveries,
-        actions,
-      ] = await Promise.all([
-        getQuotationShareLinks(
-          quotationId,
-          currentCompanyId
-        ),
-
-        getQuotationDeliveries(
-          quotationId,
-          currentCompanyId
-        ),
-
-        getQuotationCustomerActions(
-          quotationId,
-          currentCompanyId
-        ),
-      ]);
-
-      setActiveShareLink(
-        shareLinks.find(
-          (link) =>
-            link.status ===
-            "active"
-        ) ?? null
-      );
-
-      setQuotationDeliveries(
-        deliveries
-      );
-
-      setCustomerActions(
-        actions
-      );
-    } catch (error) {
-      setPageError(
-        error instanceof Error
-          ? error.message
-          : "Quotation could not be loaded."
-      );
-    } finally {
-      if (!silent) {
-        setLoadingQuotation(
-          false
-        );
-      }
-    }
+    return fetchQuotation(silent);
   }
 
   useEffect(() => {
-    refreshQuotation();
-  }, [
-    currentCompanyId,
-    quotationId,
-  ]);
+    void fetchQuotation(false);
+  }, [fetchQuotation]);
+
 
   useEffect(() => {
     if (
@@ -430,7 +433,7 @@ export default function QuotationDetailPage() {
           filter: `id=eq.${quotationId}`,
         },
         async () => {
-          await refreshQuotation();
+          await fetchQuotation(false);
         }
       )
       .on(
@@ -444,7 +447,7 @@ export default function QuotationDetailPage() {
             `quotation_id=eq.${quotationId}`,
         },
         async () => {
-          await refreshQuotation();
+          await fetchQuotation(false);
         }
       )
       .on(
@@ -458,7 +461,7 @@ export default function QuotationDetailPage() {
             `quotation_id=eq.${quotationId}`,
         },
         async () => {
-          await refreshQuotation();
+          await fetchQuotation(false);
         }
       )
       .subscribe();
@@ -469,12 +472,12 @@ export default function QuotationDetailPage() {
           document.visibilityState ===
           "visible"
         ) {
-          refreshQuotation();
+          fetchQuotation(false);
         }
       };
 
     const handleFocus = () => {
-      refreshQuotation();
+      fetchQuotation(false);
     };
 
     document.addEventListener(
@@ -505,6 +508,7 @@ export default function QuotationDetailPage() {
   }, [
     currentCompanyId,
     quotationId,
+    fetchQuotation,
   ]);
 
   // quotation-status-auto-refresh
@@ -519,7 +523,7 @@ export default function QuotationDetailPage() {
     const interval =
       window.setInterval(
         () => {
-          void refreshQuotation(
+          void fetchQuotation(
             true
           );
         },
@@ -534,6 +538,7 @@ export default function QuotationDetailPage() {
   }, [
     currentCompanyId,
     quotationId,
+    fetchQuotation,
   ]);
 
   useEffect(() => {

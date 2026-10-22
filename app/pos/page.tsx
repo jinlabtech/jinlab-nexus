@@ -6,6 +6,7 @@ import PosCheckoutShell from "@/components/pos/PosCheckoutShell";
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -307,12 +308,6 @@ export default function PosPage() {
     useRef(false);
 
 
-  const draftBranchLoadRef =
-    useRef<string | null>(
-      null
-    );
-
-
   function focusProductSearch() {
 
     window.requestAnimationFrame(
@@ -594,259 +589,325 @@ export default function PosPage() {
       CheckoutResult |
       null
     >(null);
+  const fetchWorkspace = useCallback((branchId: string |
+    null) => {
 
-
-  async function loadWorkspace(
-    branchId:
-      string |
-      null = null,
-
-    silent = false
-  ) {
-
-    try {
-
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-
-      setErrorMessage("");
-
-
-      const {
+    return supabase.auth
+      .getUser()
+      .then(async ({
         data: {
           user,
         },
-      } =
-        await supabase.auth
-          .getUser();
+      }) => {
+        if (!user) {
 
+          router.replace(
+            "/login"
+          );
 
-      if (!user) {
-
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
-          profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        posResult,
-      ] =
-        await Promise.all([
-          supabase
-            .from(
-              "company"
-            )
-            .select(
-              "company_name"
-            )
-            .eq(
-              "id",
-              profile.company_id
-            )
-            .single(),
-
-          supabase.rpc(
-            "get_pos_workspace",
-            {
-              p_branch_id:
-                branchId,
-            }
-          ),
-        ]);
-
-
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
-
-
-      if (
-        posResult.error
-      ) {
-        throw posResult.error;
-      }
-
-
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
-
-
-      const next =
-        posResult.data as PosWorkspace;
-
-
-      setWorkspace(
-        next
-      );
-
-
-      if (
-        !branchId &&
-        next.branches.length >
-          0
-      ) {
-
-        const firstBranch =
-          next.branches[0].id;
-
-
-        setSelectedBranchId(
-          firstBranch
-        );
-
+          return;
+        }
 
         const {
           data:
-            branchData,
+          profile,
           error:
-            branchError,
+          profileError,
         } =
-          await supabase.rpc(
-            "get_pos_workspace",
-            {
-              p_branch_id:
-                firstBranch,
-            }
+          await supabase
+            .from(
+              "user_profile"
+            )
+            .select(
+              "company_id"
+            )
+            .eq(
+              "user_id",
+              user.id
+            )
+            .single();
+
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
+
+        const [
+          companyResult,
+          posResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
+
+            supabase.rpc(
+              "get_pos_workspace",
+              {
+                p_branch_id:
+                  branchId,
+              }
+            ),
+          ]);
+
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
+
+        if (
+          posResult.error
+        ) {
+          throw posResult.error;
+        }
+
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
+        );
+
+        const next =
+          posResult.data as PosWorkspace;
+
+        let loadedWorkspace = next;
+
+        let loadedBranchId = branchId ?? "";
+
+        const draft = !restoredDraftRef.current ? readPosSessionDraft() : null;
+
+        if (
+          !branchId &&
+          next.branches.length >
+          0
+        ) {
+
+          const firstBranch =
+            next.branches.find(branch => branch.id === draft?.branchId)?.id ?? next.branches[0].id;
+          loadedBranchId = firstBranch;
+
+
+          setSelectedBranchId(
+            firstBranch
           );
 
 
-        if (branchError) {
-          throw branchError;
+          const {
+            data:
+            branchData,
+            error:
+            branchError,
+          } =
+            await supabase.rpc(
+              "get_pos_workspace",
+              {
+                p_branch_id:
+                  firstBranch,
+              }
+            );
+
+
+          if (branchError) {
+            throw branchError;
+          }
+
+
+          loadedWorkspace = branchData as PosWorkspace;
+
+        } else if (branchId) {
+
+          setSelectedBranchId(
+            branchId
+          );
         }
 
+        setWorkspace(loadedWorkspace);
 
-        setWorkspace(
-          branchData as PosWorkspace
+        if (!restoredDraftRef.current) {
+          if (draft && draft.branchId === loadedBranchId) {
+            const restoredCart:
+              CartItem[] =
+              draft.lines.flatMap(
+                (line) => {
+
+                  const product =
+                    loadedWorkspace.products.find(
+                      (item) =>
+                        item.id ===
+                        line.productId
+                    );
+
+
+                  if (
+                    !product ||
+                    product.quantity <= 0
+                  ) {
+                    return [];
+                  }
+
+
+                  const quantity =
+                    Math.min(
+                      product.quantity,
+                      Math.max(
+                        1,
+                        Math.floor(
+                          Number(
+                            line.quantity
+                          ) || 1
+                        )
+                      )
+                    );
+
+
+                  const discount =
+                    Math.min(
+                      100,
+                      Math.max(
+                        0,
+                        Number(
+                          line.discountPercent
+                        ) || 0
+                      )
+                    );
+
+
+                  const override =
+                    line.overrideUnitPrice !==
+                      null &&
+                      Number(
+                        line.overrideUnitPrice
+                      ) > 0
+                      ? Number(
+                        line.overrideUnitPrice
+                      )
+                      : null;
+
+
+                  return [
+                    {
+                      ...product,
+
+                      cart_quantity:
+                        quantity,
+
+                      discount_percent:
+                        discount,
+
+                      override_unit_price:
+                        override,
+                    },
+                  ];
+                }
+              );
+
+
+            setCart(
+              restoredCart
+            );
+
+
+            const customerStillExists =
+              draft.customerId
+                ? loadedWorkspace.customers.some(
+                  (customer) =>
+                    customer.id ===
+                    draft.customerId
+                )
+                : false;
+
+
+            setSelectedCustomerId(
+              customerStillExists
+                ? draft.customerId ?? ""
+                : ""
+            );
+
+
+            /*
+             * Never restore an old approval.
+             * Approval must be validated again.
+             */
+            setActiveApprovalId(
+              null
+            );
+
+            setActiveApprovalStatus(
+              ""
+            );
+
+
+            restoredDraftRef.current =
+              true;
+
+            setPosDraftReady(
+              true
+            );
+
+          } else {
+            if (draft) clearPosSessionDraft();
+            restoredDraftRef.current = true;
+            setPosDraftReady(true);
+          }
+        }
+      })
+      .catch((error) => {
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "POS could not be loaded."
         );
 
-      } else if (branchId) {
+      })
+      .finally(() => {
 
-        setSelectedBranchId(
-          branchId
-        );
-      }
+        setLoading(false);
+        setRefreshing(false);
+      });
+  }, [router]);
 
-    } catch (
-      error
-    ) {
+  function loadWorkspace(branchId:
+    string |
+    null = null, silent = false) {
 
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "POS could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(false);
-      setRefreshing(false);
+    if (silent) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
     }
+    setErrorMessage("");
+    return fetchWorkspace(branchId);
   }
 
 
-  // Cart changes invalidate an approval because approvals
-  // are bound to the exact item/quantity/discount snapshot.
-  useEffect(
-    () => {
 
-      queueMicrotask(
-        () => {
+  const [approvalCart, setApprovalCart] = useState(cart);
+  if (approvalCart !== cart) {
+    setApprovalCart(cart);
+    setActiveApprovalId(null);
+    setActiveApprovalStatus("");
+  }
+  useEffect(() => {
+    if (permissionsLoading || !canView) return;
+    void fetchWorkspace(null);
+  }, [permissionsLoading, canView, fetchWorkspace]);
 
-          setActiveApprovalId(
-            null
-          );
-
-          setActiveApprovalStatus(
-            ""
-          );
-        }
-      );
-
-    },
-    [
-      cart,
-    ]
-  );
-
-
-  useEffect(
-    () => {
-
-      if (
-        permissionsLoading
-      ) {
-        return;
-      }
-
-
-      if (!canView) {
-
-        queueMicrotask(
-          () => {
-            setLoading(false);
-          }
-        );
-
-        return;
-      }
-
-
-      queueMicrotask(
-        () => {
-          void loadWorkspace();
-        }
-      );
-
-    },
-    [
-      permissionsLoading,
-      canView,
-    ]
-  );
 
 
   async function changeBranch(
@@ -893,227 +954,7 @@ export default function PosPage() {
   }
 
 
-  /*
-   * Restore unfinished POS basket only after
-   * the current POS workspace is available.
-   *
-   * Products, prices and stock always come
-   * from the freshly loaded workspace.
-   */
-  useEffect(
-    () => {
 
-      if (
-        !workspace ||
-        !selectedBranchId ||
-        restoredDraftRef.current
-      ) {
-        return;
-      }
-
-
-      const draft =
-        readPosSessionDraft();
-
-
-      if (!draft) {
-
-        restoredDraftRef.current =
-          true;
-
-        setPosDraftReady(
-          true
-        );
-
-        return;
-      }
-
-
-      if (
-        draft.branchId !==
-        selectedBranchId
-      ) {
-
-        const branchExists =
-          workspace.branches.some(
-            (branch) =>
-              branch.id ===
-              draft.branchId
-          );
-
-
-        if (!branchExists) {
-
-          clearPosSessionDraft();
-
-          restoredDraftRef.current =
-            true;
-
-          setPosDraftReady(
-            true
-          );
-
-          return;
-        }
-
-
-        if (
-          draftBranchLoadRef.current ===
-          draft.branchId
-        ) {
-          return;
-        }
-
-
-        draftBranchLoadRef.current =
-          draft.branchId;
-
-
-        queueMicrotask(
-          () => {
-            void loadWorkspace(
-              draft.branchId,
-              true
-            );
-          }
-        );
-
-        return;
-      }
-
-
-      const restoredCart:
-        CartItem[] =
-        draft.lines.flatMap(
-          (line) => {
-
-            const product =
-              workspace.products.find(
-                (item) =>
-                  item.id ===
-                  line.productId
-              );
-
-
-            if (
-              !product ||
-              product.quantity <= 0
-            ) {
-              return [];
-            }
-
-
-            const quantity =
-              Math.min(
-                product.quantity,
-                Math.max(
-                  1,
-                  Math.floor(
-                    Number(
-                      line.quantity
-                    ) || 1
-                  )
-                )
-              );
-
-
-            const discount =
-              Math.min(
-                100,
-                Math.max(
-                  0,
-                  Number(
-                    line.discountPercent
-                  ) || 0
-                )
-              );
-
-
-            const override =
-              line.overrideUnitPrice !==
-                null &&
-              Number(
-                line.overrideUnitPrice
-              ) > 0
-                ? Number(
-                    line.overrideUnitPrice
-                  )
-                : null;
-
-
-            return [
-              {
-                ...product,
-
-                cart_quantity:
-                  quantity,
-
-                discount_percent:
-                  discount,
-
-                override_unit_price:
-                  override,
-              },
-            ];
-          }
-        );
-
-
-      setCart(
-        restoredCart
-      );
-
-
-      const customerStillExists =
-        draft.customerId
-          ? workspace.customers.some(
-              (customer) =>
-                customer.id ===
-                draft.customerId
-            )
-          : false;
-
-
-      setSelectedCustomerId(
-        customerStillExists
-          ? draft.customerId ?? ""
-          : ""
-      );
-
-
-      /*
-       * Never restore an old approval.
-       * Approval must be validated again.
-       */
-      setActiveApprovalId(
-        null
-      );
-
-      setActiveApprovalStatus(
-        ""
-      );
-
-
-      restoredDraftRef.current =
-        true;
-
-      setPosDraftReady(
-        true
-      );
-
-    },
-    [
-      workspace,
-      selectedBranchId,
-    ]
-  );
-
-
-  /*
-   * Save only transaction structure.
-   * Payment details and approvals are deliberately
-   * excluded from recovery.
-   */
   useEffect(
     () => {
 
@@ -1556,23 +1397,7 @@ export default function PosPage() {
   }
 
 
-  const cartTotal =
-    useMemo(
-      () =>
-        cart.reduce(
-          (
-            total,
-            item
-          ) =>
-            total +
-            lineTotal(item),
-          0
-        ),
-      [
-        cart,
-        workspace,
-      ]
-    );
+  const cartTotal = cart.reduce((total, item) => total + lineTotal(item), 0);
 
 
   const needsApproval =
@@ -1613,65 +1438,6 @@ export default function PosPage() {
           tender.amount ||
           0
         ),
-      0
-    );
-
-
-  const splitTenderedTotal =
-    splitTenders.reduce(
-      (
-        total,
-        tender
-      ) =>
-        total +
-        (
-          tender.payment_method ===
-            "cash"
-            ? Number(
-                tender.amount_tendered ||
-                tender.amount ||
-                0
-              )
-            : Number(
-                tender.amount ||
-                0
-              )
-        ),
-      0
-    );
-
-
-  const splitChangeDue =
-    splitTenders.reduce(
-      (
-        total,
-        tender
-      ) => {
-
-        if (
-          tender.payment_method !==
-          "cash"
-        ) {
-          return total;
-        }
-
-
-        return (
-          total +
-          Math.max(
-            Number(
-              tender.amount_tendered ||
-              tender.amount ||
-              0
-            ) -
-              Number(
-                tender.amount ||
-                0
-              ),
-            0
-          )
-        );
-      },
       0
     );
 
@@ -2615,8 +2381,7 @@ export default function PosPage() {
 
 
   if (
-    permissionsLoading ||
-    loading
+    permissionsLoading || (canView && loading)
   ) {
 
     return (

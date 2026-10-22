@@ -1,11 +1,14 @@
 "use client";
 
 import {
-  useEffect,
+  useCallback,
   useMemo,
   useState,
   useSyncExternalStore,
+  type SetStateAction,
 } from "react";
+
+import { useBrowserStorage } from "@/lib/nexus/browser-storage";
 
 import {
   ArrowLeft,
@@ -94,6 +97,8 @@ function subscribePhone(onChange: () => void) {
 const phoneSnapshot = () => window.matchMedia("(max-width: 767px)").matches;
 const serverPhoneSnapshot = () => false;
 
+const decodeSidebarOpen = (raw: string) => raw !== "false";
+
 export default function NexusPersistentShell({
   children,
 }: {
@@ -109,12 +114,17 @@ export default function NexusPersistentShell({
     useRouter();
 
 
-  const [
-    sidebarOpen,
-    setSidebarOpen,
-  ] =
-    useState(false);
-
+  const [desktopOpen, setDesktopOpen] = useBrowserStorage("nexus-sidebar-open", true, decodeSidebarOpen);
+  const [mobileSidebar, setMobileSidebar] = useState({ pathname, open: false });
+  const sidebarOpen = phone ? mobileSidebar.pathname === pathname && mobileSidebar.open : desktopOpen;
+  const setSidebarOpen = useCallback((update: SetStateAction<boolean>) => {
+    if (phone) {
+      setMobileSidebar(current => {
+        const open = current.pathname === pathname && current.open;
+        return { pathname, open: typeof update === "function" ? update(open) : update };
+      });
+    } else setDesktopOpen(update);
+  }, [phone, pathname, setDesktopOpen]);
 
   const shellEnabled =
     usesNexusShell(
@@ -144,110 +154,6 @@ export default function NexusPersistentShell({
         pathname,
       ]
     );
-
-
-  useEffect(
-    () => {
-
-      if (
-        !shellEnabled
-      ) {
-        return;
-      }
-
-
-      const mobile =
-        window.matchMedia(
-          "(max-width: 767px)"
-        ).matches;
-
-
-      if (mobile) {
-
-        setSidebarOpen(
-          false
-        );
-
-        return;
-      }
-
-
-      const saved =
-        window.localStorage
-          .getItem(
-            "nexus-sidebar-open"
-          );
-
-
-      setSidebarOpen(
-        saved !==
-          "false"
-      );
-
-    },
-    [
-      shellEnabled,
-    ]
-  );
-
-
-  useEffect(
-    () => {
-
-      if (
-        !shellEnabled
-      ) {
-        return;
-      }
-
-
-      const mobile =
-        window.matchMedia(
-          "(max-width: 767px)"
-        ).matches;
-
-
-      if (!mobile) {
-
-        window.localStorage
-          .setItem(
-            "nexus-sidebar-open",
-            String(
-              sidebarOpen
-            )
-          );
-      }
-
-    },
-    [
-      sidebarOpen,
-      shellEnabled,
-    ]
-  );
-
-
-  useEffect(
-    () => {
-
-      /*
-       * Opening another module on phone closes the drawer.
-       * The shell itself remains mounted.
-       */
-      if (
-        window.matchMedia(
-          "(max-width: 767px)"
-        ).matches
-      ) {
-        setSidebarOpen(
-          false
-        );
-      }
-
-    },
-    [
-      pathname,
-    ]
-  );
 
 
   useNexusSidebarSwipe({

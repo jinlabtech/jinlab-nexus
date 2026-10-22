@@ -12,12 +12,14 @@ import {
 } from "lucide-react";
 
 import {
-  useEffect,
+  useCallback,
   useMemo,
   useState,
   type DragEvent,
   type ReactNode,
 } from "react";
+
+import { useBrowserStorage } from "@/lib/nexus/browser-storage";
 
 export type NexusWidgetItem = {
   id: string;
@@ -54,13 +56,19 @@ export default function NexusWidgetBoard({
   const [draggedId, setDraggedId] =
     useState<string | null>(null);
 
-  const [layout, setLayout] =
-    useState<LayoutEntry[]>(
-      items.map((item) => ({
-        id: item.id,
-        hidden: false,
-      }))
-    );
+  const defaultLayout = useMemo(() => itemIds.split("|").filter(Boolean).map(id => ({ id, hidden: false })), [itemIds]);
+  const decodeLayout = useCallback((raw: string): LayoutEntry[] => {
+    const saved: unknown = JSON.parse(raw);
+    const ids = itemIds.split("|").filter(Boolean);
+    const known = new Set(ids);
+    const restored: LayoutEntry[] = Array.isArray(saved)
+      ? saved.filter((entry): entry is { id: string; hidden?: unknown } => !!entry && typeof entry === "object" && "id" in entry && typeof entry.id === "string" && known.has(entry.id))
+        .map(entry => ({ id: entry.id, hidden: Boolean(entry.hidden) }))
+      : [];
+    const restoredIds = new Set(restored.map(entry => entry.id));
+    return [...restored, ...ids.filter(id => !restoredIds.has(id)).map(id => ({ id, hidden: false }))];
+  }, [itemIds]);
+  const [layout, setLayout] = useBrowserStorage(storageKey, defaultLayout, decodeLayout);
 
   const itemMap = useMemo(
     () =>
@@ -72,95 +80,6 @@ export default function NexusWidgetBoard({
       ),
     [items]
   );
-
-  useEffect(() => {
-    const ids =
-      itemIds
-        .split("|")
-        .filter(Boolean);
-
-    try {
-      const raw =
-        window.localStorage.getItem(
-          storageKey
-        );
-
-      if (!raw) {
-        setLayout(
-          ids.map((id) => ({
-            id,
-            hidden: false,
-          }))
-        );
-
-        return;
-      }
-
-      const saved =
-        JSON.parse(raw);
-
-      const known =
-        new Set(ids);
-
-      const restored:
-        LayoutEntry[] =
-          Array.isArray(saved)
-            ? saved
-                .filter(
-                  (entry) =>
-                    entry &&
-                    typeof entry.id ===
-                      "string" &&
-                    known.has(entry.id)
-                )
-                .map((entry) => ({
-                  id: entry.id,
-                  hidden: Boolean(
-                    entry.hidden
-                  ),
-                }))
-            : [];
-
-      const restoredIds =
-        new Set(
-          restored.map(
-            (entry) =>
-              entry.id
-          )
-        );
-
-      for (const id of ids) {
-        if (
-          !restoredIds.has(id)
-        ) {
-          restored.push({
-            id,
-            hidden: false,
-          });
-        }
-      }
-
-      setLayout(restored);
-    } catch {
-      setLayout(
-        ids.map((id) => ({
-          id,
-          hidden: false,
-        }))
-      );
-    }
-  }, [itemIds, storageKey]);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(
-        storageKey,
-        JSON.stringify(layout)
-      );
-    } catch {
-      // Storage unavailable.
-    }
-  }, [layout, storageKey]);
 
   function move(
     id: string,

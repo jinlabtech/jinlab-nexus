@@ -243,108 +243,104 @@ export default function ChartOfAccountsPage() {
     useState(true);
 
 
-  async function loadData() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
+  function loadData() {
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        setLoading(true);
+        setErrorMessage("");
 
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
 
-      if (!user) {
-        router.replace(
-          "/login"
-        );
-        return;
-      }
+        if (!user) {
+          router.replace(
+            "/login"
+          );
+          return;
+        }
 
-      const {
-        data: profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-      const [
-        companyResult,
-        overviewResult,
-        accountResult,
-      ] =
-        await Promise.all([
-          supabase
+        const {
+          data: profile,
+          error:
+            profileError,
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
+            .single();
 
-          getAccountingOverview(),
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
-          getChartOfAccounts(),
-        ]);
+        const [
+          companyResult,
+          overviewResult,
+          accountResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
 
-      if (
-        companyResult.error
-      ) {
-        throw new Error(
+            getAccountingOverview(),
+
+            getChartOfAccounts(),
+          ]);
+
+        if (
+          companyResult.error
+        ) {
+          throw new Error(
+            companyResult
+              .error.message
+          );
+        }
+
+        setCompanyName(
           companyResult
-            .error.message
+            .data.company_name
         );
-      }
 
-      setCompanyName(
-        companyResult
-          .data.company_name
-      );
+        setCurrency(
+          overviewResult
+            .settings.base_currency
+        );
 
-      setCurrency(
-        overviewResult
-          .settings.base_currency
-      );
-
-      setAccounts(
-        accountResult
-      );
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Chart of Accounts could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
+        setAccounts(
+          accountResult
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Chart of Accounts could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
 
@@ -356,7 +352,6 @@ export default function ChartOfAccountsPage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
@@ -605,7 +600,7 @@ export default function ChartOfAccountsPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>

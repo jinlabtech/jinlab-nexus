@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-} from "react";
-
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
 import {
   getBranchStock,
   getInventoryCategories,
@@ -14,7 +9,6 @@ import {
   getStockMovements,
   getSuppliers,
 } from "@/lib/services/inventoryService";
-
 import type {
   BranchStock,
   InventoryCategory,
@@ -23,100 +17,38 @@ import type {
   Supplier,
 } from "@/types/inventory";
 
-export function useInventory(
-  companyId: string
-) {
-  const [items, setItems] = useState<
-    InventoryItem[]
-  >([]);
+const emptyItems: InventoryItem[] = [];
+const emptyCategories: InventoryCategory[] = [];
+const emptySuppliers: Supplier[] = [];
+const emptyStock: BranchStock[] = [];
+const emptyMovements: StockMovement[] = [];
 
-  const [categories, setCategories] =
-    useState<InventoryCategory[]>([]);
-
-  const [suppliers, setSuppliers] =
-    useState<Supplier[]>([]);
-
-  const [branchStock, setBranchStock] =
-    useState<BranchStock[]>([]);
-
-  const [movements, setMovements] =
-    useState<StockMovement[]>([]);
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [errorMessage, setErrorMessage] =
-    useState("");
-
-  const requestVersion = useRef(0);
-
-  const refreshInventory =
-    useCallback(async () => {
-      const version = ++requestVersion.current;
-      if (!companyId) {
-        setItems([]);
-        setCategories([]);
-        setSuppliers([]);
-        setBranchStock([]);
-        setMovements([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setErrorMessage("");
-
-      try {
-        const [
-          itemData,
-          categoryData,
-          supplierData,
-          stockData,
-          movementData,
-        ] = await Promise.all([
-          getInventoryItems(companyId),
-          getInventoryCategories(
-            companyId
-          ),
-          getSuppliers(companyId),
-          getBranchStock(companyId),
-          getStockMovements(
-            companyId,
-            50
-          ),
-        ]);
-
-        if (version !== requestVersion.current) return;
-        setItems(itemData);
-        setCategories(categoryData);
-        setSuppliers(supplierData);
-        setBranchStock(stockData);
-        setMovements(movementData);
-      } catch (error) {
-        if (version !== requestVersion.current) return;
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Inventory information could not be loaded."
-        );
-      } finally {
-        if (version === requestVersion.current) setLoading(false);
-      }
-    }, [companyId]);
-
-  useEffect(() => {
-    void refreshInventory();
-    return () => { requestVersion.current += 1; };
-  }, [refreshInventory]);
+export function useInventory(companyId: string) {
+  const load = useCallback(async () => {
+    const [items, categories, suppliers, branchStock, movements] = await Promise.all([
+      getInventoryItems(companyId),
+      getInventoryCategories(companyId),
+      getSuppliers(companyId),
+      getBranchStock(companyId),
+      getStockMovements(companyId, 50),
+    ]);
+    return { items, categories, suppliers, branchStock, movements };
+  }, [companyId]);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    companyId,
+    Boolean(companyId),
+    load,
+    "Inventory information could not be loaded."
+  );
 
   return {
-    items,
-    categories,
-    suppliers,
-    branchStock,
-    movements,
+    items: data?.items ?? emptyItems,
+    categories: data?.categories ?? emptyCategories,
+    suppliers: data?.suppliers ?? emptySuppliers,
+    branchStock: data?.branchStock ?? emptyStock,
+    movements: data?.movements ?? emptyMovements,
     loading,
     errorMessage,
-    refreshInventory,
+    refreshInventory: refresh,
   };
 }

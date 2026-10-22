@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
@@ -17,31 +17,25 @@ type CompanyFormProps = {
   onCancel: () => void;
 };
 
-export default function CompanyForm({
+export default function CompanyForm(props: CompanyFormProps) {
+  return <CompanyFormFields key={props.company?.id ?? "new"} {...props} />;
+}
+
+function CompanyFormFields({
   company,
   onSave,
   onCancel,
 }: CompanyFormProps) {
-  const [companyName, setCompanyName] = useState("");
+  const [companyName, setCompanyName] = useState(company?.company_name ?? "");
   const [registrationNumber, setRegistrationNumber] =
-    useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+    useState(company?.registration_number ?? "");
+  const [email, setEmail] = useState(company?.email ?? "");
+  const [phone, setPhone] = useState(company?.phone ?? "");
 
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const isEditing = Boolean(company);
-
-  useEffect(() => {
-    setCompanyName(company?.company_name ?? "");
-    setRegistrationNumber(
-      company?.registration_number ?? ""
-    );
-    setEmail(company?.email ?? "");
-    setPhone(company?.phone ?? "");
-    setErrorMessage("");
-  }, [company]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

@@ -3,6 +3,7 @@
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -424,167 +425,130 @@ export default function PosPricingPage() {
     useState<PromotionDraft>(
       newPromotion()
     );
+  const fetchPricing = useCallback(() => {
 
-
-  async function load(
-    silent = false
-  ) {
-
-    try {
-
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-
-      setErrorMessage("");
-
-
-      const {
+    return supabase.auth
+      .getUser()
+      .then(async ({
         data: {
           user,
         },
-      } =
-        await supabase.auth
-          .getUser();
+      }) => {
+        if (!user) {
 
+          router.replace(
+            "/login"
+          );
 
-      if (!user) {
+          return;
+        }
 
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
+        const {
+          data:
           profile,
-        error:
+          error:
           profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        pricingResult,
-      ] =
-        await Promise.all([
-          supabase
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
+            .single();
 
-          supabase.rpc(
-            "get_pos_pricing_workspace"
-          ),
-        ]);
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
 
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
+        const [
+          companyResult,
+          pricingResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
 
+            supabase.rpc(
+              "get_pos_pricing_workspace"
+            ),
+          ]);
 
-      if (
-        pricingResult.error
-      ) {
-        throw pricingResult.error;
-      }
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
 
+        if (
+          pricingResult.error
+        ) {
+          throw pricingResult.error;
+        }
 
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
+        );
 
+        setWorkspace(
+          pricingResult.data as Workspace
+        );
+      })
+      .catch((error) => {
 
-      setWorkspace(
-        pricingResult.data as Workspace
-      );
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "POS pricing could not be loaded."
+        );
 
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "POS pricing could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }
-
-
-  useEffect(
-    () => {
-
-      if (
-        permissionsLoading
-      ) {
-        return;
-      }
-
-
-      if (!canView) {
+      })
+      .finally(() => {
 
         setLoading(false);
+        setRefreshing(false);
+      });
+  }, [router]);
 
-        return;
-      }
+  function load(silent = false) {
 
+    if (silent) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    setErrorMessage("");
+    return fetchPricing();
+  }
 
-      void load();
+  useEffect(() => {
+    if (permissionsLoading || !canView) return;
+    void fetchPricing();
+  }, [permissionsLoading, canView, fetchPricing]);
 
-    },
-    [
-      permissionsLoading,
-      canView,
-    ]
-  );
 
 
   function editPriceBook(
@@ -1153,8 +1117,7 @@ export default function PosPricingPage() {
 
 
   if (
-    permissionsLoading ||
-    loading
+    permissionsLoading || (canView && loading)
   ) {
 
     return (

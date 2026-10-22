@@ -800,7 +800,7 @@ export default function MySchedulePage() {
           <section className="rounded-2xl border bg-background p-5">
 
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Today's shift
+              Today&apos;s shift
             </p>
 
             <h2 className="mt-2 text-xl font-bold">
@@ -1065,7 +1065,7 @@ export default function MySchedulePage() {
                   return (
                     <AvailabilityRow
                       key={
-                        day.number
+                        `${day.number}:${availability.id ?? ""}:${availability.is_available}:${availability.available_from}:${availability.available_to}`
                       }
                       dayName={
                         day.name
@@ -1122,21 +1122,6 @@ function AvailabilityRow({
     useState<AvailabilityItem>(
       value
     );
-
-
-  useEffect(
-    () => {
-      setForm(
-        value
-      );
-    },
-    [
-      value.id,
-      value.is_available,
-      value.available_from,
-      value.available_to,
-    ]
-  );
 
 
   return (

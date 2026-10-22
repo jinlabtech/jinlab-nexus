@@ -1,70 +1,25 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
+import { getQuotations } from "@/lib/services/quotationService";
+import type { Quotation } from "@/types/quotation";
 
-import {
-  getQuotations,
-} from "@/lib/services/quotationService";
+const emptyData: Quotation[] = [];
 
-import type {
-  Quotation,
-} from "@/types/quotation";
-
-export function useQuotations(
-  companyId: string
-) {
-  const [quotations, setQuotations] =
-    useState<Quotation[]>([]);
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [
-    errorMessage,
-    setErrorMessage,
-  ] = useState("");
-
-  const refreshQuotations =
-    useCallback(async () => {
-      if (!companyId) {
-        setQuotations([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setErrorMessage("");
-
-      try {
-        const data =
-          await getQuotations(
-            companyId
-          );
-
-        setQuotations(data);
-      } catch (error) {
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Quotations could not be loaded."
-        );
-      } finally {
-        setLoading(false);
-      }
-    }, [companyId]);
-
-  useEffect(() => {
-    refreshQuotations();
-  }, [refreshQuotations]);
+export function useQuotations(companyId: string) {
+  const load = useCallback(() => getQuotations(companyId), [companyId]);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    companyId,
+    Boolean(companyId),
+    load,
+    "Quotations could not be loaded."
+  );
 
   return {
-    quotations,
+    quotations: data ?? emptyData,
     loading,
     errorMessage,
-    refreshQuotations,
+    refreshQuotations: refresh,
   };
 }

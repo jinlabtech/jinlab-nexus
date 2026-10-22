@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -46,41 +47,33 @@ export default function CompanySettingsPage() {
   const allowed =
     can("settings.company.manage");
 
-  useEffect(() => {
-    if (permissionLoading) return;
-
-    if (!allowed) {
-      setLoading(false);
-      return;
-    }
-
-    void loadProfile();
-  }, [permissionLoading, allowed]);
-
   async function logout() {
     await supabase.auth.signOut();
     router.replace("/login");
   }
+  const loadProfile = useCallback(() => {
+    return getCompanyProfileSettings()
+      .then(async (data) => {
+        setProfile(data);
+      })
+      .catch((error) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Company Profile could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-  async function loadProfile() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
+  }, []);
 
-      const data =
-        await getCompanyProfileSettings();
+  useEffect(() => {
+    if (permissionLoading || !(allowed)) return;
+    void loadProfile();
+  }, [permissionLoading, allowed, loadProfile]);
 
-      setProfile(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Company Profile could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function saveProfile() {
     if (!profile) return;
@@ -108,7 +101,7 @@ export default function CompanySettingsPage() {
     }
   }
 
-  if (permissionLoading || loading) {
+  if (permissionLoading || ((allowed) && loading)) {
     return (
       <DashboardLayout>
         <Navbar
@@ -171,7 +164,7 @@ export default function CompanySettingsPage() {
         </h1>
 
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          This is the company's operational and legal
+          This is the company&apos;s operational and legal
           identity. Branding and document appearance
           are configured separately.
         </p>

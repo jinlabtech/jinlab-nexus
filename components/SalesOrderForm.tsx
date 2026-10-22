@@ -4,7 +4,6 @@ import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
   FormEvent,
-  useEffect,
   useState,
 } from "react";
 
@@ -53,7 +52,7 @@ export default function SalesOrderForm({
   ] = useState("");
 
   const [
-    branchId,
+    selectedBranchId,
     setBranchId,
   ] = useState("");
 
@@ -81,19 +80,11 @@ export default function SalesOrderForm({
     setErrorMessage,
   ] = useState("");
 
-  useEffect(() => {
-    if (
-      !branchId &&
-      branches.length === 1
-    ) {
-      setBranchId(
-        branches[0].id
-      );
-    }
-  }, [
-    branchId,
-    branches,
-  ]);
+  const branchId = branches.some((branch) => branch.id === selectedBranchId)
+    ? selectedBranchId
+    : branches.length === 1
+      ? branches[0].id
+      : "";
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>

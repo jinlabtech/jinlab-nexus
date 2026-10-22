@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -82,40 +83,33 @@ export default function SecuritySettingsPage() {
   const allowed =
     can("settings.security.manage");
 
-  useEffect(() => {
-    if (permissionsLoading) return;
-
-    if (!allowed) {
-      setLoading(false);
-      return;
-    }
-
-    void loadSettings();
-  }, [permissionsLoading, allowed]);
-
   async function logout() {
     await supabase.auth.signOut();
     router.replace("/login");
   }
+  const loadSettings = useCallback(() => {
+    return getSecuritySettings()
+      .then(async (data) => {
+        setSettings(data);
+      })
+      .catch((error) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Security settings could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-  async function loadSettings() {
-    try {
-      setLoading(true);
+  }, []);
 
-      const data =
-        await getSecuritySettings();
+  useEffect(() => {
+    if (permissionsLoading || !(allowed)) return;
+    void loadSettings();
+  }, [permissionsLoading, allowed, loadSettings]);
 
-      setSettings(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Security settings could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function saveSettings() {
     if (!settings) return;
@@ -143,7 +137,7 @@ export default function SecuritySettingsPage() {
     }
   }
 
-  if (permissionsLoading || loading) {
+  if (permissionsLoading || ((allowed) && loading)) {
     return (
       <DashboardLayout>
         <Navbar

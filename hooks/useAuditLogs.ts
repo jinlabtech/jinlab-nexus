@@ -1,49 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
 import { getAuditLogs } from "@/lib/services/auditLogService";
 import type { AuditLog } from "@/types/auditLog";
 
-export function useAuditLogs(
-  companyId: string,
-  limit = 5
-) {
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+const emptyData: AuditLog[] = [];
 
-  const refreshAuditLogs = useCallback(async () => {
-    if (!companyId) {
-      setAuditLogs([]);
-      return;
-    }
-
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const data = await getAuditLogs(companyId, limit);
-      setAuditLogs(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Audit activity could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, limit]);
-
-  useEffect(() => {
-    refreshAuditLogs();
-  }, [refreshAuditLogs]);
+export function useAuditLogs(companyId: string, limit = 5) {
+  const load = useCallback(() => getAuditLogs(companyId, limit), [companyId, limit]);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    JSON.stringify([companyId, limit]),
+    Boolean(companyId),
+    load,
+    "Audit activity could not be loaded."
+  );
 
   return {
-    auditLogs,
+    auditLogs: data ?? emptyData,
     loading,
     errorMessage,
-    refreshAuditLogs,
+    refreshAuditLogs: refresh,
   };
 }

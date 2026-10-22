@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useEffect,
   useState,
 } from "react";
 
@@ -20,23 +19,21 @@ type BranchFormProps = {
   onCancel: () => void;
 };
 
-export default function BranchForm({
+export default function BranchForm(props: BranchFormProps) {
+  return <BranchFormFields key={props.branch?.id ?? "new"} {...props} />;
+}
+
+function BranchFormFields({
   branch,
   onSave,
   onCancel,
 }: BranchFormProps) {
-  const [branchName, setBranchName] = useState("");
-  const [address, setAddress] = useState("");
+  const [branchName, setBranchName] = useState(branch?.branch_name ?? "");
+  const [address, setAddress] = useState(branch?.address ?? "");
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const isEditing = Boolean(branch);
-
-  useEffect(() => {
-    setBranchName(branch?.branch_name ?? "");
-    setAddress(branch?.address ?? "");
-    setErrorMessage("");
-  }, [branch]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

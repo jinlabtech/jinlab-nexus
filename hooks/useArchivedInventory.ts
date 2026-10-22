@@ -1,68 +1,25 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
+import { getArchivedInventoryItems } from "@/lib/services/inventoryService";
+import type { InventoryItem } from "@/types/inventory";
 
-import {
-  getArchivedInventoryItems,
-} from "@/lib/services/inventoryService";
+const emptyData: InventoryItem[] = [];
 
-import type {
-  InventoryItem,
-} from "@/types/inventory";
-
-export function useArchivedInventory(
-  companyId: string
-) {
-  const [items, setItems] =
-    useState<InventoryItem[]>([]);
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [errorMessage, setErrorMessage] =
-    useState("");
-
-  const refreshArchivedInventory =
-    useCallback(async () => {
-      if (!companyId) {
-        setItems([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setErrorMessage("");
-
-      try {
-        const data =
-          await getArchivedInventoryItems(
-            companyId
-          );
-
-        setItems(data);
-      } catch (error) {
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Archived inventory could not be loaded."
-        );
-      } finally {
-        setLoading(false);
-      }
-    }, [companyId]);
-
-  useEffect(() => {
-    refreshArchivedInventory();
-  }, [refreshArchivedInventory]);
+export function useArchivedInventory(companyId: string) {
+  const load = useCallback(() => getArchivedInventoryItems(companyId), [companyId]);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    companyId,
+    Boolean(companyId),
+    load,
+    "Archived inventory could not be loaded."
+  );
 
   return {
-    items,
+    items: data ?? emptyData,
     loading,
     errorMessage,
-    refreshArchivedInventory,
+    refreshArchivedInventory: refresh,
   };
 }

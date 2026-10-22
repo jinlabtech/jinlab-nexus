@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -117,45 +118,37 @@ export default function FinanceSettingsPage() {
 
   const canManageAccounting =
     can("settings.accounting.manage");
-
-  useEffect(() => {
-    if (permissionsLoading) {
-      return;
-    }
-
-    if (!canViewFinance) {
-      setLoading(false);
-      return;
-    }
-
-    void loadSettings();
-  }, [permissionsLoading, canViewFinance]);
-
-  async function loadSettings() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
-
-      const [
+  const loadSettings = useCallback(() => {
+    return Promise.all([
+      getFinanceSettings(),
+      getAccountingSettings(),
+    ])
+      .then(async ([
         financeSettings,
         accountingSettings,
-      ] = await Promise.all([
-        getFinanceSettings(),
-        getAccountingSettings(),
-      ]);
+      ]) => {
+        setFinance(financeSettings);
 
-      setFinance(financeSettings);
-      setAccounting(accountingSettings);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Settings could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+        setAccounting(accountingSettings);
+      })
+      .catch((error) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Settings could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+  }, []);
+
+  useEffect(() => {
+    if (permissionsLoading || !(canViewFinance)) return;
+    void loadSettings();
+  }, [permissionsLoading, canViewFinance, loadSettings]);
+
 
   async function logout() {
     await supabase.auth.signOut();
@@ -218,7 +211,7 @@ export default function FinanceSettingsPage() {
     }
   }
 
-  if (permissionsLoading || loading) {
+  if (permissionsLoading || ((canViewFinance) && loading)) {
     return (
       <DashboardLayout>
         <Navbar
@@ -952,7 +945,7 @@ export default function FinanceSettingsPage() {
                 </h3>
 
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Control Nexus Accountant's
+                  Control Nexus Accountant&apos;s
                   autonomous decision authority.
                 </p>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  useEffect,
+  useCallback,
   useState,
 } from "react";
 
@@ -20,6 +20,8 @@ import {
 import {
   usePermissions,
 } from "@/hooks/usePermissions";
+
+import { useRequestData } from "@/hooks/useRequestData";
 
 import {
   supabase,
@@ -156,7 +158,11 @@ function money(
 }
 
 
-export default function SuspendedSalesPanel({
+export default function SuspendedSalesPanel(props: Parameters<typeof SuspendedSalesContent>[0]) {
+  return <SuspendedSalesContent key={props.branchId} {...props} />;
+}
+
+function SuspendedSalesContent({
   branchId,
   customerId,
   cartItems,
@@ -214,23 +220,6 @@ export default function SuspendedSalesPanel({
 
 
   const [
-    workspace,
-    setWorkspace,
-  ] =
-    useState<
-      SuspendedWorkspace |
-      null
-    >(null);
-
-
-  const [
-    loading,
-    setLoading,
-  ] =
-    useState(false);
-
-
-  const [
     workingId,
     setWorkingId,
   ] =
@@ -248,86 +237,38 @@ export default function SuspendedSalesPanel({
 
 
   const [
-    errorMessage,
+    actionErrorMessage,
     setErrorMessage,
   ] =
     useState("");
 
 
-  async function load(
-    silent = false
-  ) {
+  const fetchWorkspace = useCallback(async () => {
+    const { data, error } = await supabase.rpc("get_pos_suspended_sales", { p_branch_id: branchId });
+    if (error) throw new Error(error.message);
+    return data as SuspendedWorkspace;
+  }, [branchId]);
 
-    if (!branchId) {
-      return;
-    }
+  const {
+    data: workspace,
+    loading: requestLoading,
+    errorMessage: requestErrorMessage,
+    refresh,
+  } = useRequestData(branchId, Boolean(branchId) && enabled, fetchWorkspace, "Held sales could not be loaded.");
 
+  const errorMessage = actionErrorMessage || requestErrorMessage;
+  const [quietRefreshKey, setQuietRefreshKey] = useState<string | null>(null);
+  const loading = requestLoading && quietRefreshKey !== branchId;
 
+  async function load(silent = false) {
+    setQuietRefreshKey(silent ? branchId : null);
+    setErrorMessage("");
     try {
-
-      if (!silent) {
-        setLoading(true);
-      }
-
-
-      setErrorMessage("");
-
-
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "get_pos_suspended_sales",
-          {
-            p_branch_id:
-              branchId,
-          }
-        );
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      setWorkspace(
-        data as SuspendedWorkspace
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Held sales could not be loaded."
-      );
-
+      await refresh();
     } finally {
-
-      setLoading(false);
+      setQuietRefreshKey(null);
     }
   }
-
-
-  useEffect(
-    () => {
-
-      if (
-        branchId &&
-        enabled
-      ) {
-        void load();
-      }
-
-    },
-    [
-      branchId,
-      enabled,
-    ]
-  );
 
 
   async function suspendCurrentSale() {

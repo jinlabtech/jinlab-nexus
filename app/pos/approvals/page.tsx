@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -211,182 +212,135 @@ export default function PosApprovalsPage() {
     setErrorMessage,
   ] =
     useState("");
+  const fetchApprovals = useCallback(() => {
 
-
-  async function load(
-    silent = false
-  ) {
-
-    try {
-
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-
-      setErrorMessage("");
-
-
-      const {
+    return supabase.auth
+      .getUser()
+      .then(async ({
         data: {
           user,
         },
-      } =
-        await supabase.auth
-          .getUser();
+      }) => {
+        if (!user) {
 
+          router.replace(
+            "/login"
+          );
 
-      if (!user) {
+          return;
+        }
 
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
+        const {
+          data:
           profile,
-        error:
+          error:
           profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        approvalResult,
-      ] =
-        await Promise.all([
-          supabase
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
+            .single();
 
-          supabase.rpc(
-            "get_pos_approval_workspace",
-            {
-              p_branch_id:
-                null,
-            }
-          ),
-        ]);
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
 
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
+        const [
+          companyResult,
+          approvalResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
 
+            supabase.rpc(
+              "get_pos_approval_workspace",
+              {
+                p_branch_id:
+                  null,
+              }
+            ),
+          ]);
 
-      if (
-        approvalResult.error
-      ) {
-        throw approvalResult.error;
-      }
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
 
+        if (
+          approvalResult.error
+        ) {
+          throw approvalResult.error;
+        }
 
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
-
-
-      setWorkspace(
-        approvalResult.data as
-          ApprovalWorkspace
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "POS approvals could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }
-
-
-  useEffect(
-    () => {
-
-      if (
-        permissionsLoading
-      ) {
-        return;
-      }
-
-
-      if (!canApprove) {
-
-        queueMicrotask(
-          () => {
-            setLoading(
-              false
-            );
-          }
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
         );
 
-        return;
-      }
+        setWorkspace(
+          approvalResult.data as
+          ApprovalWorkspace
+        );
+      })
+      .catch((error) => {
 
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "POS approvals could not be loaded."
+        );
 
-      queueMicrotask(
-        () => {
-          void load();
-        }
-      );
+      })
+      .finally(() => {
 
-    },
-    [
-      permissionsLoading,
-      canApprove,
-    ]
-  );
+        setLoading(false);
+        setRefreshing(false);
+      });
+  }, [router]);
+
+  function load(silent = false) {
+
+    if (silent) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    setErrorMessage("");
+    return fetchApprovals();
+  }
+
+  useEffect(() => {
+    if (permissionsLoading || !canApprove) return;
+    void fetchApprovals();
+  }, [permissionsLoading, canApprove, fetchApprovals]);
+
 
 
   useEffect(() => {
@@ -589,8 +543,7 @@ export default function PosApprovalsPage() {
 
 
   if (
-    permissionsLoading ||
-    loading
+    permissionsLoading || (canApprove && loading)
   ) {
 
     return (

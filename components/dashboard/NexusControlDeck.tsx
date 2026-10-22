@@ -3,7 +3,6 @@
 import {
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 
@@ -105,7 +104,7 @@ export default function NexusControlDeck({
 
 
   const [arrivalVisible, setArrivalVisible] = useState(false);
-  const hasArrived = useRef(false);
+  const [hasArrived, setHasArrived] = useState(false);
 
   const urgentFindings = useMemo(
     () =>
@@ -115,26 +114,17 @@ export default function NexusControlDeck({
     [intelligenceFindings],
   );
 
+  if (!hasArrived && !checking && analysisReady) {
+    setHasArrived(true);
+    if (urgent > 0) setPulseOpen(true);
+    if (urgentFindings.length > 0) setArrivalVisible(true);
+  }
+
   useEffect(() => {
-    if (hasArrived.current || checking || !analysisReady) return;
-
-    hasArrived.current = true;
-
-    if (urgent > 0) {
-      setPulseOpen(true);
-    }
-
-    if (urgentFindings.length > 0) {
-      setArrivalVisible(true);
-
-      const timer = window.setTimeout(
-        () => setArrivalVisible(false),
-        6500,
-      );
-
-      return () => window.clearTimeout(timer);
-    }
-  }, [analysisReady, checking, urgent, urgentFindings]);
+    if (!arrivalVisible) return;
+    const timer = window.setTimeout(() => setArrivalVisible(false), 6500);
+    return () => window.clearTimeout(timer);
+  }, [arrivalVisible]);
 
 
   const coveragePercentage =

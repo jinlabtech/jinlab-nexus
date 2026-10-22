@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useMemo,
   useState,
 } from "react";
@@ -162,7 +164,11 @@ function statusClass(
 }
 
 
-export default function DebtorPaymentPromises({
+export default function DebtorPaymentPromises(props: Props) {
+  return <DebtorPaymentPromisesContent key={props.customerId} {...props} />;
+}
+
+function DebtorPaymentPromisesContent({
   customerId,
   canManage,
   outstanding = 0,
@@ -243,38 +249,41 @@ export default function DebtorPaymentPromises({
     useState("");
 
 
+  const requestVersion = useRef(0);
+
+  const fetchData = useCallback(() => {
+    const version = ++requestVersion.current;
+    return getCustomerPaymentPromises(customerId).then((result) => {
+      if (version !== requestVersion.current)
+        return;
+      setPromises(result.promises ??
+        []);
+    }).catch((error) => {
+      if (version !== requestVersion.current)
+        return;
+      setErrorMessage(error instanceof Error
+        ? error.message
+        : "Payment promises could not be loaded.");
+    }).finally(() => {
+      if (version === requestVersion.current) {
+        setLoading(false);
+      }
+    });
+  }, [customerId]);
+
   async function loadData() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
-
-      const result =
-        await getCustomerPaymentPromises(
-          customerId
-        );
-
-      setPromises(
-        result.promises ??
-        []
-      );
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Payment promises could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    setErrorMessage("");
+    await fetchData();
   }
 
 
   useEffect(() => {
-    void loadData();
-  }, [
-    customerId,
-  ]);
+    void fetchData();
+    return () => {
+      requestVersion.current += 1;
+    };
+  }, [fetchData]);
 
 
   const activePromise =

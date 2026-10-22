@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -11,7 +12,6 @@ import {
 } from "next/navigation";
 
 import {
-  Barcode,
   Building2,
   CheckCircle2,
   CreditCard,
@@ -381,112 +381,77 @@ export default function PosSettingsPage() {
     setSuccessMessage,
   ] =
     useState("");
+  const loadSettings = useCallback(() => {
 
-
-  async function loadSettings() {
-
-    try {
-
-      setLoading(true);
-      setErrorMessage("");
-
-
-      const {
+    return Promise.resolve(supabase.rpc(
+      "get_pos_profile_settings"
+    ))
+      .then(async ({
         data,
         error,
-      } =
-        await supabase.rpc(
-          "get_pos_profile_settings"
+      }) => {
+        if (error) {
+          throw error;
+        }
+
+        const next =
+          data as PosSettingsWorkspace;
+
+        setWorkspace(
+          next
         );
 
+        setSettings({
+          ...next.settings,
 
-      if (error) {
-        throw error;
-      }
+          receipt_options: {
+            paper_size:
+              next.settings
+                .receipt_options
+                ?.paper_size ??
+              "80mm",
 
+            auto_print:
+              next.settings
+                .receipt_options
+                ?.auto_print ??
+              false,
 
-      const next =
-        data as PosSettingsWorkspace;
+            show_cashier:
+              next.settings
+                .receipt_options
+                ?.show_cashier ??
+              true,
 
+            show_branch:
+              next.settings
+                .receipt_options
+                ?.show_branch ??
+              true,
+          },
+        });
+      })
+      .catch((error) => {
 
-      setWorkspace(
-        next
-      );
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "POS settings could not be loaded."
+        );
 
-
-      setSettings({
-        ...next.settings,
-
-        receipt_options: {
-          paper_size:
-            next.settings
-              .receipt_options
-              ?.paper_size ??
-            "80mm",
-
-          auto_print:
-            next.settings
-              .receipt_options
-              ?.auto_print ??
-            false,
-
-          show_cashier:
-            next.settings
-              .receipt_options
-              ?.show_cashier ??
-            true,
-
-          show_branch:
-            next.settings
-              .receipt_options
-              ?.show_branch ??
-            true,
-        },
-      });
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "POS settings could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(false);
-    }
-  }
-
-
-  useEffect(
-    () => {
-
-      if (
-        permissionsLoading
-      ) {
-        return;
-      }
-
-
-      if (!canView) {
+      })
+      .finally(() => {
 
         setLoading(false);
+      });
 
-        return;
-      }
+  }, []);
 
+  useEffect(() => {
+    if (permissionsLoading || !(canView)) return;
+    void loadSettings();
+  }, [permissionsLoading, canView, loadSettings]);
 
-      void loadSettings();
-
-    },
-    [
-      permissionsLoading,
-      canView,
-    ]
-  );
 
 
   async function logout() {
@@ -772,8 +737,7 @@ export default function PosSettingsPage() {
 
 
   if (
-    permissionsLoading ||
-    loading
+    permissionsLoading || ((canView) && loading)
   ) {
 
     return (

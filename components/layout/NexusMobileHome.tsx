@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useBrowserStorage, decodeStringList, useBrowserHydrated, useBrowserClock } from "@/lib/nexus/browser-storage";
 
 import {
   useRouter,
@@ -32,6 +33,8 @@ import {
   getMobileNexusApps,
 } from "@/lib/nexus/registry";
 
+
+const emptyRecent: string[] = [];
 
 const RECENT_KEY =
   "nexus-mobile-recent-apps-v1";
@@ -76,11 +79,7 @@ export default function NexusMobileHome() {
   const apps =
     getMobileNexusApps();
 
-  const [
-    mounted,
-    setMounted,
-  ] =
-    useState(false);
+  const mounted = useBrowserHydrated();
 
   const [
     quickOpen,
@@ -88,75 +87,9 @@ export default function NexusMobileHome() {
   ] =
     useState(false);
 
-  const [
-    recentIds,
-    setRecentIds,
-  ] =
-    useState<string[]>(
-      []
-    );
-
-  const [
-    now,
-    setNow,
-  ] =
-    useState<Date | null>(
-      null
-    );
-
-
-  useEffect(() => {
-    setMounted(true);
-    setNow(
-      new Date()
-    );
-
-    try {
-      const saved =
-        window.localStorage.getItem(
-          RECENT_KEY
-        );
-
-      if (saved) {
-        const parsed =
-          JSON.parse(saved);
-
-        if (
-          Array.isArray(parsed)
-        ) {
-          setRecentIds(
-            parsed.filter(
-              (value) =>
-                typeof value ===
-                "string"
-            )
-          );
-        }
-      }
-    } catch {
-      // Mobile home still works
-      // when local storage is unavailable.
-    }
-  }, []);
-
-
-  useEffect(() => {
-    const timer =
-      window.setInterval(
-        () => {
-          setNow(
-            new Date()
-          );
-        },
-        30_000
-      );
-
-    return () =>
-      window.clearInterval(
-        timer
-      );
-  }, []);
-
+  const [recentIds, setRecentIds] = useBrowserStorage<string[]>(RECENT_KEY, emptyRecent, decodeStringList);
+  const clock = useBrowserClock();
+  const now = clock === null ? null : new Date(clock);
 
   useEffect(() => {
     if (!quickOpen) {
@@ -205,17 +138,6 @@ export default function NexusMobileHome() {
             6
           );
 
-        try {
-          window.localStorage
-            .setItem(
-              RECENT_KEY,
-              JSON.stringify(
-                next
-              )
-            );
-        } catch {
-          // Ignore storage failure.
-        }
 
         return next;
       }

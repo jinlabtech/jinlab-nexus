@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -335,177 +336,136 @@ export default function PosReturnsPage() {
     setErrorMessage,
   ] =
     useState("");
+  const fetchWorkspace = useCallback((lookup: string | null) => {
 
-
-  async function loadWorkspace(
-    lookup:
-      string |
-      null = null,
-
-    silent = false
-  ) {
-
-    try {
-
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-
-      setErrorMessage("");
-
-
-      const {
+    return supabase.auth
+      .getUser()
+      .then(async ({
         data: {
           user,
         },
-      } =
-        await supabase.auth
-          .getUser();
+      }) => {
+        if (!user) {
 
+          router.replace(
+            "/login"
+          );
 
-      if (!user) {
+          return;
+        }
 
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
+        const {
+          data:
           profile,
-        error:
+          error:
           profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        returnsResult,
-      ] =
-        await Promise.all([
-          supabase
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
+            .single();
 
-          supabase.rpc(
-            "get_pos_return_workspace",
-            {
-              p_lookup:
-                lookup,
-            }
-          ),
-        ]);
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
 
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
+        const [
+          companyResult,
+          returnsResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
 
+            supabase.rpc(
+              "get_pos_return_workspace",
+              {
+                p_lookup:
+                  lookup,
+              }
+            ),
+          ]);
 
-      if (
-        returnsResult.error
-      ) {
-        throw returnsResult.error;
-      }
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
 
+        if (
+          returnsResult.error
+        ) {
+          throw returnsResult.error;
+        }
 
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
-
-
-      setWorkspace(
-        returnsResult.data as Workspace
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Returns workspace could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }
-
-
-  useEffect(
-    () => {
-
-      if (
-        permissionsLoading
-      ) {
-        return;
-      }
-
-
-      if (!canView) {
-
-        setLoading(
-          false
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
         );
 
-        return;
-      }
+        setWorkspace(
+          returnsResult.data as Workspace
+        );
+      })
+      .catch((error) => {
 
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Returns workspace could not be loaded."
+        );
 
-      void loadWorkspace();
+      })
+      .finally(() => {
 
-    },
-    [
-      permissionsLoading,
-      canView,
-    ]
-  );
+        setLoading(false);
+        setRefreshing(false);
+      });
+  }, [router]);
+
+  function loadWorkspace(lookup:
+    string |
+    null = null, silent = false) {
+
+    if (silent) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    setErrorMessage("");
+    return fetchWorkspace(lookup);
+  }
+
+  useEffect(() => {
+    if (permissionsLoading || !canView) return;
+    void fetchWorkspace(null);
+  }, [permissionsLoading, canView, fetchWorkspace]);
+
 
 
   async function searchSales() {
@@ -971,8 +931,7 @@ export default function PosReturnsPage() {
 
 
   if (
-    permissionsLoading ||
-    loading
+    permissionsLoading || (canView && loading)
   ) {
 
     return (

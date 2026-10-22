@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -131,29 +132,6 @@ export default function DataPortabilityPage() {
     can("data.backup");
 
 
-  useEffect(() => {
-    if (
-      permissionsLoading
-    ) {
-      return;
-    }
-
-    if (
-      !canExport &&
-      !canBackup
-    ) {
-      setLoadingJobs(false);
-      return;
-    }
-
-    void loadJobs();
-  }, [
-    permissionsLoading,
-    canExport,
-    canBackup,
-  ]);
-
-
   async function logout() {
     await supabase.auth.signOut();
 
@@ -161,26 +139,29 @@ export default function DataPortabilityPage() {
       "/login"
     );
   }
+  const loadJobs = useCallback(() => {
+    return getExportJobs()
+      .then(async (data) => {
+        setJobs(data);
+      })
+      .catch((error) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Export history could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoadingJobs(false);
+      });
 
+  }, []);
 
-  async function loadJobs() {
-    try {
-      setLoadingJobs(true);
+  useEffect(() => {
+    if (permissionsLoading || !(canExport || canBackup)) return;
+    void loadJobs();
+  }, [permissionsLoading, canExport, canBackup, loadJobs]);
 
-      const data =
-        await getExportJobs();
-
-      setJobs(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Export history could not be loaded."
-      );
-    } finally {
-      setLoadingJobs(false);
-    }
-  }
 
 
   async function runExport(
@@ -262,7 +243,7 @@ export default function DataPortabilityPage() {
         </h1>
 
         <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-          Export your company's business information
+          Export your company&apos;s business information
           for offline storage, reporting, migration or
           use with another management system.
           JINLAB Nexus is designed to avoid unnecessary
@@ -481,7 +462,7 @@ export default function DataPortabilityPage() {
               </div>
 
 
-              {loadingJobs ? (
+              {(canExport || canBackup) && loadingJobs ? (
                 <p className="p-5 text-sm text-muted-foreground">
                   Loading export history...
                 </p>

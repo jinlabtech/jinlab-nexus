@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
@@ -17,30 +17,25 @@ type SupplierFormProps = {
   onCancel: () => void;
 };
 
-export default function SupplierForm({
+export default function SupplierForm(props: SupplierFormProps) {
+  return <SupplierFormFields key={props.supplier?.id ?? "new"} {...props} />;
+}
+
+function SupplierFormFields({
   supplier,
   onSave,
   onCancel,
 }: SupplierFormProps) {
-  const [supplierName, setSupplierName] = useState("");
-  const [contactPerson, setContactPerson] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [supplierName, setSupplierName] = useState(supplier?.supplier_name ?? "");
+  const [contactPerson, setContactPerson] = useState(supplier?.contact_person ?? "");
+  const [email, setEmail] = useState(supplier?.email ?? "");
+  const [phone, setPhone] = useState(supplier?.phone ?? "");
+  const [address, setAddress] = useState(supplier?.address ?? "");
 
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const isEditing = Boolean(supplier);
-
-  useEffect(() => {
-    setSupplierName(supplier?.supplier_name ?? "");
-    setContactPerson(supplier?.contact_person ?? "");
-    setEmail(supplier?.email ?? "");
-    setPhone(supplier?.phone ?? "");
-    setAddress(supplier?.address ?? "");
-    setErrorMessage("");
-  }, [supplier]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

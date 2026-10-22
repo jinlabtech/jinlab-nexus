@@ -449,72 +449,66 @@ export default function HrRecordsPage() {
     });
 
 
-  async function load(
+  function load(
     employeeId?:
       string
   ) {
-    setError(
-      ""
-    );
-
-    const {
-      data: {
-        user,
-      },
-    } =
-      await supabase.auth.getUser();
-
-
-    if (!user) {
-      router.push(
-        "/login"
+    return supabase.auth.getUser().then(async ({ data: { user } }) => {
+      setError(
+        ""
       );
 
-      return;
-    }
+      if (!user) {
+        router.push(
+          "/login"
+        );
+
+        return;
+      }
 
 
-    const {
-      data:
-        result,
-      error:
-        rpcError,
-    } =
-      await supabase.rpc(
-        "get_hr_records_workspace",
-        {
-          p_employee_id:
-            employeeId ||
-            null,
-        }
+      const {
+        data:
+          result,
+        error:
+          rpcError,
+      } =
+        await supabase.rpc(
+          "get_hr_records_workspace",
+          {
+            p_employee_id:
+              employeeId ||
+              null,
+          }
+        );
+
+
+      if (rpcError) {
+        throw rpcError;
+      }
+
+
+      const workspace =
+        result as RecordsWorkspace;
+
+
+      setData(
+        workspace
       );
 
 
-    if (rpcError) {
-      throw rpcError;
-    }
-
-
-    const workspace =
-      result as RecordsWorkspace;
-
-
-    setData(
-      workspace
-    );
-
-
-    if (
-      workspace.mode ===
-        "management" &&
-      !selectedEmployeeId &&
-      workspace.employees.length >
-        0
-    ) {
-      setSelectedEmployeeId(
-        workspace.employees[0].id
-      );
-    }
+      if (
+        workspace.mode ===
+          "management" &&
+        !selectedEmployeeId &&
+        workspace.employees.length >
+          0
+      ) {
+        setSelectedEmployeeId(
+          workspace.employees[0].id
+        );
+      }
+    });
   }
 
 

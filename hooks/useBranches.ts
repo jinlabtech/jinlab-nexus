@@ -1,51 +1,25 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
 import { getBranches } from "@/lib/services/branchService";
 import type { Branch } from "@/types/branch";
 
+const emptyData: Branch[] = [];
+
 export function useBranches(companyId: string) {
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const refreshBranches = useCallback(async () => {
-    if (!companyId) {
-      setBranches([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const data = await getBranches(companyId);
-      setBranches(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Branches could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => {
-    refreshBranches();
-  }, [refreshBranches]);
+  const load = useCallback(() => getBranches(companyId), [companyId]);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    companyId,
+    Boolean(companyId),
+    load,
+    "Branches could not be loaded."
+  );
 
   return {
-    branches,
+    branches: data ?? emptyData,
     loading,
     errorMessage,
-    refreshBranches,
+    refreshBranches: refresh,
   };
 }

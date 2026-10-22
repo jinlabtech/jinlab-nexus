@@ -3,6 +3,7 @@
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -181,132 +182,7 @@ export default function InventoryBarcodesPage() {
     useState(
       ""
     );
-
-
-  async function initialise() {
-
-    setLoading(
-      true
-    );
-
-
-    try {
-
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth.getUser();
-
-
-      if (!user) {
-
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
-          profile,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "full_name, company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .maybeSingle();
-
-
-      if (
-        profile?.full_name
-      ) {
-
-        setUserName(
-          profile.full_name
-        );
-      }
-
-
-      if (
-        profile?.company_id
-      ) {
-
-        const {
-          data:
-            company,
-        } =
-          await supabase
-            .from(
-              "company"
-            )
-            .select(
-              "company_name"
-            )
-            .eq(
-              "id",
-              profile.company_id
-            )
-            .maybeSingle();
-
-
-        if (
-          company?.company_name
-        ) {
-
-          setCompanyName(
-            company.company_name
-          );
-        }
-
-      }
-
-
-      await loadWorkspace(
-        ""
-      );
-
-
-      await loadItems(
-        "",
-        ""
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to load barcode workspace."
-      );
-
-    } finally {
-
-      setLoading(
-        false
-      );
-
-    }
-
-  }
-
-
-  async function loadWorkspace(
-    nextBranch:
-      string
-  ) {
+  const loadWorkspace = useCallback(async (nextBranch: string) => {
 
     const {
       data,
@@ -330,90 +206,175 @@ export default function InventoryBarcodesPage() {
     setWorkspace(
       data as Workspace
     );
-  }
+  }, []);
+
+  const fetchItems = useCallback((query: string, nextBranch: string) => {
 
 
-  async function loadItems(
-    query =
-      search,
+    return Promise.resolve(supabase.rpc(
+      "search_inventory_barcodes",
+      {
+        p_search:
+          query.trim() ||
+          null,
 
-    nextBranch =
-      branchId
-  ) {
+        p_branch_id:
+          nextBranch ||
+          null,
 
-    setLoading(
-      true
-    );
-
-    setErrorMessage(
-      ""
-    );
-
-
-    try {
-
-      const {
+        p_limit:
+          100,
+      }
+    ))
+      .then(async ({
         data,
         error,
-      } =
-        await supabase.rpc(
-          "search_inventory_barcodes",
-          {
-            p_search:
-              query.trim() ||
-              null,
+      }) => {
+        if (error) {
+          throw error;
+        }
 
-            p_branch_id:
-              nextBranch ||
-              null,
+        setItems(
+          (
+            data ??
+            []
+          ) as BarcodeItem[]
+        );
+      })
+      .catch((error) => {
 
-            p_limit:
-              100,
-          }
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to search inventory."
         );
 
+      })
+      .finally(() => {
 
-      if (error) {
-        throw error;
-      }
+        setLoading(
+          false
+        );
+
+      });
 
 
-      setItems(
-        (
-          data ??
-          []
-        ) as BarcodeItem[]
-      );
+  }, []);
 
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to search inventory."
-      );
-
-    } finally {
-
-      setLoading(
-        false
-      );
-
-    }
-
+  function loadItems(query = search, nextBranch = branchId) {
+    setLoading(true);
+    setErrorMessage("");
+    return fetchItems(query, nextBranch);
   }
 
+  const initialise = useCallback(() => {
 
-  useEffect(
-    () => {
 
-      void initialise();
+    return supabase.auth.getUser()
+      .then(async ({
+        data: {
+          user,
+        },
+      }) => {
+        if (!user) {
 
-    },
-    []
-  );
+          router.replace(
+            "/login"
+          );
+
+          return;
+        }
+
+        const {
+          data:
+          profile,
+        } =
+          await supabase
+            .from(
+              "user_profile"
+            )
+            .select(
+              "full_name, company_id"
+            )
+            .eq(
+              "user_id",
+              user.id
+            )
+            .maybeSingle();
+
+        if (
+          profile?.full_name
+        ) {
+
+          setUserName(
+            profile.full_name
+          );
+        }
+
+        if (
+          profile?.company_id
+        ) {
+
+          const {
+            data:
+            company,
+          } =
+            await supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .maybeSingle();
+
+
+          if (
+            company?.company_name
+          ) {
+
+            setCompanyName(
+              company.company_name
+            );
+          }
+
+        }
+
+        await loadWorkspace(
+          ""
+        );
+
+        await fetchItems(
+          "",
+          ""
+        );
+      })
+      .catch((error) => {
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to load barcode workspace."
+        );
+
+      })
+      .finally(() => {
+
+        setLoading(
+          false
+        );
+
+      });
+
+
+  }, [router, loadWorkspace, fetchItems]);
+
+  useEffect(() => { void initialise(); }, [initialise]);
+
 
 
   function toggleItem(
@@ -432,7 +393,7 @@ export default function InventoryBarcodesPage() {
 
         if (
           next[
-            itemId
+          itemId
           ]
         ) {
 

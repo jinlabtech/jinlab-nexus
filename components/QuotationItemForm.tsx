@@ -4,7 +4,6 @@ import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
   FormEvent,
-  useEffect,
   useState,
 } from "react";
 
@@ -32,7 +31,11 @@ type Props = {
   onCancel: () => void;
 };
 
-export default function QuotationItemForm({
+export default function QuotationItemForm(props: Props) {
+  return <QuotationItemFormFields key={props.item?.id ?? "new"} {...props} />;
+}
+
+function QuotationItemFormFields({
   inventoryItems,
   item,
   onSave,
@@ -41,48 +44,48 @@ export default function QuotationItemForm({
   const [
     inventoryItemId,
     setInventoryItemId,
-  ] = useState("");
+  ] = useState(item?.inventory_item_id ?? "");
 
   const [
     description,
     setDescription,
-  ] = useState("");
+  ] = useState(item?.description ?? "");
 
   const [
     quantity,
     setQuantity,
-  ] = useState("1");
+  ] = useState(item ? String(item.quantity) : "1");
 
   const [
     unitPrice,
     setUnitPrice,
-  ] = useState("0");
+  ] = useState(item ? String(item.unit_price) : "0");
 
   const [
     discountMode,
     setDiscountMode,
   ] =
     useState<DiscountMode>(
-      "percentage"
+      item?.discount_mode ?? "percentage"
     );
 
   const [
     discountValue,
     setDiscountValue,
-  ] = useState("0");
+  ] = useState(item ? String(item.discount_value) : "0");
 
   const [
     taxMode,
     setTaxMode,
   ] =
     useState<TaxMode>(
-      "none"
+      item?.tax_mode ?? "none"
     );
 
   const [
     taxRate,
     setTaxRate,
-  ] = useState("15");
+  ] = useState(item ? String(item.tax_rate) : "15");
 
   const [
     saving,
@@ -96,55 +99,6 @@ export default function QuotationItemForm({
 
   const isEditing =
     Boolean(item);
-
-  useEffect(() => {
-    setInventoryItemId(
-      item?.inventory_item_id ??
-        ""
-    );
-
-    setDescription(
-      item?.description ?? ""
-    );
-
-    setQuantity(
-      item
-        ? String(item.quantity)
-        : "1"
-    );
-
-    setUnitPrice(
-      item
-        ? String(item.unit_price)
-        : "0"
-    );
-
-    setDiscountMode(
-      item?.discount_mode ??
-        "percentage"
-    );
-
-    setDiscountValue(
-      item
-        ? String(
-            item.discount_value
-          )
-        : "0"
-    );
-
-    setTaxMode(
-      item?.tax_mode ??
-        "none"
-    );
-
-    setTaxRate(
-      item
-        ? String(item.tax_rate)
-        : "15"
-    );
-
-    setErrorMessage("");
-  }, [item]);
 
   function selectInventoryItem(
     id: string

@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  useEffect,
+  useCallback,
   useState,
 } from "react";
 
@@ -23,6 +23,8 @@ import {
 import {
   usePermissions,
 } from "@/hooks/usePermissions";
+
+import { useRequestData } from "@/hooks/useRequestData";
 
 import {
   supabase,
@@ -89,7 +91,11 @@ function money(
 }
 
 
-export default function TillSessionPanel({
+export default function TillSessionPanel(props: Parameters<typeof TillSessionContent>[0]) {
+  return <TillSessionContent key={props.branchId} {...props} />;
+}
+
+function TillSessionContent({
   branchId,
   onSessionChange,
 }: {
@@ -101,23 +107,6 @@ export default function TillSessionPanel({
     can,
   } =
     usePermissions();
-
-
-  const [
-    workspace,
-    setWorkspace,
-  ] =
-    useState<
-      TillWorkspace |
-      null
-    >(null);
-
-
-  const [
-    loading,
-    setLoading,
-  ] =
-    useState(false);
 
 
   const [
@@ -156,7 +145,7 @@ export default function TillSessionPanel({
 
 
   const [
-    errorMessage,
+    actionErrorMessage,
     setErrorMessage,
   ] =
     useState("");
@@ -169,68 +158,20 @@ export default function TillSessionPanel({
     useState(false);
 
 
-  async function load() {
+  const fetchWorkspace = useCallback(async () => {
+    const { data, error } = await supabase.rpc("get_pos_till_workspace", { p_branch_id: branchId });
+    if (error) throw new Error(error.message);
+    return data as TillWorkspace;
+  }, [branchId]);
 
-    if (!branchId) {
-      return;
-    }
+  const {
+    data: workspace,
+    loading,
+    errorMessage: requestErrorMessage,
+    refresh: load,
+  } = useRequestData(branchId, Boolean(branchId), fetchWorkspace, "Till session could not be loaded.");
 
-
-    try {
-
-      setLoading(true);
-      setErrorMessage("");
-
-
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "get_pos_till_workspace",
-          {
-            p_branch_id:
-              branchId,
-          }
-        );
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      setWorkspace(
-        data as TillWorkspace
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Till session could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(false);
-    }
-  }
-
-
-  useEffect(
-    () => {
-
-      void load();
-
-    },
-    [
-      branchId,
-    ]
-  );
+  const errorMessage = actionErrorMessage || requestErrorMessage;
 
 
   async function openTill() {
