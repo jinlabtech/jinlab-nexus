@@ -1,41 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
 import { getCompanies } from "@/lib/services/companyService";
 import type { Company } from "@/types/company";
 
+const emptyData: Company[] = [];
+
 export function useCompanies() {
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const refreshCompanies = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const data = await getCompanies();
-      setCompanies(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Companies could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    refreshCompanies();
-  }, [refreshCompanies]);
+  const load = useCallback(() => getCompanies(), []);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    "companies",
+    true,
+    load,
+    "Companies could not be loaded."
+  );
 
   return {
-    companies,
+    companies: data ?? emptyData,
     loading,
     errorMessage,
-    refreshCompanies,
+    refreshCompanies: refresh,
   };
 }

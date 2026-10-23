@@ -9,10 +9,10 @@ import {
 
 import {
   useCallback,
-  useEffect,
   useMemo,
-  useState,
 } from "react";
+
+import { useRequestData } from "@/hooks/useRequestData";
 
 import {
   useRouter,
@@ -30,98 +30,67 @@ type Workspace = {
   shipments?: Shipment[];
 };
 
+const EMPTY_SHIPMENTS: Shipment[] = [];
+
 export default function NexusShippingAlerts() {
   const router =
     useRouter();
 
-  const [
-    shipments,
-    setShipments,
-  ] =
-    useState<Shipment[]>([]);
-
-  const [
-    loading,
-    setLoading,
-  ] =
-    useState(true);
-
-  const [
-    error,
-    setError,
-  ] =
-    useState("");
-
   const load =
     useCallback(
       async () => {
-        setLoading(true);
-        setError("");
+        const {
+          data: {
+            session,
+          },
+        } =
+          await supabase.auth
+            .getSession();
 
-        try {
-          const {
-            data: {
-              session,
-            },
-          } =
-            await supabase.auth
-              .getSession();
-
-          if (!session) {
-            throw new Error(
-              "Please sign in to Nexus."
-            );
-          }
-
-          const response =
-            await fetch(
-              "/api/shipping",
-              {
-                headers: {
-                  Authorization:
-                    `Bearer ${session.access_token}`,
-                },
-                cache:
-                  "no-store",
-              }
-            );
-
-          const result =
-            await response.json();
-
-          if (!response.ok) {
-            throw new Error(
-              result.error ||
-                "Shipping could not be loaded."
-            );
-          }
-
-          const workspace =
-            result as Workspace;
-
-          setShipments(
-            Array.isArray(
-              workspace.shipments
-            )
-              ? workspace.shipments
-              : []
+        if (!session) {
+          throw new Error(
+            "Please sign in to Nexus."
           );
-        } catch (failure) {
-          setError(
-            failure instanceof Error
-              ? failure.message
-              : "Shipping unavailable."
-          );
-        } finally {
-          setLoading(false);
         }
+
+        const response =
+          await fetch(
+            "/api/shipping",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${session.access_token}`,
+              },
+              cache:
+                "no-store",
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error ||
+              "Shipping could not be loaded."
+          );
+        }
+
+        const workspace =
+          result as Workspace;
+
+        return Array.isArray(workspace.shipments) ? workspace.shipments : [];
       },
       []
     );
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const { data, loading, errorMessage: error } = useRequestData(
+    "dashboard-shipping-alerts",
+    true,
+    load,
+    "Shipping unavailable."
+  );
+  const shipments = data ?? EMPTY_SHIPMENTS;
 
   const active =
     useMemo(

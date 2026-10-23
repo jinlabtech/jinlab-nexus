@@ -81,8 +81,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- 2. POSTING PROFILE COLUMN
 -- ============================================================
@@ -94,8 +92,6 @@ add column if not exists
 payment_clearing_account_id uuid
 references public.accounting_account(id)
 on delete restrict;
-
-
 update public.accounting_posting_profile p
 set
   payment_clearing_account_id =
@@ -116,8 +112,6 @@ set
 where
   p.payment_clearing_account_id
     is null;
-
-
 -- ============================================================
 -- 3. ENSURE CLEARING ACCOUNT
 -- ============================================================
@@ -234,14 +228,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.ensure_payment_clearing_account(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- 4. PROFILE VALIDATION
 -- ============================================================
@@ -497,8 +487,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- 5. ENSURE POSTING PROFILE NOW INCLUDES CLEARING
 -- ============================================================
@@ -682,14 +670,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.ensure_accounting_posting_profile(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- END PART 1
 -- ============================================================
@@ -1151,14 +1135,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.post_invoice_payment_to_ledger(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

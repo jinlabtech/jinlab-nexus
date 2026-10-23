@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -39,40 +40,33 @@ export default function SettingsAuditPage() {
   const allowed =
     can("settings.audit.view");
 
-  useEffect(() => {
-    if (permissionsLoading) return;
-
-    if (!allowed) {
-      setLoading(false);
-      return;
-    }
-
-    void loadAudit();
-  }, [permissionsLoading, allowed]);
-
   async function logout() {
     await supabase.auth.signOut();
     router.replace("/login");
   }
+  const loadAudit = useCallback(() => {
+    return getSettingsAuditLog()
+      .then(async (data) => {
+        setRows(data);
+      })
+      .catch((error) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Audit history could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-  async function loadAudit() {
-    try {
-      setLoading(true);
+  }, []);
 
-      const data =
-        await getSettingsAuditLog();
+  useEffect(() => {
+    if (permissionsLoading || !(allowed)) return;
+    void loadAudit();
+  }, [permissionsLoading, allowed, loadAudit]);
 
-      setRows(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Audit history could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <DashboardLayout>
@@ -100,7 +94,7 @@ export default function SettingsAuditPage() {
           </div>
         )}
 
-        {permissionsLoading || loading ? (
+        {permissionsLoading || ((allowed) && loading) ? (
           <p className="mt-8 text-sm text-muted-foreground">
             Loading audit history...
           </p>

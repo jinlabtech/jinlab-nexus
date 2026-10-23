@@ -253,3 +253,12 @@ test("WhatsApp intelligence detects actionable sales signals and links to the co
   assert.equal(result.findings.find((item) => item.id === "whatsapp:waiting")?.href, "/whatsapp?filter=waiting");
   assert.equal(result.findings.find((item) => item.id === "whatsapp:won-unpaid")?.href, "/whatsapp?filter=won");
 });
+
+
+test("outstanding repairs excludes closed jobs and retains collection work", () => {
+  const result=analyzeCore(snapshot({repairs:[repair("1","closed"),repair("2","collected"),repair("3","cancelled"),repair("4","ready_for_collection"),repair("5","in_progress")]}));
+  assert.equal(result.repairReport?.total,2);
+  assert.deepEqual(result.repairReport?.jobs.map(job=>job.id),["4","5"]);
+  const denied=analyzeCore(snapshot({repairs:[repair("private")],coverage:unavailable("repairs")}));
+  assert.equal(denied.repairReport,undefined);
+});

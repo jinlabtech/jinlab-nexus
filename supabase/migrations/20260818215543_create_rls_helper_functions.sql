@@ -15,8 +15,6 @@ as $$
     where user_id = auth.uid()
     limit 1;
 $$;
-
 grant execute
 on function public.current_company_id()
 to authenticated;
-

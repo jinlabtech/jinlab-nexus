@@ -20,8 +20,6 @@ on function public.repair_record_handover_signature(
   text
 )
 from public, anon, authenticated, service_role;
-
-
 -- ============================================================
 -- 2. SERVER-ONLY SIGNATURE RECORDING
 -- ============================================================
@@ -264,8 +262,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.repair_record_handover_signature_server(
@@ -275,7 +271,6 @@ public.repair_record_handover_signature_server(
   text
 )
 from public, anon, authenticated;
-
 grant execute
 on function
 public.repair_record_handover_signature_server(
@@ -285,8 +280,6 @@ public.repair_record_handover_signature_server(
   text
 )
 to service_role;
-
-
 -- ============================================================
 -- 3. HARDEN FINAL VERIFICATION
 --
@@ -641,8 +634,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.repair_finalize_verified_handover(
@@ -653,7 +644,6 @@ public.repair_finalize_verified_handover(
   text
 )
 from public, anon, authenticated;
-
 grant execute
 on function
 public.repair_finalize_verified_handover(

@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { Activity, ArrowDownToLine, X } from "lucide-react";
+import NexusContextCoach from "@/components/layout/NexusContextCoach";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 const CoreQuestionPanel = dynamic(() => import("@/components/intelligence/CoreQuestionPanel"));
+const CoreReports = dynamic(() => import("@/components/intelligence/CoreReports"));
 const NexusCoreWidgets = dynamic(() => import("@/components/NexusCoreWidgets"));
 import { downloadCoreReport } from "@/lib/services/coreIntelligenceService";
 import type { CoreAnalysis } from "@/lib/intelligence/types";
@@ -19,9 +22,11 @@ function moduleLabel(pathname: string) {
 export default function NexusHelper() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<"ask" | "reports">("ask");
+  const [extrasOpen, setExtrasOpen] = useState(false);
+  const panel = useRef<HTMLElement | null>(null);
   const [hasOpened, setHasOpened] = useState(false);
   const [analysis, setAnalysis] = useState<CoreAnalysis | null>(null);
-  const opener = useRef<HTMLButtonElement | null>(null);
   const closeButton = useRef<HTMLButtonElement | null>(null);
   const wasOpen = useRef(false);
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -46,33 +51,62 @@ export default function NexusHelper() {
   }, []);
 
   useEffect(() => {
-    if (!open) { if (wasOpen.current) (returnFocus.current ?? opener.current)?.focus(); wasOpen.current = false; return; }
+    if (!open) { if (wasOpen.current) returnFocus.current?.focus(); wasOpen.current = false; return; }
     wasOpen.current = true;
-    closeButton.current?.focus();
+    closeButton.current?.focus({preventScroll:true});
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const originalOverflow = document.body.style.overflow;
+    if (mobile) document.body.style.overflow = "hidden";
+    const viewport = window.visualViewport;
+    const resize = () => {
+      if (panel.current) panel.current.dataset.shortViewport = String((viewport?.height ?? window.innerHeight) < 500);
+      panel.current?.style.setProperty("--core-top", `${(viewport?.offsetTop ?? 0) + 8}px`);
+      panel.current?.style.setProperty("--core-height", `${Math.max(200, (viewport?.height ?? window.innerHeight) - 16)}px`);
+    };
+    resize();
+    viewport?.addEventListener("resize", resize);
+    viewport?.addEventListener("scroll", resize);
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") { setOpen(false); (returnFocus.current ?? opener.current)?.focus(); }
+      if (event.key === "Escape") { event.preventDefault(); setOpen(false); }
+      if (mobile && event.key === "Tab") {
+        const targets = Array.from(panel.current?.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],textarea:not(:disabled),input:not(:disabled),summary') ?? []).filter(el => el.getClientRects().length > 0);
+        const first = targets[0], last = targets.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
     }
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      viewport?.removeEventListener("resize", resize);
+      viewport?.removeEventListener("scroll", resize);
+      if (mobile) document.body.style.overflow = originalOverflow;
+    };
   }, [open]);
-  function close() { setOpen(false); (returnFocus.current ?? opener.current)?.focus(); }
+  function close() { setOpen(false); returnFocus.current?.focus(); }
   return <div id="nexus-helper-root">
-    <button ref={opener} type="button" onClick={() => { returnFocus.current = opener.current; setHasOpened(true); setOpen((current) => !current); }} aria-label={open ? "Close Nexus Core helper" : "Open Nexus Core helper"} aria-expanded={open} aria-controls="nexus-core-helper" className={`${open ? "hidden" : "hidden md:flex"} fixed bottom-5 right-5 z-[70] size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring`}><Activity className="size-5" /></button>
-    <section id="nexus-core-helper" hidden={!open} role="dialog" aria-modal="false" aria-label="Nexus Core helper" className={`${open ? "flex" : "hidden"} fixed bottom-0 right-0 top-0 z-[80] w-full max-w-md flex-col border-l bg-background shadow-2xl sm:bottom-5 sm:right-5 sm:top-auto sm:h-[min(760px,calc(100dvh-40px))] sm:rounded-2xl sm:border`}>
+    {hasOpened && typeof document !== "undefined" && createPortal(<section ref={panel} id="nexus-core-helper" hidden={!open} role="dialog" aria-modal="false" aria-label="Nexus Core helper" className={`${open ? "flex" : "hidden"} fixed bottom-0 right-0 top-0 z-[80] w-full max-w-md flex-col border-l bg-background shadow-2xl sm:bottom-5 sm:right-5 sm:top-auto sm:h-[min(760px,calc(100dvh-40px))] sm:rounded-2xl sm:border`}>
       <header className="flex items-center justify-between gap-3 border-b px-4 py-4"><div><p className="flex items-center gap-2 text-sm font-semibold"><Activity className="size-4 text-primary" />Nexus Core</p><p className="mt-1 text-xs text-muted-foreground">{moduleLabel(pathname)} · Business records and checks</p></div><div className="flex items-center gap-1">{analysis && <Button variant="ghost" size="icon" aria-label="Download current business review" onClick={() => downloadCoreReport(analysis)}><ArrowDownToLine /></Button>}<Button ref={closeButton} variant="ghost" size="icon" aria-label="Close Nexus Core helper" onClick={close}><X /></Button></div></header>
-      <div className="nexus-core-body min-h-0 flex-1">
-        {open && <NexusCoreWidgets />}
-
-        <div className="nexus-core-intelligence-panel min-h-0 flex-1">
+      <nav aria-label="Nexus Core views" className="flex shrink-0 gap-2 border-b p-2">
+        <Button type="button" variant={view === "ask" ? "default" : "outline"} aria-pressed={view === "ask"} onClick={() => setView("ask")}>Ask Core</Button>
+        <Button type="button" variant={view === "reports" ? "default" : "outline"} aria-pressed={view === "reports"} onClick={() => setView("reports")}>Reports</Button>
+      </nav>
+      <div className="nexus-core-body flex min-h-0 flex-1 flex-col overflow-hidden">
+        <details hidden={view !== "ask"} className="nexus-core-extras shrink-0 border-b" open={extrasOpen} onToggle={event => setExtrasOpen(event.currentTarget.open)}>
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium">Tips and widgets</summary>
+          {open && extrasOpen && <div className="max-h-[30dvh] overflow-y-auto"><NexusCoreWidgets /><NexusContextCoach key={pathname} /></div>}
+        </details>
+        <div hidden={view !== "ask"} className={`${view === "ask" ? "flex" : "hidden"} nexus-core-intelligence-panel min-h-0 flex-1 flex-col overflow-hidden`}>
           {hasOpened && <CoreQuestionPanel
             route={pathname}
             compact
-            active={open}
+            active={open && view === "ask"}
             onAnalysis={setAnalysis}
           />}
         </div>
+        {open && view === "reports" && <CoreReports analysis={analysis} onAnalysis={setAnalysis} />}
       </div>
       <p className="border-t px-4 py-2 text-[10px] text-muted-foreground">Nexus records only. Your draft stays here when you close this panel.</p>
-    </section>
+    </section>, document.body)}
   </div>;
 }

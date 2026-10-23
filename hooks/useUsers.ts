@@ -1,51 +1,25 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
 import { getCompanyUsers } from "@/lib/services/userService";
 import type { UserProfile } from "@/types/userProfile";
 
+const emptyData: UserProfile[] = [];
+
 export function useUsers(companyId: string) {
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const refreshUsers = useCallback(async () => {
-    if (!companyId) {
-      setUsers([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const data = await getCompanyUsers(companyId);
-      setUsers(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Users could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => {
-    refreshUsers();
-  }, [refreshUsers]);
+  const load = useCallback(() => getCompanyUsers(companyId), [companyId]);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    companyId,
+    Boolean(companyId),
+    load,
+    "Users could not be loaded."
+  );
 
   return {
-    users,
+    users: data ?? emptyData,
     loading,
     errorMessage,
-    refreshUsers,
+    refreshUsers: refresh,
   };
 }

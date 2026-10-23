@@ -15,8 +15,6 @@ values
   ('data.backup'),
   ('data.export.audit')
 on conflict (permission_name) do nothing;
-
-
 -- Owner receives full data portability authority.
 insert into public.role_permissions (
   role_id,
@@ -34,8 +32,6 @@ and p.permission_name in (
   'data.export.audit'
 )
 on conflict (role_id, permission_id) do nothing;
-
-
 -- Admin may perform ordinary exports,
 -- but full backup authority remains owner-only.
 insert into public.role_permissions (
@@ -52,8 +48,6 @@ and p.permission_name in (
   'data.export'
 )
 on conflict (role_id, permission_id) do nothing;
-
-
 -- ============================================================
 -- 2. EXPORT JOB TABLE
 -- ============================================================
@@ -117,37 +111,27 @@ create table if not exists public.company_export_job (
 
   metadata jsonb not null default '{}'::jsonb
 );
-
-
 create index if not exists
 company_export_job_company_idx
 on public.company_export_job (
   company_id,
   requested_at desc
 );
-
-
 create index if not exists
 company_export_job_status_idx
 on public.company_export_job (
   company_id,
   status
 );
-
-
 -- ============================================================
 -- 3. RLS
 -- ============================================================
 
 alter table public.company_export_job
 enable row level security;
-
-
 drop policy if exists
 "company members can read permitted export jobs"
 on public.company_export_job;
-
-
 create policy
 "company members can read permitted export jobs"
 on public.company_export_job
@@ -169,8 +153,6 @@ using (
     )
   )
 );
-
-
 -- No direct INSERT / UPDATE / DELETE policy.
 -- Export jobs must be created through secure RPCs.
 
@@ -300,8 +282,6 @@ begin
   return v_job_id;
 end;
 $$;
-
-
 -- ============================================================
 -- 5. CANCEL PENDING EXPORT
 -- ============================================================
@@ -378,8 +358,6 @@ begin
   );
 end;
 $$;
-
-
 -- ============================================================
 -- 6. EXECUTE PRIVILEGES
 -- ============================================================
@@ -391,13 +369,9 @@ public.request_company_export(
   boolean
 )
 from public;
-
-
 revoke all on function
 public.cancel_company_export(uuid)
 from public;
-
-
 grant execute on function
 public.request_company_export(
   text,
@@ -405,8 +379,6 @@ public.request_company_export(
   boolean
 )
 to authenticated;
-
-
 grant execute on function
 public.cancel_company_export(uuid)
 to authenticated;

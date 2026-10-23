@@ -1,74 +1,25 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
+import { getSalesOrders } from "@/lib/services/salesService";
+import type { SalesOrder } from "@/types/sales";
 
-import {
-  getSalesOrders,
-} from "@/lib/services/salesService";
+const emptyData: SalesOrder[] = [];
 
-import type {
-  SalesOrder,
-} from "@/types/sales";
-
-export function useSalesOrders(
-  companyId: string | null
-) {
-  const [
-    salesOrders,
-    setSalesOrders,
-  ] = useState<SalesOrder[]>([]);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
-
-  const [
-    error,
-    setError,
-  ] = useState<string | null>(null);
-
-  const loadSalesOrders =
-    useCallback(async () => {
-      if (!companyId) {
-        setSalesOrders([]);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data =
-          await getSalesOrders(
-            companyId
-          );
-
-        setSalesOrders(data);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Could not load sales orders."
-        );
-      } finally {
-        setLoading(false);
-      }
-    }, [companyId]);
-
-  useEffect(() => {
-    loadSalesOrders();
-  }, [loadSalesOrders]);
+export function useSalesOrders(companyId: string | null) {
+  const load = useCallback(() => getSalesOrders(companyId ?? ""), [companyId]);
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    companyId ?? "",
+    Boolean(companyId),
+    load,
+    "Could not load sales orders."
+  );
 
   return {
-    salesOrders,
+    salesOrders: data ?? emptyData,
     loading,
-    error,
-    refresh:
-      loadSalesOrders,
+    error: errorMessage || null,
+    refresh,
   };
 }

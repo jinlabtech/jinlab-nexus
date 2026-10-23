@@ -12,8 +12,6 @@
 alter table public.journal_entry
 drop constraint if exists
 journal_entry_source_type_check;
-
-
 alter table public.journal_entry
 add constraint
 journal_entry_source_type_check
@@ -33,8 +31,6 @@ check (
     'reversal'
   )
 );
-
-
 -- ============================================================
 -- Retry any pre-existing Sales Order payments that may not yet
 -- have reached the ledger.
@@ -95,8 +91,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

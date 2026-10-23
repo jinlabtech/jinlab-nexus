@@ -30,6 +30,98 @@ import {
   supabase,
 } from "@/lib/supabase";
 
+type FinancialYear = {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+};
+
+type Budget = {
+  id: string;
+  name: string;
+  status: "draft" | "approved" | "archived";
+  financial_year_id: string;
+  financial_year_name: string;
+  branch_id: string | null;
+  branch_name: string | null;
+};
+
+type BudgetPeriod = {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+};
+
+type BudgetAccount = {
+  id: string;
+  code: string;
+  name: string;
+  account_type: "revenue" | "expense";
+  account_subtype: string | null;
+};
+
+type BudgetWorkspace = {
+  budget: Budget;
+  periods: BudgetPeriod[];
+  accounts: BudgetAccount[];
+  lines: {
+    id: string;
+    account_id: string;
+    accounting_period_id: string;
+    amount: number;
+  }[];
+};
+
+type BudgetComparison = {
+  summary: {
+    revenue_budget_to_date: number;
+    revenue_actual_to_date: number;
+    expense_budget_to_date: number;
+    expense_actual_to_date: number;
+    profit_budget_to_date: number;
+    profit_actual_to_date: number;
+  };
+};
+
+type PerformanceDashboard = {
+  financial_year: Omit<FinancialYear, "status"> | null;
+  budget: { available: boolean; budget_id?: string };
+  kpis: {
+    revenue_mtd: number;
+    revenue_ytd: number;
+    cash_collected_mtd: number;
+    cash_and_bank: number;
+    trade_debtors: number;
+    overdue_receivables: number;
+    net_profit_ytd: number;
+    net_margin_ytd_pct: number | null;
+    gross_profit_ytd: number;
+    overdue_invoice_count: number;
+    open_posting_exceptions: number;
+  };
+  quality: { cost_of_sales_note: string };
+};
+
+type PerformanceRpcResults = {
+  get_accounting_kpi_dashboard: PerformanceDashboard;
+  get_accounting_budgets: { budgets: Budget[] };
+  get_accounting_budget_workspace: BudgetWorkspace;
+  get_budget_vs_actual: BudgetComparison;
+  generate_performance_based_budget: {
+    budget_id: string;
+    scenario: string;
+    confidence: string;
+  };
+  get_budget_print_html: string;
+  create_accounting_budget: { budget: Pick<Budget, "id"> };
+  save_accounting_budget_lines: { ok: boolean };
+  approve_accounting_budget: { ok: boolean; budget_id: string; status: string };
+};
+
 
 function localToday() {
   const now = new Date();
@@ -103,25 +195,25 @@ export default function AccountingPerformancePage() {
     dashboard,
     setDashboard,
   ] =
-    useState<any>(null);
+    useState<PerformanceDashboard | null>(null);
 
   const [
     budgets,
     setBudgets,
   ] =
-    useState<any[]>([]);
+    useState<Budget[]>([]);
 
   const [
     years,
     setYears,
   ] =
-    useState<any[]>([]);
+    useState<FinancialYear[]>([]);
 
   const [
     branches,
     setBranches,
   ] =
-    useState<any[]>([]);
+    useState<{ id: string; branch_name: string }[]>([]);
 
   const [
     selectedBudgetId,
@@ -133,13 +225,13 @@ export default function AccountingPerformancePage() {
     workspace,
     setWorkspace,
   ] =
-    useState<any>(null);
+    useState<BudgetWorkspace | null>(null);
 
   const [
     comparison,
     setComparison,
   ] =
-    useState<any>(null);
+    useState<BudgetComparison | null>(null);
 
   const [
     values,
@@ -239,10 +331,10 @@ export default function AccountingPerformancePage() {
   }
 
 
-  async function rpc(
-    name: string,
-    params: any = {}
-  ) {
+  async function rpc<Name extends keyof PerformanceRpcResults>(
+    name: Name,
+    params: Record<string, unknown> = {}
+  ): Promise<PerformanceRpcResults[Name]> {
     const {
       data,
       error,
@@ -258,245 +350,229 @@ export default function AccountingPerformancePage() {
       );
     }
 
-    return data as any;
+    return data as PerformanceRpcResults[Name];
   }
 
 
-  async function loadData(
+  function loadData(
     silent = false
   ) {
-    try {
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (silent) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
 
-      setErrorMessage("");
-
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
-
-      if (!user) {
-        router.replace(
-          "/login"
-        );
-        return;
-      }
-
-      const {
-        data: profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
+        setErrorMessage("");
 
 
-      const [
-        companyResult,
-        yearsResult,
-        branchesResult,
-        kpiResult,
-        budgetResult,
-      ] =
-        await Promise.all([
-          supabase
-            .from("company")
-            .select(
-              "company_name"
-            )
-            .eq(
-              "id",
-              profile.company_id
-            )
-            .single(),
+        if (!user) {
+          router.replace(
+            "/login"
+          );
+          return;
+        }
 
-          supabase
+        const {
+          data: profile,
+          error:
+            profileError,
+        } =
+          await supabase
             .from(
-              "accounting_financial_year"
+              "user_profile"
             )
             .select(
-              "id, name, start_date, end_date, status"
+              "company_id"
             )
             .eq(
-              "company_id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .order(
-              "start_date",
+            .single();
+
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
+
+
+        const [
+          companyResult,
+          yearsResult,
+          branchesResult,
+          kpiResult,
+          budgetResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from("company")
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
+
+            supabase
+              .from(
+                "accounting_financial_year"
+              )
+              .select(
+                "id, name, start_date, end_date, status"
+              )
+              .eq(
+                "company_id",
+                profile.company_id
+              )
+              .order(
+                "start_date",
+                {
+                  ascending: false,
+                }
+              ),
+
+            supabase
+              .from("branch")
+              .select(
+                "id, branch_name"
+              )
+              .eq(
+                "company_id",
+                profile.company_id
+              )
+              .order(
+                "branch_name"
+              ),
+
+            rpc(
+              "get_accounting_kpi_dashboard",
               {
-                ascending: false,
+                p_as_of_date:
+                  asOfDate,
+                p_branch_id:
+                  null,
               }
             ),
 
-          supabase
-            .from("branch")
-            .select(
-              "id, branch_name"
-            )
-            .eq(
-              "company_id",
-              profile.company_id
-            )
-            .order(
-              "branch_name"
+            rpc(
+              "get_accounting_budgets",
+              {
+                p_financial_year_id:
+                  null,
+              }
             ),
-
-          rpc(
-            "get_accounting_kpi_dashboard",
-            {
-              p_as_of_date:
-                asOfDate,
-              p_branch_id:
-                null,
-            }
-          ),
-
-          rpc(
-            "get_accounting_budgets",
-            {
-              p_financial_year_id:
-                null,
-            }
-          ),
-        ]);
+          ]);
 
 
-      if (
-        companyResult.error
-      ) {
-        throw new Error(
-          companyResult
-            .error.message
-        );
-      }
-
-      if (
-        yearsResult.error
-      ) {
-        throw new Error(
-          yearsResult
-            .error.message
-        );
-      }
-
-      if (
-        branchesResult.error
-      ) {
-        throw new Error(
-          branchesResult
-            .error.message
-        );
-      }
-
-
-      setCompanyName(
-        companyResult
-          .data.company_name
-      );
-
-      setYears(
-        yearsResult.data ??
-        []
-      );
-
-      setBranches(
-        branchesResult.data ??
-        []
-      );
-
-      setDashboard(
-        kpiResult
-      );
-
-      const nextBudgets =
-        budgetResult
-          ?.budgets ??
-        [];
-
-      setBudgets(
-        nextBudgets
-      );
-
-
-      if (
-        !selectedBudgetId
-      ) {
-        const preferred =
-          kpiResult
-            ?.budget
-            ?.budget_id ??
-          nextBudgets.find(
-            (item: any) =>
-              item.status ===
-              "draft"
-          )?.id ??
-          nextBudgets[0]?.id ??
-          "";
-
-        if (preferred) {
-          setSelectedBudgetId(
-            preferred
+        if (
+          companyResult.error
+        ) {
+          throw new Error(
+            companyResult
+              .error.message
           );
         }
-      }
 
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Accounting performance could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+        if (
+          yearsResult.error
+        ) {
+          throw new Error(
+            yearsResult
+              .error.message
+          );
+        }
+
+        if (
+          branchesResult.error
+        ) {
+          throw new Error(
+            branchesResult
+              .error.message
+          );
+        }
+
+
+        setCompanyName(
+          companyResult
+            .data.company_name
+        );
+
+        setYears(
+          yearsResult.data ??
+          []
+        );
+
+        setBranches(
+          branchesResult.data ??
+          []
+        );
+
+        setDashboard(
+          kpiResult
+        );
+
+        const nextBudgets =
+          budgetResult
+            ?.budgets ??
+          [];
+
+        setBudgets(
+          nextBudgets
+        );
+
+
+        if (
+          !selectedBudgetId
+        ) {
+          const preferred =
+            kpiResult
+              ?.budget
+              ?.budget_id ??
+            nextBudgets.find(
+              (item) =>
+                item.status ===
+                "draft"
+            )?.id ??
+            nextBudgets[0]?.id ??
+            "";
+
+          if (preferred) {
+            setSelectedBudgetId(
+              preferred
+            );
+          }
+        }
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Accounting performance could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   }
 
 
-  async function loadBudget(
+  function loadBudget(
     id: string
   ) {
     if (!id) {
-      setWorkspace(null);
-      setComparison(null);
-      setValues({});
       return;
     }
-
-    try {
-      setErrorMessage("");
-
-      const [
-        workspaceResult,
-        comparisonResult,
-      ] =
-        await Promise.all([
+    return Promise.all([
           rpc(
             "get_accounting_budget_workspace",
             {
@@ -514,50 +590,54 @@ export default function AccountingPerformancePage() {
                 asOfDate,
             }
           ),
-        ]);
+        ])
+      .then(([
+        workspaceResult,
+        comparisonResult,
+      ]) => {
+        setErrorMessage("");
+
+        setWorkspace(
+          workspaceResult
+        );
+
+        setComparison(
+          comparisonResult
+        );
 
 
-      setWorkspace(
-        workspaceResult
-      );
+        const next:
+          Record<
+            string,
+            string
+          > = {};
 
-      setComparison(
-        comparisonResult
-      );
+        for (
+          const line of
+          workspaceResult.lines ??
+          []
+        ) {
+          next[
+            `${line.account_id}:${line.accounting_period_id}`
+          ] =
+            String(
+              Number(
+                line.amount
+              )
+            );
+        }
 
-
-      const next:
-        Record<
-          string,
-          string
-        > = {};
-
-      for (
-        const line of
-        workspaceResult.lines ??
-        []
-      ) {
-        next[
-          `${line.account_id}:${line.accounting_period_id}`
-        ] =
-          String(
-            Number(
-              line.amount
-            )
-          );
-      }
-
-      setValues(
-        next
-      );
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Budget could not be loaded."
-      );
-    }
+        setValues(
+          next
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Budget could not be loaded."
+        );
+      });
   }
 
 
@@ -569,7 +649,6 @@ export default function AccountingPerformancePage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
@@ -981,8 +1060,7 @@ export default function AccountingPerformancePage() {
             (
               total:
                 number,
-              period:
-                any
+              period
             ) =>
               total +
               Number(
@@ -1005,7 +1083,7 @@ export default function AccountingPerformancePage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>
@@ -1314,7 +1392,7 @@ export default function AccountingPerformancePage() {
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   {
                     dashboard
-                      .quality
+                      ?.quality
                       .cost_of_sales_note
                   }
                 </p>
@@ -1624,8 +1702,7 @@ export default function AccountingPerformancePage() {
 
                       {workspace.periods.map(
                         (
-                          period:
-                            any
+                          period
                         ) => (
                           <th
                             key={
@@ -1653,8 +1730,7 @@ export default function AccountingPerformancePage() {
 
                     {workspace.accounts.map(
                       (
-                        account:
-                          any
+                        account
                       ) => (
                         <tr
                           key={
@@ -1685,8 +1761,7 @@ export default function AccountingPerformancePage() {
 
                           {workspace.periods.map(
                             (
-                              period:
-                                any
+                              period
                             ) => {
                               const key =
                                 `${account.id}:${period.id}`;

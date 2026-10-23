@@ -484,8 +484,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.create_automatic_accounting_journal(
   uuid,

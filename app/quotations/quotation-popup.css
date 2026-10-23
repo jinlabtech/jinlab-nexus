@@ -1,0 +1,17 @@
+/* Quotation-only phone sheet: stable size and one scrolling content area. */
+@media (max-width: 767px) {
+  .nexus-quotation-popup.nexus-popup-layer { padding: 0 !important; animation: none !important; }
+  .nexus-quotation-popup.nexus-popup-layer .nexus-popup-panel {
+    height: 100% !important; max-height: 100% !important; border-radius: 0 !important;
+    animation: none !important; transition: none !important; background: var(--background) !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  }
+  .nexus-quotation-popup .nexus-mobile-modal-header { padding-top: max(12px, env(safe-area-inset-top)) !important; }
+  .nexus-quotation-popup .nexus-mobile-modal-body { padding: 16px !important; padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
+  .nexus-quotation-popup .nexus-app-card { padding: 0 !important; border: 0 !important; box-shadow: none !important; background: transparent !important; }
+  .nexus-quotation-popup .nexus-quotation-form { gap: 16px !important; }
+  .nexus-quotation-popup .nexus-quotation-form-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 16px !important; }
+  .nexus-quotation-popup .nexus-quotation-form label > span { font-size: 14px !important; line-height: 1.4 !important; }
+  .nexus-quotation-popup .nexus-quotation-form :is(input,select) { height: 44px !important; min-height: 44px !important; }
+  .nexus-quotation-popup .nexus-quotation-form-actions { position: static !important; margin: 0 !important; padding: 12px 0 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}

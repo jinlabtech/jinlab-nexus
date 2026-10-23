@@ -2,7 +2,7 @@
 
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
@@ -23,31 +23,26 @@ type PurchaseOrderFormProps = {
   onCancel: () => void;
 };
 
-export default function PurchaseOrderForm({
+export default function PurchaseOrderForm(props: PurchaseOrderFormProps) {
+  return <PurchaseOrderFormFields key={props.order?.id ?? "new"} {...props} />;
+}
+
+function PurchaseOrderFormFields({
   order,
   suppliers,
   branches,
   onSave,
   onCancel,
 }: PurchaseOrderFormProps) {
-  const [supplierId, setSupplierId] = useState("");
-  const [branchId, setBranchId] = useState("");
-  const [expectedDate, setExpectedDate] = useState("");
-  const [supplierReference, setSupplierReference] = useState("");
-  const [notes, setNotes] = useState("");
+  const [supplierId, setSupplierId] = useState(order?.supplier_id ?? "");
+  const [branchId, setBranchId] = useState(order?.branch_id ?? "");
+  const [expectedDate, setExpectedDate] = useState(order?.expected_date ?? "");
+  const [supplierReference, setSupplierReference] = useState(order?.supplier_reference ?? "");
+  const [notes, setNotes] = useState(order?.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const isEditing = Boolean(order);
-
-  useEffect(() => {
-    setSupplierId(order?.supplier_id ?? "");
-    setBranchId(order?.branch_id ?? "");
-    setExpectedDate(order?.expected_date ?? "");
-    setSupplierReference(order?.supplier_reference ?? "");
-    setNotes(order?.notes ?? "");
-    setErrorMessage("");
-  }, [order]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

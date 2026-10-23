@@ -3,6 +3,7 @@
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -194,165 +195,141 @@ export default function PosAnalyticsPage() {
     useState(
       ""
     );
+  const fetchWorkspace = useCallback((nextBranch: string, nextDays: number) => {
+
+    return supabase.auth.getUser()
+      .then(async ({
+        data: {
+          user,
+        },
+      }) => {
+        if (!user) {
+
+          router.replace(
+            "/login"
+          );
+
+          return;
+        }
+
+        const {
+          data:
+          profile,
+        } =
+          await supabase
+            .from(
+              "user_profile"
+            )
+            .select(
+              "full_name, company_id"
+            )
+            .eq(
+              "user_id",
+              user.id
+            )
+            .maybeSingle();
+
+        if (
+          profile?.full_name
+        ) {
+
+          setUserName(
+            profile.full_name
+          );
+        }
+
+        if (
+          profile?.company_id
+        ) {
+
+          const {
+            data:
+            company,
+          } =
+            await supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .maybeSingle();
 
 
-  async function loadWorkspace(
-    nextBranch =
-      branchId,
+          if (
+            company?.company_name
+          ) {
 
-    nextDays =
-      days
-  ) {
+            setCompanyName(
+              company.company_name
+            );
+          }
+
+        }
+
+        const {
+          data,
+          error,
+        } =
+          await supabase.rpc(
+            "get_pos_analytics_workspace",
+            {
+              p_branch_id:
+                nextBranch ||
+                null,
+
+              p_days:
+                nextDays,
+            }
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        setWorkspace(
+          data as Workspace
+        );
+      })
+      .catch((error) => {
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to load POS analytics."
+        );
+
+      })
+      .finally(() => {
+
+        setLoading(
+          false
+        );
+
+      });
+  }, [router]);
+
+  function loadWorkspace(nextBranch =
+    branchId, nextDays =
+      days) {
 
     setLoading(
       true
     );
-
     setErrorMessage(
       ""
     );
-
-
-    try {
-
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth.getUser();
-
-
-      if (!user) {
-
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
-          profile,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "full_name, company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .maybeSingle();
-
-
-      if (
-        profile?.full_name
-      ) {
-
-        setUserName(
-          profile.full_name
-        );
-      }
-
-
-      if (
-        profile?.company_id
-      ) {
-
-        const {
-          data:
-            company,
-        } =
-          await supabase
-            .from(
-              "company"
-            )
-            .select(
-              "company_name"
-            )
-            .eq(
-              "id",
-              profile.company_id
-            )
-            .maybeSingle();
-
-
-        if (
-          company?.company_name
-        ) {
-
-          setCompanyName(
-            company.company_name
-          );
-        }
-
-      }
-
-
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "get_pos_analytics_workspace",
-          {
-            p_branch_id:
-              nextBranch ||
-              null,
-
-            p_days:
-              nextDays,
-          }
-        );
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      setWorkspace(
-        data as Workspace
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to load POS analytics."
-      );
-
-    } finally {
-
-      setLoading(
-        false
-      );
-
-    }
-
+    return fetchWorkspace(nextBranch, nextDays);
   }
 
+  useEffect(() => {
+    void fetchWorkspace("", 30);
+  }, [fetchWorkspace]);
 
-  useEffect(
-    () => {
-
-      void loadWorkspace(
-        "",
-        30
-      );
-
-    },
-    []
-  );
 
 
   async function logout() {

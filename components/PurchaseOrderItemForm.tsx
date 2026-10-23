@@ -2,7 +2,7 @@
 
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
@@ -24,23 +24,27 @@ type PurchaseOrderItemFormProps = {
   onCancel: () => void;
 };
 
-export default function PurchaseOrderItemForm({
+export default function PurchaseOrderItemForm(props: PurchaseOrderItemFormProps) {
+  return <PurchaseOrderItemFormFields key={props.item?.id ?? "new"} {...props} />;
+}
+
+function PurchaseOrderItemFormFields({
   inventoryItems,
   item,
   onSave,
   onCancel,
 }: PurchaseOrderItemFormProps) {
   const [inventoryItemId, setInventoryItemId] =
-    useState("");
+    useState(item?.inventory_item_id ?? "");
 
   const [quantity, setQuantity] =
-    useState("1");
+    useState(item ? String(item.quantity_ordered) : "1");
 
   const [unitCost, setUnitCost] =
-    useState("0");
+    useState(item ? String(item.unit_cost) : "0");
 
   const [taxRate, setTaxRate] =
-    useState("15");
+    useState(item ? String(item.tax_rate) : "15");
 
   const [saving, setSaving] =
     useState(false);
@@ -49,32 +53,6 @@ export default function PurchaseOrderItemForm({
     useState("");
 
   const isEditing = Boolean(item);
-
-  useEffect(() => {
-    setInventoryItemId(
-      item?.inventory_item_id ?? ""
-    );
-
-    setQuantity(
-      item
-        ? String(item.quantity_ordered)
-        : "1"
-    );
-
-    setUnitCost(
-      item
-        ? String(item.unit_cost)
-        : "0"
-    );
-
-    setTaxRate(
-      item
-        ? String(item.tax_rate)
-        : "15"
-    );
-
-    setErrorMessage("");
-  }, [item]);
 
   function handleInventoryItemChange(
     itemId: string

@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -135,7 +137,11 @@ function statusLabel(
 }
 
 
-export default function DebtorCollectionPanel({
+export default function DebtorCollectionPanel(props: Props) {
+  return <DebtorCollectionPanelContent key={props.customerId} {...props} />;
+}
+
+function DebtorCollectionPanelContent({
   customerId,
   canManage,
 }: Props) {
@@ -245,10 +251,8 @@ export default function DebtorCollectionPanel({
     useState("");
 
 
-  function populateForm(
-    response:
-      CustomerCollectionResponse
-  ) {
+  const populateForm = useCallback((response:
+    CustomerCollectionResponse) => {
     setCollectionStatus(
       response.control
         .collection_status
@@ -270,9 +274,9 @@ export default function DebtorCollectionPanel({
       response.control
         .promised_amount != null
         ? String(
-            response.control
-              .promised_amount
-          )
+          response.control
+            .promised_amount
+        )
         : ""
     );
 
@@ -286,39 +290,38 @@ export default function DebtorCollectionPanel({
         .credit_hold_reason ??
       ""
     );
-  }
+  }, []);
 
 
-  async function loadData() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
+  const requestVersion = useRef(0);
 
-      const response =
-        await getCustomerCollectionControl(
-          customerId
-        );
-
+  const fetchData = useCallback(() => {
+    const version = ++requestVersion.current;
+    return getCustomerCollectionControl(customerId).then((response) => {
+      if (version !== requestVersion.current)
+        return;
       setData(response);
       populateForm(response);
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Collection information could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+    }).catch((error) => {
+      if (version !== requestVersion.current)
+        return;
+      setErrorMessage(error instanceof Error
+        ? error.message
+        : "Collection information could not be loaded.");
+    }).finally(() => {
+      if (version === requestVersion.current) {
+        setLoading(false);
+      }
+    });
+  }, [customerId, populateForm]);
 
 
   useEffect(() => {
-    void loadData();
-  }, [
-    customerId,
-  ]);
+    void fetchData();
+    return () => {
+      requestVersion.current += 1;
+    };
+  }, [fetchData]);
 
 
   async function saveControl() {

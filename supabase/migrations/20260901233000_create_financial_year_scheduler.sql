@@ -68,15 +68,11 @@ public.accounting_financial_year (
     end_date
   )
 );
-
-
 create index if not exists
 accounting_financial_year_company_idx
 on public.accounting_financial_year (
   company_id
 );
-
-
 create index if not exists
 accounting_financial_year_dates_idx
 on public.accounting_financial_year (
@@ -84,28 +80,21 @@ on public.accounting_financial_year (
   start_date,
   end_date
 );
-
-
 create index if not exists
 accounting_financial_year_status_idx
 on public.accounting_financial_year (
   company_id,
   status
 );
-
-
 drop trigger if exists
 accounting_financial_year_set_updated_at
 on public.accounting_financial_year;
-
 create trigger
 accounting_financial_year_set_updated_at
 before update
 on public.accounting_financial_year
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 2. LINK ACCOUNTING PERIODS TO FINANCIAL YEARS
 -- ============================================================
@@ -115,15 +104,11 @@ add column if not exists
 financial_year_id uuid
 references public.accounting_financial_year(id)
 on delete restrict;
-
-
 create index if not exists
 accounting_period_financial_year_idx
 on public.accounting_period (
   financial_year_id
 );
-
-
 -- ============================================================
 -- 3. RESOLVE / CREATE FINANCIAL YEAR
 -- Existing manually scheduled years take precedence.
@@ -309,8 +294,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.ensure_accounting_financial_year(
@@ -318,8 +301,6 @@ public.ensure_accounting_financial_year(
   date
 )
 from public;
-
-
 -- ============================================================
 -- 4. GENERATE PERIODS INSIDE A FINANCIAL YEAR
 --
@@ -452,16 +433,12 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.generate_accounting_periods_for_financial_year(
   uuid
 )
 from public;
-
-
 -- ============================================================
 -- 5. REPLACE OLD PERIOD GENERATOR
 -- It now routes through Financial Years.
@@ -495,8 +472,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.ensure_accounting_periods(
@@ -504,8 +479,6 @@ public.ensure_accounting_periods(
   date
 )
 from public;
-
-
 -- ============================================================
 -- 6. MIGRATE EXISTING COMPANIES
 -- ============================================================
@@ -538,8 +511,6 @@ begin
 
 end;
 $$;
-
-
 -- Link any old matching accounting periods.
 update public.accounting_period ap
 set financial_year_id =
@@ -557,8 +528,6 @@ where
 
   and ap.end_date <=
     fy.end_date;
-
-
 -- ============================================================
 -- 7. SCHEDULE A FUTURE FINANCIAL YEAR
 -- ============================================================
@@ -722,8 +691,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.schedule_accounting_financial_year(
@@ -732,7 +699,6 @@ public.schedule_accounting_financial_year(
   text
 )
 from public;
-
 grant execute
 on function
 public.schedule_accounting_financial_year(
@@ -741,8 +707,6 @@ public.schedule_accounting_financial_year(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 8. CHANGE A FUTURE SCHEDULE
 -- Historical accounting cannot be rewritten.
@@ -955,8 +919,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.update_scheduled_accounting_financial_year(
@@ -966,7 +928,6 @@ public.update_scheduled_accounting_financial_year(
   text
 )
 from public;
-
 grant execute
 on function
 public.update_scheduled_accounting_financial_year(
@@ -976,8 +937,6 @@ public.update_scheduled_accounting_financial_year(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 9. SECURITY
 -- ============================================================
@@ -985,8 +944,6 @@ to authenticated;
 alter table
 public.accounting_financial_year
 enable row level security;
-
-
 create policy
 "company members read financial years"
 on public.accounting_financial_year
@@ -1000,18 +957,12 @@ using (
       auth.uid()
   )
 );
-
-
 revoke insert, update, delete
 on public.accounting_financial_year
 from authenticated;
-
-
 grant select
 on public.accounting_financial_year
 to authenticated;
-
-
 -- ============================================================
 -- 10. RBAC
 -- ============================================================
@@ -1026,8 +977,6 @@ on conflict (
   permission_name
 )
 do nothing;
-
-
 insert into public.role_permissions (
   role_id,
   permission_id
@@ -1048,8 +997,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

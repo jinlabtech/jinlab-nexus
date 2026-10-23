@@ -19,8 +19,6 @@ on conflict (
   permission_name
 )
 do nothing;
-
-
 -- OWNER
 insert into public.role_permissions (
   role_id,
@@ -40,8 +38,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- ADMIN
 insert into public.role_permissions (
   role_id,
@@ -61,8 +57,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- MANAGER
 insert into public.role_permissions (
   role_id,
@@ -82,8 +76,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 2. CUSTOMER COLLECTION CONTROL
 -- ============================================================
@@ -158,8 +150,6 @@ public.debtor_collection_control (
     customer_id
   )
 );
-
-
 create index if not exists
 debtor_collection_control_company_idx
 on public.debtor_collection_control (
@@ -167,13 +157,9 @@ on public.debtor_collection_control (
   collection_status,
   next_follow_up_date
 );
-
-
 drop trigger if exists
 debtor_collection_control_updated_at
 on public.debtor_collection_control;
-
-
 create trigger
 debtor_collection_control_updated_at
 before update
@@ -181,8 +167,6 @@ on public.debtor_collection_control
 for each row
 execute function
 public.set_updated_at();
-
-
 -- ============================================================
 -- 3. COLLECTION ACTIVITY LOG
 --
@@ -230,8 +214,6 @@ public.debtor_collection_activity (
   created_at timestamptz
     not null default now()
 );
-
-
 create index if not exists
 debtor_collection_activity_customer_idx
 on public.debtor_collection_activity (
@@ -239,8 +221,6 @@ on public.debtor_collection_activity (
   customer_id,
   activity_date desc
 );
-
-
 -- ============================================================
 -- 4. RLS
 -- ============================================================
@@ -248,18 +228,12 @@ on public.debtor_collection_activity (
 alter table
 public.debtor_collection_control
 enable row level security;
-
-
 alter table
 public.debtor_collection_activity
 enable row level security;
-
-
 drop policy if exists
 "accounting users view debtor controls"
 on public.debtor_collection_control;
-
-
 create policy
 "accounting users view debtor controls"
 on public.debtor_collection_control
@@ -273,13 +247,9 @@ using (
     'accounting.view'
   )
 );
-
-
 drop policy if exists
 "accounting users view debtor activities"
 on public.debtor_collection_activity;
-
-
 create policy
 "accounting users view debtor activities"
 on public.debtor_collection_activity
@@ -293,28 +263,18 @@ using (
     'accounting.view'
   )
 );
-
-
 grant select
 on public.debtor_collection_control
 to authenticated;
-
-
 grant select
 on public.debtor_collection_activity
 to authenticated;
-
-
 revoke insert, update, delete
 on public.debtor_collection_control
 from authenticated;
-
-
 revoke insert, update, delete
 on public.debtor_collection_activity
 from authenticated;
-
-
 -- ============================================================
 -- 5. READ CUSTOMER COLLECTION CONTROL
 -- ============================================================
@@ -468,20 +428,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_customer_collection_control(uuid)
 from public;
-
-
 grant execute
 on function
 public.get_customer_collection_control(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- 6. UPDATE CONTROL
 -- ============================================================
@@ -732,8 +686,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.update_customer_collection_control(
@@ -746,8 +698,6 @@ public.update_customer_collection_control(
   text
 )
 from public;
-
-
 grant execute
 on function
 public.update_customer_collection_control(
@@ -760,8 +710,6 @@ public.update_customer_collection_control(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 7. ADD COLLECTION ACTIVITY
 -- ============================================================
@@ -922,8 +870,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.add_customer_collection_activity(
@@ -932,8 +878,6 @@ public.add_customer_collection_activity(
   text
 )
 from public;
-
-
 grant execute
 on function
 public.add_customer_collection_activity(
@@ -942,8 +886,6 @@ public.add_customer_collection_activity(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 8. PROTECT ACTIVITY HISTORY
 --
@@ -954,8 +896,6 @@ to authenticated;
 revoke update, delete
 on public.debtor_collection_activity
 from authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

@@ -196,146 +196,133 @@ export default function InventoryCostingPage() {
     useState("");
 
 
-  async function loadData(
+  function loadData(
     silent = false
   ) {
-
-    try {
-
-      if (silent) {
-        setRefreshing(
-          true
-        );
-      } else {
-        setLoading(
-          true
-        );
-      }
-
-
-      setErrorMessage(
-        ""
-      );
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (silent) {
+          setRefreshing(
+            true
+          );
+        } else {
+          setLoading(
+            true
+          );
+        }
 
 
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
-
-
-      if (!user) {
-
-        router.replace(
-          "/login"
+        setErrorMessage(
+          ""
         );
 
-        return;
-      }
 
 
-      const {
-        data:
-          profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
+        if (!user) {
+
+          router.replace(
+            "/login"
+          );
+
+          return;
+        }
 
 
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        readinessResult,
-      ] =
-        await Promise.all([
-          supabase
+        const {
+          data:
+            profile,
+          error:
+            profileError,
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
-
-          supabase.rpc(
-            "get_inventory_costing_readiness"
-          ),
-        ]);
+            .single();
 
 
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
 
-      if (
-        readinessResult.error
-      ) {
-        throw readinessResult.error;
-      }
+        const [
+          companyResult,
+          readinessResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
+
+            supabase.rpc(
+              "get_inventory_costing_readiness"
+            ),
+          ]);
 
 
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
 
 
-      setReadiness(
-        readinessResult.data as Readiness
-      );
+        if (
+          readinessResult.error
+        ) {
+          throw readinessResult.error;
+        }
 
-    } catch (
-      error
-    ) {
 
-      setErrorMessage(
-        error && typeof error === "object" && "message" in error
-          ? String(error.message)
-          : "Inventory costing could not be loaded."
-      );
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
+        );
 
-    } finally {
 
-      setLoading(
-        false
-      );
+        setReadiness(
+          readinessResult.data as Readiness
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error && typeof error === "object" && "message" in error
+            ? String(error.message)
+            : "Inventory costing could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(
+          false
+        );
 
-      setRefreshing(
-        false
-      );
-    }
+        setRefreshing(
+          false
+        );
+      });
   }
 
 
@@ -350,10 +337,6 @@ export default function InventoryCostingPage() {
 
 
       if (!canView) {
-
-        setLoading(
-          false
-        );
 
         return;
       }
@@ -514,7 +497,7 @@ export default function InventoryCostingPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
 
     return (

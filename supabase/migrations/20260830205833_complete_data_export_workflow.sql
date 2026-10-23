@@ -112,8 +112,6 @@ begin
   );
 end;
 $$;
-
-
 create or replace function public.fail_company_export(
   p_export_job_id uuid,
   p_error_message text
@@ -207,8 +205,6 @@ begin
   );
 end;
 $$;
-
-
 revoke all on function
 public.complete_company_export(
   uuid,
@@ -216,16 +212,12 @@ public.complete_company_export(
   text
 )
 from public;
-
-
 revoke all on function
 public.fail_company_export(
   uuid,
   text
 )
 from public;
-
-
 grant execute on function
 public.complete_company_export(
   uuid,
@@ -233,8 +225,6 @@ public.complete_company_export(
   text
 )
 to authenticated;
-
-
 grant execute on function
 public.fail_company_export(
   uuid,

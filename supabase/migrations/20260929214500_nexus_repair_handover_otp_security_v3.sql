@@ -249,8 +249,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.repair_issue_handover_otp(
   uuid,
@@ -261,7 +259,6 @@ on function public.repair_issue_handover_otp(
   timestamptz
 )
 from public, anon, authenticated;
-
 grant execute
 on function public.repair_issue_handover_otp(
   uuid,
@@ -272,8 +269,6 @@ on function public.repair_issue_handover_otp(
   timestamptz
 )
 to service_role;
-
-
 -- ============================================================
 -- 2. RECORD DELIVERY RESULT
 -- ============================================================
@@ -393,8 +388,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.repair_mark_handover_otp_delivery(
   uuid,
@@ -403,7 +396,6 @@ on function public.repair_mark_handover_otp_delivery(
   text
 )
 from public, anon, authenticated;
-
 grant execute
 on function public.repair_mark_handover_otp_delivery(
   uuid,
@@ -412,8 +404,6 @@ on function public.repair_mark_handover_otp_delivery(
   text
 )
 to service_role;
-
-
 -- ============================================================
 -- 3. VERIFY OTP DIGEST
 -- ============================================================
@@ -658,8 +648,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.repair_verify_handover_otp(
   uuid,
@@ -667,7 +655,6 @@ on function public.repair_verify_handover_otp(
   text
 )
 from public, anon, authenticated;
-
 grant execute
 on function public.repair_verify_handover_otp(
   uuid,

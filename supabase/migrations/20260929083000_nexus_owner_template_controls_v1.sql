@@ -98,8 +98,6 @@ begin
   );
 end;
 $$;
-
-
 create or replace function public.communication_owner_restore_template(
   p_template_id uuid
 )
@@ -177,8 +175,6 @@ begin
   );
 end;
 $$;
-
-
 create or replace function public.communication_owner_delete_template(
   p_template_id uuid
 )
@@ -304,28 +300,21 @@ begin
   );
 end;
 $$;
-
-
 revoke all
 on function public.communication_owner_trash_template(uuid)
 from public, anon;
-
 revoke all
 on function public.communication_owner_restore_template(uuid)
 from public, anon;
-
 revoke all
 on function public.communication_owner_delete_template(uuid)
 from public, anon;
-
 grant execute
 on function public.communication_owner_trash_template(uuid)
 to authenticated;
-
 grant execute
 on function public.communication_owner_restore_template(uuid)
 to authenticated;
-
 grant execute
 on function public.communication_owner_delete_template(uuid)
 to authenticated;

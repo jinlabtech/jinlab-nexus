@@ -8,8 +8,6 @@ create unique index if not exists
 invoice_payment_gateway_transaction_unique_idx
 on public.invoice_payment(gateway_transaction_id)
 where gateway_transaction_id is not null;
-
-
 create or replace function public.post_verified_gateway_payment(
   p_transaction_id uuid,
   p_provider_transaction_id text,
@@ -408,8 +406,6 @@ begin
 
 end;
 $$;
-
-
 -- This function represents confirmed money.
 -- Browser users must NEVER be allowed to call it directly.
 
@@ -423,7 +419,6 @@ on function public.post_verified_gateway_payment(
   jsonb
 )
 from public;
-
 revoke all
 on function public.post_verified_gateway_payment(
   uuid,
@@ -434,7 +429,6 @@ on function public.post_verified_gateway_payment(
   jsonb
 )
 from anon;
-
 revoke all
 on function public.post_verified_gateway_payment(
   uuid,
@@ -445,7 +439,6 @@ on function public.post_verified_gateway_payment(
   jsonb
 )
 from authenticated;
-
 grant execute
 on function public.post_verified_gateway_payment(
   uuid,

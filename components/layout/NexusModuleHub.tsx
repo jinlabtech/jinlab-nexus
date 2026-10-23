@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useBrowserStorage } from "@/lib/nexus/browser-storage";
 
 import Link from "next/link";
 
@@ -26,7 +23,6 @@ import type {
 } from "@/lib/nexus/registry";
 
 import {
-  getNexusModuleMemory,
   type NexusModuleMemory,
 } from "@/lib/nexus/navigation-memory";
 
@@ -108,6 +104,13 @@ function FeatureIcon({name}:{name:NexusHubIcon}) {
   return <span className="nexus-feature-icon" aria-hidden="true"><Icon /></span>;
 }
 
+const emptyMemory: Partial<Record<NexusAppId, NexusModuleMemory>> = {};
+function decodeMemory(raw: string): Partial<Record<NexusAppId, NexusModuleMemory>> {
+  const value: unknown = JSON.parse(raw);
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Partial<Record<NexusAppId, NexusModuleMemory>> : {};
+}
+
 export default function NexusModuleHub({
   title,
   subtitle,
@@ -119,37 +122,8 @@ export default function NexusModuleHub({
     useRouter();
 
 
-  const [
-    memory,
-    setMemory,
-  ] =
-    useState<
-      NexusModuleMemory |
-      null
-    >(null);
-
-
-  useEffect(
-    () => {
-
-      if (!moduleId) {
-        setMemory(null);
-        return;
-      }
-
-
-      setMemory(
-        getNexusModuleMemory(
-          moduleId
-        )
-      );
-
-    },
-    [
-      moduleId,
-    ]
-  );
-
+  const [memoryStore] = useBrowserStorage("nexus-module-memory-v1", emptyMemory, decodeMemory);
+  const memory = moduleId ? memoryStore[moduleId] ?? null : null;
 
   function prepareRoute(
     href: string

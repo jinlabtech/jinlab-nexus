@@ -52,12 +52,9 @@ begin
   return new;
 end;
 $$;
-
-
 drop trigger if exists
   email_campaign_soft_delete_guard
 on public.email_campaign;
-
 create trigger
   email_campaign_soft_delete_guard
 before update of deleted_at
@@ -65,12 +62,9 @@ on public.email_campaign
 for each row
 execute function
   public.nexus_communication_soft_delete_guard();
-
-
 drop trigger if exists
   email_bulk_batch_soft_delete_guard
 on public.email_bulk_batch;
-
 create trigger
   email_bulk_batch_soft_delete_guard
 before update of deleted_at
@@ -78,12 +72,9 @@ on public.email_bulk_batch
 for each row
 execute function
   public.nexus_communication_soft_delete_guard();
-
-
 drop trigger if exists
   marketing_campaign_series_soft_delete_guard
 on public.marketing_campaign_series;
-
 create trigger
   marketing_campaign_series_soft_delete_guard
 before update of deleted_at
@@ -91,8 +82,6 @@ on public.marketing_campaign_series
 for each row
 execute function
   public.nexus_communication_soft_delete_guard();
-
-
 revoke all
 on function public.nexus_communication_soft_delete_guard()
 from public, anon, authenticated;

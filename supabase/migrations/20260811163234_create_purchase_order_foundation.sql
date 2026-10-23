@@ -56,7 +56,6 @@ create table if not exists public.purchase_order (
 
     unique (company_id, purchase_order_number)
 );
-
 create table if not exists public.purchase_order_item (
     id uuid primary key default gen_random_uuid(),
 
@@ -99,7 +98,6 @@ create table if not exists public.purchase_order_item (
 
     check (quantity_received <= quantity_ordered)
 );
-
 create table if not exists public.purchase_receipt (
     id uuid primary key default gen_random_uuid(),
 
@@ -128,7 +126,6 @@ create table if not exists public.purchase_receipt (
 
     unique (company_id, receipt_number)
 );
-
 create table if not exists public.purchase_receipt_item (
     id uuid primary key default gen_random_uuid(),
 
@@ -156,7 +153,6 @@ create table if not exists public.purchase_receipt_item (
 
     created_at timestamptz not null default now()
 );
-
 -- ===========================================================
 -- JINLAB Nexus
 -- Sprint 16.1 - Purchasing Foundation
@@ -170,60 +166,42 @@ create table if not exists public.purchase_receipt_item (
 
 create index if not exists purchase_order_company_idx
     on public.purchase_order(company_id);
-
 create index if not exists purchase_order_supplier_idx
     on public.purchase_order(supplier_id);
-
 create index if not exists purchase_order_branch_idx
     on public.purchase_order(branch_id);
-
 create index if not exists purchase_order_status_idx
     on public.purchase_order(status);
-
 create index if not exists purchase_order_date_idx
     on public.purchase_order(order_date desc);
-
 create index if not exists purchase_order_item_po_idx
     on public.purchase_order_item(purchase_order_id);
-
 create index if not exists purchase_order_item_company_idx
     on public.purchase_order_item(company_id);
-
 create index if not exists purchase_order_item_inventory_idx
     on public.purchase_order_item(inventory_item_id);
-
 create index if not exists purchase_receipt_company_idx
     on public.purchase_receipt(company_id);
-
 create index if not exists purchase_receipt_po_idx
     on public.purchase_receipt(purchase_order_id);
-
 create index if not exists purchase_receipt_branch_idx
     on public.purchase_receipt(branch_id);
-
 create index if not exists purchase_receipt_item_receipt_idx
     on public.purchase_receipt_item(purchase_receipt_id);
-
 create index if not exists purchase_receipt_item_po_item_idx
     on public.purchase_receipt_item(purchase_order_item_id);
-
 create index if not exists purchase_receipt_item_inventory_idx
     on public.purchase_receipt_item(inventory_item_id);
-
-
 -- ===========================================================
 -- 6. UPDATED_AT TRIGGER
 -- ============================================================
 
 drop trigger if exists purchase_order_set_updated_at
 on public.purchase_order;
-
 create trigger purchase_order_set_updated_at
 before update on public.purchase_order
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 7. PURCHASE ORDERINE TOTALS
 -- ===========================================================
@@ -254,17 +232,13 @@ begin
     return new;
 end;
 $$;
-
 drop trigger if exists purchase_order_item_calculate_totals
 on public.purchase_order_item;
-
 create trigger purchase_order_item_calculate_totals
 before insert or update
 on public.purchase_order_item
 for each row
 execute function public.calculate_purchase_order_item_totals();
-
-
 -- ============================================================
 -- 8. PURCHASE ORDER HEADER TOTALS
 
@@ -303,7 +277,6 @@ begin
         target_purchase_order_id;
 end;
 $$;
-
 create or replace function public.purchase_order_item_recalculate_parent()
 returns trigger
 language plpgsql
@@ -331,17 +304,13 @@ begin
     return new;
 end;
 $$;
-
 drop trigger if exists purchase_order_item_recalculate_after_change
 on public.purchase_order_item;
-
 create trigger purchase_order_item_recalculate_after_change
 after insert or update or delete
 on public.purchase_order_item
 for each row
 execute function public.purchase_order_item_recalculate_parent();
-
-
 -- ===========================================================
 -- 9. PURCHASE ORDER NUMBER GENERATOR
 -- ============================================================
@@ -377,8 +346,6 @@ begin
         lpad(next_number::text, 5, '0');
 end;
 $$;
-
-
 -- ===========================================================
 -- 10. GOODS RECEIPT NUMBER GENERATOR
 -- ============================================================
@@ -414,24 +381,18 @@ begin
         lpad(next_number::text, 5, '0');
 end;
 $$;
-
 -- ===========================================================
 -- 11. ENABLE ROW LEVEL SECURITY
 -- ===========================================================
 
 alter table public.purchase_order
 enable row level security;
-
 alter table public.purchase_order_item
 enable row level security;
-
 alter table public.purchase_receipt
 enable row level security;
-
 alter table public.purchase_receipt_item
 enable row level security;
-
-
 -- ===========================================================
 -- 12. PURCHASE ORDER RLS
 -- ============================================================
@@ -447,7 +408,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can create company purchase orders"
 on public.purchase_order
 for insert
@@ -463,7 +423,6 @@ with check (
         or created_by = auth.uid()
     )
 );
-
 create policy "Users can update company purchase orders"
 on public.purchase_order
 for update
@@ -482,7 +441,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can delete draft company purchase orders"
 on public.purchase_order
 for delete
@@ -495,8 +453,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 -- ============================================================
 -- 13. PURCHASE ORDER ITEM RLS
 -- ============================================================
@@ -526,7 +482,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can create company purchase order items"
 on public.purchase_order_item
 for insert
@@ -538,7 +493,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can update company purchase order items"
 on public.purchase_order_item
 for update
@@ -557,7 +511,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can delete company purchase order items"
 on public.purchase_order_item
 for delete
@@ -569,8 +522,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 -- ============================================================
 -- 14. PURCHASE RECEIPT RLS
 -- =============================================================
@@ -586,7 +537,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can create company purchase receipts"
 on public.purchase_receipt
 for insert
@@ -602,8 +552,6 @@ with check (
         or received_by = auth.uid()
     )
 );
-
-
 -- =============================================================
 -- 15. PURCHASE RECEIPT ITEM RLS
 -- ==============================================================
@@ -619,7 +567,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can create company purchase receipt items"
 on public.purchase_receipt_item
 for insert
@@ -631,7 +578,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
 -- 15. PURCHASING RBAC PERMISSIONS
 -- ============================================================
 
@@ -646,7 +592,6 @@ values
     ('purchasing.receive')
 on conflict (permission_name)
 do nothing;
-
 -- OWNER
 insert into public.role_permissions (role_id, permission_id)
 select
@@ -657,7 +602,6 @@ cross join public.permissions p
 where r.role_name = 'owner'
   and p.permission_name like 'purchasing.%'
 on conflict (role_id, permission_id) do nothing;
-
 -- ADMIN
 insert into public.role_permissions (role_id, permission_id)
 select
@@ -676,7 +620,6 @@ join public.permissions p
     )
 where r.role_name = 'admin'
 on conflict (role_id, permission_id) do nothing;
-
 -- MANAGER
 insert into public.role_permissions (role_id, permission_id)
 select
@@ -693,7 +636,6 @@ join public.permissions p
     )
 where r.role_name = 'manager'
 on conflict (role_id, permission_id) do nothing;
-
 -- READ-ONLY ROLES
 insert into public.role_permissions (
     role_id,
@@ -716,8 +658,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- END PURCHASE ORDER FOUNDATION
--- ============================================================
+-- ============================================================;

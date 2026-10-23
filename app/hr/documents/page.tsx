@@ -463,56 +463,50 @@ export default function HrDocumentsPage() {
     });
 
 
-  async function load(
+  function load(
     employeeId:
       string =
         selectedEmployeeId
   ) {
-    setError(
-      ""
-    );
-
-
-    const {
-      data: {
-        user,
-      },
-    } =
-      await supabase.auth.getUser();
-
-
-    if (!user) {
-      router.push(
-        "/login"
-      );
-
-      return;
-    }
-
-
-    const {
-      data,
-      error:
-        rpcError,
-    } =
-      await supabase.rpc(
-        "get_hr_documents_workspace",
-        {
-          p_employee_id:
-            employeeId ||
-            null,
-        }
+    return supabase.auth.getUser().then(async ({ data: { user } }) => {
+      setError(
+        ""
       );
 
 
-    if (rpcError) {
-      throw rpcError;
-    }
+      if (!user) {
+        router.push(
+          "/login"
+        );
+
+        return;
+      }
 
 
-    setWorkspace(
-      data as DocumentWorkspace
-    );
+      const {
+        data,
+        error:
+          rpcError,
+      } =
+        await supabase.rpc(
+          "get_hr_documents_workspace",
+          {
+            p_employee_id:
+              employeeId ||
+              null,
+          }
+        );
+
+
+      if (rpcError) {
+        throw rpcError;
+      }
+
+
+      setWorkspace(
+        data as DocumentWorkspace
+      );
+    });
   }
 
 

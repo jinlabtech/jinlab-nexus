@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -94,97 +95,82 @@ export default function BrandingSettingsPage() {
     can("settings.branding.manage");
 
 
-  useEffect(() => {
-    if (permissionsLoading) {
-      return;
-    }
-
-    if (!canManage) {
-      setLoading(false);
-      return;
-    }
-
-    void loadSettings();
-  }, [
-    permissionsLoading,
-    canManage,
-  ]);
-
-
   async function logout() {
     await supabase.auth.signOut();
 
     router.replace("/login");
   }
+  const loadSettings = useCallback(() => {
+    return getCompanyDocumentSettings()
+      .then(async (data) => {
+        const signedLogoUrl =
+          await getDocumentLogoUrl(
+            data.logo_path
+          );
 
-
-  async function loadSettings() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
-
-      const data =
-        await getCompanyDocumentSettings();
-
-      const signedLogoUrl =
-        await getDocumentLogoUrl(
-          data.logo_path
+        setLogoUrl(
+          signedLogoUrl
         );
 
-      setLogoUrl(
-        signedLogoUrl
-      );
+        setSettings({
+          logo_path:
+            data.logo_path,
 
-      setSettings({
-        logo_path:
-          data.logo_path,
+          document_display_name:
+            data.document_display_name,
 
-        document_display_name:
-          data.document_display_name,
+          show_registration_number:
+            data.show_registration_number,
 
-        show_registration_number:
-          data.show_registration_number,
+          show_vat_number:
+            data.show_vat_number,
 
-        show_vat_number:
-          data.show_vat_number,
+          show_company_address:
+            data.show_company_address,
 
-        show_company_address:
-          data.show_company_address,
+          show_company_phone:
+            data.show_company_phone,
 
-        show_company_phone:
-          data.show_company_phone,
+          show_company_email:
+            data.show_company_email,
 
-        show_company_email:
-          data.show_company_email,
+          show_company_website:
+            data.show_company_website,
 
-        show_company_website:
-          data.show_company_website,
+          document_footer:
+            data.document_footer,
 
-        document_footer:
-          data.document_footer,
+          invoice_footer:
+            data.invoice_footer,
 
-        invoice_footer:
-          data.invoice_footer,
+          quotation_footer:
+            data.quotation_footer,
 
-        quotation_footer:
-          data.quotation_footer,
+          default_invoice_template:
+            data.default_invoice_template,
 
-        default_invoice_template:
-          data.default_invoice_template,
-
-        default_quotation_template:
-          data.default_quotation_template,
+          default_quotation_template:
+            data.default_quotation_template,
+        });
+      })
+      .catch((error) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Branding settings could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
       });
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Branding settings could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+
+  }, []);
+
+  useEffect(() => {
+    if (permissionsLoading || !(canManage)) return;
+    void loadSettings();
+  }, [permissionsLoading, canManage, loadSettings]);
+
 
 
   function update<K extends keyof EditableSettings>(
@@ -303,8 +289,7 @@ export default function BrandingSettingsPage() {
 
 
   if (
-    permissionsLoading ||
-    loading
+    permissionsLoading || ((canManage) && loading)
   ) {
     return (
       <DashboardLayout>

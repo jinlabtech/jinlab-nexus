@@ -73,20 +73,15 @@ public.accounting_posting_profile (
   updated_at timestamptz
     not null default now()
 );
-
-
 drop trigger if exists
 accounting_posting_profile_set_updated_at
 on public.accounting_posting_profile;
-
 create trigger
 accounting_posting_profile_set_updated_at
 before update
 on public.accounting_posting_profile
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 2. VALIDATE ACCOUNT OWNERSHIP + ACCOUNT TYPES
 -- ============================================================
@@ -303,12 +298,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 accounting_posting_profile_validate
 on public.accounting_posting_profile;
-
 create trigger
 accounting_posting_profile_validate
 before insert or update
@@ -316,8 +308,6 @@ on public.accounting_posting_profile
 for each row
 execute function
 public.validate_accounting_posting_profile();
-
-
 -- ============================================================
 -- 3. SEED POSTING PROFILE FROM DEFAULT CHART
 -- ============================================================
@@ -529,8 +519,6 @@ on conflict (
   company_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 4. READ PROFILE
 -- ============================================================
@@ -584,19 +572,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_accounting_posting_profile()
 from public;
-
 grant execute
 on function
 public.get_accounting_posting_profile()
 to authenticated;
-
-
 -- ============================================================
 -- 5. RLS
 -- ============================================================
@@ -604,12 +587,9 @@ to authenticated;
 alter table
 public.accounting_posting_profile
 enable row level security;
-
-
 drop policy if exists
 "permitted users read accounting posting profile"
 on public.accounting_posting_profile;
-
 create policy
 "permitted users read accounting posting profile"
 on public.accounting_posting_profile
@@ -623,17 +603,12 @@ using (
     'accounting.view'
   )
 );
-
-
 revoke insert, update, delete
 on public.accounting_posting_profile
 from authenticated;
-
 grant select
 on public.accounting_posting_profile
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

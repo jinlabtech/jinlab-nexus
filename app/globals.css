@@ -6,16 +6,15 @@
 @import "./nexus-art-direction.css";
 @import "./nexus-module-surfaces.css";
 @import "./nexus-appearance.css";
-@import "../components/nexus-icons/nexus-icons.css";
-@import "../components/nexus-icons/nexus-icon-styles.css";
 @import "./nexus-theme-signatures.css";
 @import "./nexus-readability.css";
-@import "../components/nexus-icons/nexus-glyphs.css";
-@import "../components/nexus-icons/nexus-premium-art.css";
 @import "../components/dashboard/nexus-control-deck.css";
 @import "./nexus-mobile-production.css";
 @import "./nexus-experience-polish.css";
 @import "./nexus-control-contract.css";
+@import "../components/nexus-icons/nexus-essential-icons.css";
+@import "./nexus-desktop-lite.css";
+@import "./nexus-desktop-dashboard.css";
 
 @font-face {
   font-family: NexusUI;
@@ -884,3 +883,133 @@
   }
 
 }
+
+/* Shared popup contract: portalled above navigation, keyboard-aware, one scroller. */
+.nexus-popup-layer.nexus-mobile-modal-backdrop {
+  position: fixed !important; inset: auto 0 !important; top: var(--popup-top, 0px) !important;
+  height: var(--popup-height, 100dvh) !important; z-index: 300 !important;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) !important;
+  background: rgb(5 12 24 / .32) !important; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  opacity: 1 !important; visibility: visible !important; isolation: isolate;
+}
+.nexus-popup-layer .nexus-popup-panel {
+  display: flex !important; flex-direction: column !important; width: 100% !important; min-height: 0 !important;
+  max-height: 100% !important; overflow: hidden !important; margin: 0 auto !important;
+  transform: none !important; opacity: 1 !important; visibility: visible !important;
+  color: var(--foreground) !important; background: color-mix(in srgb, var(--background) 88%, transparent) !important;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+}
+.nexus-popup-panel .nexus-mobile-modal-header { position: relative !important; flex-shrink: 0 !important; background: transparent !important; }
+.nexus-popup-panel .nexus-mobile-modal-body {
+  min-height: 0 !important; max-height: none !important; overflow-y: auto !important; overflow-x: hidden;
+  background: transparent !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+}
+.nexus-popup-panel::before, .nexus-popup-panel::after { pointer-events: none !important; }
+.nexus-popup-panel :is(input,select,textarea) { background: var(--background) !important; color: var(--foreground) !important; }
+@media (max-width: 767px) {
+  .nexus-popup-panel :is(input,select,textarea) { font-size: 16px !important; min-height: 44px; }
+  .nexus-popup-panel button { min-height: 44px; white-space: normal; }
+  .nexus-popup-panel { border-radius: 22px !important; }
+}
+@media print { .nexus-popup-layer { display: none !important; } }
+
+/* Keep physical paper inside its scaled screen footprint; printing uses the A4 rules above. */
+@media screen {
+  .nexus-a4-preview-stage.nexus-a4-fit-screen { overflow-x: clip !important; min-width: 0; }
+  .nexus-a4-preview-stage.nexus-a4-full-size { overflow-x: auto !important; overscroll-behavior-x: contain; }
+  .nexus-a4-full-size .nexus-a4-scale-holder { width: 210mm; }
+  .nexus-a4-fit-screen .nexus-a4-paper { margin: 0; }
+  #nexus-core-helper .nexus-core-body { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  #nexus-core-helper .nexus-core-intelligence-panel { min-height: 0; overflow: hidden; }
+  #nexus-core-helper > header, #nexus-core-helper > p { flex-shrink: 0; }
+}
+@media screen and (max-width: 767px) {
+  #nexus-core-helper {
+    top: var(--core-top, 8px) !important;
+    bottom: auto !important;
+    height: var(--core-height, calc(100dvh - 16px)) !important;
+    max-height: var(--core-height, calc(100dvh - 16px)) !important;
+    z-index: 240 !important;
+  }
+  #nexus-core-helper > p { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  #nexus-core-helper textarea { font-size: 16px !important; }
+  #nexus-core-helper button { min-height: 44px; }
+  #nexus-core-helper .nexus-core-extras summary { min-height: 44px; }
+}
+
+@media screen and (max-width: 767px) {
+  #nexus-core-helper[data-short-viewport="true"] .nexus-core-extras,
+  #nexus-core-helper[data-short-viewport="true"] > p { display: none; }
+}
+@media print { #nexus-core-helper { display: none !important; } }
+
+
+/* NEXUS DESKTOP STABLE BASELINE
+   Preserve mobile experience.
+   Keep desktop route rendering immediate.
+*/
+@media screen and (min-width: 768px) {
+  .nexus-page-enter {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+
+/* =========================================================
+   JINLAB SEAMLESS BRAND LOGO V1
+   Navbar only — does not change document branding.
+   JPG background blending fallback.
+   ========================================================= */
+
+[data-nexus-jinlab-brand="true"] {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  filter: none !important;
+  isolation: auto !important;
+}
+
+[data-nexus-jinlab-brand="true"]
+[data-nexus-company-logo="true"] {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center left;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  isolation: auto !important;
+  filter: none !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Dark-mode fallback for the existing white JPG artwork. */
+html.dark
+[data-nexus-jinlab-brand="true"]
+[data-nexus-company-logo="true"],
+html[data-theme="dark"]
+[data-nexus-jinlab-brand="true"]
+[data-nexus-company-logo="true"],
+html[data-nexus-theme="jinlab_blue_dark"]
+[data-nexus-jinlab-brand="true"]
+[data-nexus-company-logo="true"],
+html[data-nexus-theme="jinlab_graphite"]
+[data-nexus-jinlab-brand="true"]
+[data-nexus-company-logo="true"] {
+  filter: invert(1) hue-rotate(180deg) !important;
+  mix-blend-mode: screen !important;
+}
+

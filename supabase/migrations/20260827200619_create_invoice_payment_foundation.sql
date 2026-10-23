@@ -47,20 +47,14 @@ create table if not exists public.invoice_payment (
 
     created_at timestamptz not null default now()
 );
-
 create index if not exists invoice_payment_company_idx
     on public.invoice_payment(company_id);
-
 create index if not exists invoice_payment_invoice_idx
     on public.invoice_payment(invoice_id);
-
 create index if not exists invoice_payment_customer_idx
     on public.invoice_payment(customer_id);
-
 create index if not exists invoice_payment_date_idx
     on public.invoice_payment(payment_date desc);
-
-
 -- ============================================================
 -- PAYMENT TOTAL REFRESH
 -- ============================================================
@@ -134,8 +128,6 @@ begin
         target_invoice_id;
 end;
 $$;
-
-
 create or replace function public.invoice_payment_refresh_parent()
 returns trigger
 language plpgsql
@@ -168,18 +160,13 @@ begin
     return new;
 end;
 $$;
-
-
 drop trigger if exists invoice_payment_refresh_invoice
 on public.invoice_payment;
-
 create trigger invoice_payment_refresh_invoice
 after insert or update or delete
 on public.invoice_payment
 for each row
 execute function public.invoice_payment_refresh_parent();
-
-
 -- ============================================================
 -- PREVENT PAYMENT ON INVALID INVOICE
 -- ============================================================
@@ -243,25 +230,19 @@ begin
     return new;
 end;
 $$;
-
-
 drop trigger if exists invoice_payment_validate
 on public.invoice_payment;
-
 create trigger invoice_payment_validate
 before insert or update
 on public.invoice_payment
 for each row
 execute function public.validate_invoice_payment();
-
-
 -- ============================================================
 -- ROW LEVEL SECURITY
 -- ============================================================
 
 alter table public.invoice_payment
 enable row level security;
-
 create policy "Users can view company invoice payments"
 on public.invoice_payment
 for select
@@ -273,7 +254,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can create company invoice payments"
 on public.invoice_payment
 for insert
@@ -285,7 +265,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can update company invoice payments"
 on public.invoice_payment
 for update
@@ -304,7 +283,6 @@ with check (
         where user_id = auth.uid()
     )
 );
-
 create policy "Users can delete company invoice payments"
 on public.invoice_payment
 for delete
@@ -316,8 +294,6 @@ using (
         where user_id = auth.uid()
     )
 );
-
-
 -- ============================================================
 -- PERMISSIONS
 -- ============================================================
@@ -334,7 +310,6 @@ on conflict (
     permission_name
 )
 do nothing;
-
 insert into public.role_permissions (
     role_id,
     permission_id
@@ -353,7 +328,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
 insert into public.role_permissions (
     role_id,
     permission_id
@@ -377,7 +351,6 @@ on conflict (
     permission_id
 )
 do nothing;
-
 -- ============================================================
 -- END PAYMENT FOUNDATION
--- ============================================================
+-- ============================================================;

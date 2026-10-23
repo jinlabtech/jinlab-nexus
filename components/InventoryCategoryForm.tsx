@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
@@ -21,16 +21,20 @@ type InventoryCategoryFormProps = {
   onCancel: () => void;
 };
 
-export default function InventoryCategoryForm({
+export default function InventoryCategoryForm(props: InventoryCategoryFormProps) {
+  return <InventoryCategoryFormFields key={props.category?.id ?? "new"} {...props} />;
+}
+
+function InventoryCategoryFormFields({
   category,
   onSave,
   onCancel,
 }: InventoryCategoryFormProps) {
   const [categoryName, setCategoryName] =
-    useState("");
+    useState(category?.category_name ?? "");
 
   const [description, setDescription] =
-    useState("");
+    useState(category?.description ?? "");
 
   const [saving, setSaving] =
     useState(false);
@@ -39,18 +43,6 @@ export default function InventoryCategoryForm({
     useState("");
 
   const isEditing = Boolean(category);
-
-  useEffect(() => {
-    setCategoryName(
-      category?.category_name ?? ""
-    );
-
-    setDescription(
-      category?.description ?? ""
-    );
-
-    setErrorMessage("");
-  }, [category]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

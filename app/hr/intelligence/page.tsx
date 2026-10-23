@@ -490,88 +490,79 @@ export default function HrIntelligencePage() {
 
   const load =
     useCallback(
-      async (
+      (
         quiet =
           false
       ) => {
-        if (
-          !quiet
-        ) {
-          setRefreshing(
-            true
-          );
-        }
+        return supabase.auth.getUser()
+          .then(async ({ data: { user } }) => {
+            if (
+              !quiet
+            ) {
+              setRefreshing(
+                true
+              );
+            }
 
 
-        setError(
-          ""
-        );
-
-
-        try {
-          const {
-            data: {
-              user,
-            },
-          } =
-            await supabase.auth.getUser();
-
-
-          if (!user) {
-            window.location.href =
-              "/login";
-
-            return;
-          }
-
-
-          const {
-            data,
-            error:
-              rpcError,
-          } =
-            await supabase.rpc(
-              "get_hr_intelligence_workspace",
-              {
-                p_branch_id:
-                  branchId ||
-                  null,
-
-                p_days:
-                  days,
-              }
+            setError(
+              ""
             );
 
 
-          if (
-            rpcError
-          ) {
-            throw rpcError;
-          }
+            if (!user) {
+              window.location.href =
+                "/login";
+
+              return;
+            }
 
 
-          setWorkspace(
-            data as Workspace
-          );
+            const {
+              data,
+              error:
+                rpcError,
+            } =
+              await supabase.rpc(
+                "get_hr_intelligence_workspace",
+                {
+                  p_branch_id:
+                    branchId ||
+                    null,
 
-        } catch (
-          caught
-        ) {
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : "Unable to load HR intelligence."
-          );
+                  p_days:
+                    days,
+                }
+              );
 
-        } finally {
-          setLoading(
-            false
-          );
 
-          setRefreshing(
-            false
-          );
-        }
+            if (
+              rpcError
+            ) {
+              throw rpcError;
+            }
+
+
+            setWorkspace(
+              data as Workspace
+            );
+          })
+          .catch((caught: unknown) => {
+            setError(
+              caught instanceof Error
+                ? caught.message
+                : "Unable to load HR intelligence."
+            );
+          })
+          .finally(() => {
+            setLoading(
+              false
+            );
+
+            setRefreshing(
+              false
+            );
+          });
       },
       [
         branchId,

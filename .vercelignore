@@ -9,6 +9,9 @@ node_modules/
 *.log
 .DS_Store
 supabase/.temp/
+work/
+*.bak
+*.before-*
 
 # Import inputs and reports are local business records, not application assets.
 scripts/zoho-import/data/

@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -127,7 +129,11 @@ function basisLabel(
 }
 
 
-export default function SalesOrderPaymentPanel({
+export default function SalesOrderPaymentPanel(props: Props) {
+  return <SalesOrderPaymentPanelContent key={props.salesOrderId} {...props} />;
+}
+
+function SalesOrderPaymentPanelContent({
   salesOrderId,
 }: Props) {
 
@@ -222,36 +228,34 @@ export default function SalesOrderPaymentPanel({
     useState("");
 
 
-  async function loadSummary() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
-      setSummary(null);
+  const requestVersion = useRef(0);
 
-      const result =
-        await getSalesOrderPaymentSummary(
-          salesOrderId
-        );
-
+  const fetchData = useCallback(() => {
+    const version = ++requestVersion.current;
+    return getSalesOrderPaymentSummary(salesOrderId).then((result) => {
+      if (version !== requestVersion.current)
+        return;
       setSummary(result);
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Payment information could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+    }).catch((error) => {
+      if (version !== requestVersion.current)
+        return;
+      setErrorMessage(error instanceof Error
+        ? error.message
+        : "Payment information could not be loaded.");
+    }).finally(() => {
+      if (version === requestVersion.current) {
+        setLoading(false);
+      }
+    });
+  }, [salesOrderId]);
 
 
   useEffect(() => {
-    void loadSummary();
-  }, [
-    salesOrderId,
-  ]);
+    void fetchData();
+    return () => {
+      requestVersion.current += 1;
+    };
+  }, [fetchData]);
 
 
   async function recordPayment() {

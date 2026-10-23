@@ -275,58 +275,13 @@ export default function PosReceiptPage() {
     );
 
 
-  const loadReceipt =
-    useCallback(
-      async () => {
-
-        setLoading(
-          true
-        );
-
-        setErrorMessage(
-          ""
-        );
+  const fetchReceipt = useCallback(() => supabase.rpc("get_pos_receipt", { p_pos_sale_id: saleId }).then(({ data, error }) => {
+    setErrorMessage(error?.message ?? "");
+    if (!error) setReceipt(data as ReceiptData);
+    setLoading(false);
+  }), [saleId]);
 
 
-        const {
-          data,
-          error,
-        } =
-          await supabase.rpc(
-            "get_pos_receipt",
-            {
-              p_pos_sale_id:
-                saleId,
-            }
-          );
-
-
-        if (error) {
-
-          setErrorMessage(
-            error.message
-          );
-
-          setLoading(
-            false
-          );
-
-          return;
-        }
-
-
-        setReceipt(
-          data as ReceiptData
-        );
-
-        setLoading(
-          false
-        );
-      },
-      [
-        saleId,
-      ]
-    );
 
 
   const printReceipt =
@@ -429,12 +384,10 @@ export default function PosReceiptPage() {
   useEffect(
     () => {
 
-      void loadReceipt();
+      void fetchReceipt();
 
     },
-    [
-      loadReceipt,
-    ]
+    [fetchReceipt]
   );
 
 

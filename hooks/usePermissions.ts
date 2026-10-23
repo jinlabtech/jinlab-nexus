@@ -1,65 +1,29 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
-import {
-  getCurrentUserPermissions,
-  hasPermission,
-} from "@/lib/services/permissionService";
-
+import { useCallback, useMemo } from "react";
+import { useRequestData } from "@/hooks/useRequestData";
+import { getCurrentUserPermissions, hasPermission } from "@/lib/services/permissionService";
 import type { PermissionName } from "@/types/permissions";
 
+const emptyPermissions: PermissionName[] = [];
+
 export function usePermissions() {
-  const [permissions, setPermissions] = useState<
-    PermissionName[]
-  >([]);
-
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const refreshPermissions = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage("");
-
-    try {
-      const data =
-        await getCurrentUserPermissions();
-
-      setPermissions(data);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Permissions could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    refreshPermissions();
-  }, [refreshPermissions]);
-
-  const permissionSet = useMemo(
-    () => new Set(permissions),
-    [permissions]
+  const { data, loading, errorMessage, refresh } = useRequestData(
+    "permissions",
+    true,
+    getCurrentUserPermissions,
+    "Permissions could not be loaded."
   );
+  const permissions = data ?? emptyPermissions;
+  const permissionSet = useMemo(() => new Set(permissions), [permissions]);
 
-  function can(permission: PermissionName) {
+  const can = useCallback((permission: PermissionName) => {
     return permissionSet.has(permission);
-  }
+  }, [permissionSet]);
 
-  async function verifyPermission(
-    permission: PermissionName
-  ) {
+  const verifyPermission = useCallback((permission: PermissionName) => {
     return hasPermission(permission);
-  }
+  }, []);
 
   return {
     permissions,
@@ -67,6 +31,6 @@ export function usePermissions() {
     errorMessage,
     can,
     verifyPermission,
-    refreshPermissions,
+    refreshPermissions: refresh,
   };
 }

@@ -35,13 +35,9 @@ public.accounting_automatic_journal_sequence (
     sequence_year
   )
 );
-
-
 revoke all
 on public.accounting_automatic_journal_sequence
 from public, authenticated;
-
-
 create or replace function
 public.next_automatic_journal_number(
   p_company_id uuid,
@@ -101,8 +97,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.next_automatic_journal_number(
@@ -110,8 +104,6 @@ public.next_automatic_journal_number(
   date
 )
 from public, authenticated;
-
-
 -- ============================================================
 -- 2. ACCOUNTING AUTOMATION EXCEPTIONS
 --
@@ -181,38 +173,27 @@ public.accounting_posting_exception (
     source_event
   )
 );
-
-
 create index if not exists
 accounting_posting_exception_company_idx
 on public.accounting_posting_exception (
   company_id,
   status
 );
-
-
 drop trigger if exists
 accounting_posting_exception_updated_at
 on public.accounting_posting_exception;
-
 create trigger
 accounting_posting_exception_updated_at
 before update
 on public.accounting_posting_exception
 for each row
 execute function public.set_updated_at();
-
-
 alter table
 public.accounting_posting_exception
 enable row level security;
-
-
 drop policy if exists
 "permitted users read accounting posting exceptions"
 on public.accounting_posting_exception;
-
-
 create policy
 "permitted users read accounting posting exceptions"
 on public.accounting_posting_exception
@@ -226,18 +207,12 @@ using (
     'accounting.view'
   )
 );
-
-
 grant select
 on public.accounting_posting_exception
 to authenticated;
-
-
 revoke insert, update, delete
 on public.accounting_posting_exception
 from authenticated;
-
-
 create or replace function
 public.record_accounting_posting_exception(
   p_company_id uuid,
@@ -311,8 +286,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.record_accounting_posting_exception(
@@ -326,8 +299,6 @@ public.record_accounting_posting_exception(
   text
 )
 from public, authenticated;
-
-
 -- ============================================================
 -- 3. ENSURE POSTING PROFILE EXISTS
 -- ============================================================
@@ -572,14 +543,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.ensure_accounting_posting_profile(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- 4. GENERIC AUTOMATIC JOURNAL CREATOR
 -- ============================================================
@@ -1068,8 +1035,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.create_automatic_accounting_journal(
@@ -1087,8 +1052,6 @@ public.create_automatic_accounting_journal(
   uuid
 )
 from public, authenticated;
-
-
 -- ============================================================
 -- END PART 1
 -- ============================================================
@@ -1646,14 +1609,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.post_invoice_issue_to_ledger(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- 6. CANCEL / REVERSE ISSUED INVOICE
 -- ============================================================
@@ -1834,14 +1793,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.post_invoice_cancellation_to_ledger(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- 7. POST CUSTOMER PAYMENT
 --
@@ -2195,14 +2150,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.post_invoice_payment_to_ledger(uuid)
 from public, authenticated;
-
-
 -- ============================================================
 -- 8. VAT COMPLIANCE GUARD BEFORE ISSUE
 -- ============================================================
@@ -2249,13 +2200,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 invoice_accounting_compliance_guard
 on public.invoice;
-
-
 create trigger
 invoice_accounting_compliance_guard
 before update of status
@@ -2263,8 +2210,6 @@ on public.invoice
 for each row
 execute function
 public.invoice_accounting_compliance_guard();
-
-
 -- ============================================================
 -- 9. INVOICE ACCOUNTING EVENT TRIGGER
 -- ============================================================
@@ -2329,13 +2274,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 invoice_accounting_event_sync
 on public.invoice;
-
-
 create trigger
 invoice_accounting_event_sync
 after update of status
@@ -2343,8 +2284,6 @@ on public.invoice
 for each row
 execute function
 public.invoice_accounting_event_sync();
-
-
 -- ============================================================
 -- 10. PAYMENT ACCOUNTING EVENT TRIGGER
 --
@@ -2398,13 +2337,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 invoice_payment_accounting_event_sync
 on public.invoice_payment;
-
-
 create trigger
 invoice_payment_accounting_event_sync
 after insert
@@ -2412,8 +2347,6 @@ on public.invoice_payment
 for each row
 execute function
 public.invoice_payment_accounting_event_sync();
-
-
 -- ============================================================
 -- 11. PAYMENT IMMUTABILITY
 --
@@ -2468,13 +2401,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 invoice_payment_protect_financial_fields
 on public.invoice_payment;
-
-
 create trigger
 invoice_payment_protect_financial_fields
 before update
@@ -2482,8 +2411,6 @@ on public.invoice_payment
 for each row
 execute function
 public.protect_invoice_payment_financial_fields();
-
-
 create or replace function
 public.prevent_invoice_payment_delete()
 returns trigger
@@ -2497,13 +2424,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 invoice_payment_prevent_delete
 on public.invoice_payment;
-
-
 create trigger
 invoice_payment_prevent_delete
 before delete
@@ -2511,8 +2434,6 @@ on public.invoice_payment
 for each row
 execute function
 public.prevent_invoice_payment_delete();
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

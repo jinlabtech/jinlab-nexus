@@ -41,6 +41,8 @@ yarn-error.log*
 next-env.d.ts
 .nexus-backups/
 .nexus-recovery/
+/work/
+*.before-*
 
 # local development snapshots
 *.bak

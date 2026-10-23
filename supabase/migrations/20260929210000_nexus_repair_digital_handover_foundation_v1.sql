@@ -54,22 +54,16 @@ create table if not exists public.repair_handover_terms (
     version
   )
 );
-
-
 create unique index if not exists
   repair_handover_terms_one_active_per_company
 on public.repair_handover_terms(company_id)
 where is_active = true;
-
-
 create index if not exists
   repair_handover_terms_company_idx
 on public.repair_handover_terms(
   company_id,
   version desc
 );
-
-
 -- ============================================================
 -- 2. SEED SAFE VERSION-1 TERMS FOR EXISTING COMPANIES
 -- ============================================================
@@ -111,8 +105,6 @@ where not exists (
   from public.repair_handover_terms t
   where t.company_id = c.id
 );
-
-
 -- ============================================================
 -- 2B. TENANT-SAFE PARENT KEYS
 --
@@ -127,22 +119,18 @@ alter table public.service_job
     company_id,
     id
   );
-
 alter table public.branch
   add constraint branch_company_id_id_key
   unique (
     company_id,
     id
   );
-
 alter table public.customer
   add constraint customer_company_id_id_key
   unique (
     company_id,
     id
   );
-
-
 -- ============================================================
 -- 3. DIGITAL HANDOVER RECORD
 -- ============================================================
@@ -297,8 +285,6 @@ create table if not exists public.repair_handover (
     )
     references public.repair_handover_terms(id)
 );
-
-
 create index if not exists
   repair_handover_job_idx
 on public.repair_handover(
@@ -306,8 +292,6 @@ on public.repair_handover(
   service_job_id,
   created_at desc
 );
-
-
 create index if not exists
   repair_handover_status_idx
 on public.repair_handover(
@@ -315,8 +299,6 @@ on public.repair_handover(
   status,
   created_at desc
 );
-
-
 create unique index if not exists
   repair_handover_one_live_flow_idx
 on public.repair_handover(
@@ -330,8 +312,6 @@ where status in (
   'awaiting_otp',
   'verified'
 );
-
-
 -- ============================================================
 -- 4. OTP CHALLENGE
 --
@@ -410,8 +390,6 @@ create table if not exists public.repair_handover_otp (
   updated_at timestamptz not null
     default now()
 );
-
-
 create index if not exists
   repair_handover_otp_lookup_idx
 on public.repair_handover_otp(
@@ -419,8 +397,6 @@ on public.repair_handover_otp(
   handover_id,
   created_at desc
 );
-
-
 -- ============================================================
 -- 5. PRIVATE SIGNATURE STORAGE
 --
@@ -453,26 +429,19 @@ do update set
     'image/png',
     'image/webp'
   ];
-
-
 -- ============================================================
 -- 6. RLS
 -- ============================================================
 
 alter table public.repair_handover_terms
   enable row level security;
-
 alter table public.repair_handover
   enable row level security;
-
 alter table public.repair_handover_otp
   enable row level security;
-
-
 drop policy if exists
   repair_handover_terms_read
 on public.repair_handover_terms;
-
 create policy
   repair_handover_terms_read
 on public.repair_handover_terms
@@ -484,12 +453,9 @@ using (
     'repair.view'
   )
 );
-
-
 drop policy if exists
   repair_handover_read
 on public.repair_handover;
-
 create policy
   repair_handover_read
 on public.repair_handover
@@ -501,21 +467,15 @@ using (
     'repair.view'
   )
 );
-
-
 revoke insert, update, delete
 on public.repair_handover_terms
 from anon, authenticated;
-
 revoke insert, update, delete
 on public.repair_handover
 from anon, authenticated;
-
 revoke all
 on public.repair_handover_otp
 from anon, authenticated;
-
-
 -- ============================================================
 -- 7. BEGIN / RESUME INTAKE HANDOVER
 -- ============================================================
@@ -768,8 +728,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- 8. RECORD SIGNATURE AFTER SECURE SERVER UPLOAD
 -- ============================================================
@@ -972,8 +930,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- 9. SERVER-ONLY VERIFIED HANDOVER FINALISER
 --
@@ -1250,8 +1206,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- 10. CURRENT HANDOVER STATE
 -- ============================================================
@@ -1336,8 +1290,6 @@ begin
 
 end;
 $$;
-
-
 -- ============================================================
 -- 11. FUNCTION SECURITY
 -- ============================================================
@@ -1346,13 +1298,10 @@ revoke all
 on function
 public.repair_begin_intake_handover(uuid)
 from public, anon;
-
 grant execute
 on function
 public.repair_begin_intake_handover(uuid)
 to authenticated;
-
-
 revoke all
 on function
 public.repair_record_handover_signature(
@@ -1361,7 +1310,6 @@ public.repair_record_handover_signature(
   text
 )
 from public, anon;
-
 grant execute
 on function
 public.repair_record_handover_signature(
@@ -1370,19 +1318,14 @@ public.repair_record_handover_signature(
   text
 )
 to authenticated;
-
-
 revoke all
 on function
 public.repair_get_intake_handover(uuid)
 from public, anon;
-
 grant execute
 on function
 public.repair_get_intake_handover(uuid)
 to authenticated;
-
-
 revoke all
 on function
 public.repair_finalize_verified_handover(
@@ -1393,7 +1336,6 @@ public.repair_finalize_verified_handover(
   text
 )
 from public, anon, authenticated;
-
 grant execute
 on function
 public.repair_finalize_verified_handover(
@@ -1404,8 +1346,6 @@ public.repair_finalize_verified_handover(
   text
 )
 to service_role;
-
-
 -- ============================================================
 -- 12. CUSTOMER CONTACT + EXPLICIT MARKETING CONSENT
 -- ============================================================
@@ -1419,8 +1359,6 @@ alter table public.repair_handover
     marketing_whatsapp_opt_in boolean not null default false,
   add column if not exists
     marketing_consent_at timestamptz;
-
-
 create or replace function
 public.repair_update_handover_contact(
   p_handover_id uuid,
@@ -2028,8 +1966,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.repair_update_handover_contact(
@@ -2041,7 +1977,6 @@ public.repair_update_handover_contact(
   boolean
 )
 from public, anon;
-
 grant execute
 on function
 public.repair_update_handover_contact(

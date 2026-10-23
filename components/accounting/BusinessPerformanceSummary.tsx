@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useMemo,
   useState,
 } from "react";
@@ -820,6 +822,16 @@ function PlanCard({
 }
 
 
+async function getBusinessPerformance() {
+  return await supabase.rpc(
+    "get_owner_business_dashboard",
+    {
+      p_as_of_date:
+        today(),
+    }
+  );
+}
+
 export default function BusinessPerformanceSummary() {
 
   const [
@@ -877,153 +889,84 @@ export default function BusinessPerformanceSummary() {
     useState("");
 
 
-  async function loadData(
-    silent = false
-  ) {
+  const requestVersion = useRef(0);
+  const animationTimer = useRef<number | null>(null);
 
-    try {
-
-      if (
-        silent
-      ) {
-        setRefreshing(
-          true
-        );
-      } else {
-        setLoading(
-          true
-        );
-      }
-
-
-      setReady(
-        false
-      );
-
-      setErrorMessage(
-        ""
-      );
-
-
-      const {
-        data:
-          result,
-        error,
-      } =
-        await supabase.rpc(
-          "get_owner_business_dashboard",
-          {
-            p_as_of_date:
-              today(),
-          }
-        );
-
-
-      if (
-        error
-      ) {
-
-        if (
-          error.message
-            .toLowerCase()
-            .includes(
-              "permission denied"
-            )
-        ) {
-          setData(
-            null
-          );
-
+  const fetchData = useCallback(() => {
+    const version = ++requestVersion.current;
+    if (animationTimer.current !== null)
+      window.clearTimeout(animationTimer.current);
+    return getBusinessPerformance().then(({ data: result, error, }) => {
+      if (version !== requestVersion.current)
+        return;
+      if (error) {
+        if (error.message
+          .toLowerCase()
+          .includes("permission denied")) {
+          setData(null);
           return;
         }
-
         throw error;
       }
+      const next = result as OwnerBusinessDashboard;
+      setData(next);
+      const activeMonths = next.monthly.filter((month) => Number(month.revenue_actual) !==
+        0 ||
+        Number(month.cogs_actual) !==
+        0 ||
+        Number(month.operating_expenses_actual) !==
+        0 ||
+        Number(month.net_profit_actual) !==
+        0);
+      setSelectedMonth(activeMonths[activeMonths.length -
+        1] ??
+        next.monthly[next.monthly.length -
+        1] ??
+        null);
+      animationTimer.current = window.setTimeout(() => setReady(true), 100);
+    }).catch((error) => {
+      if (version !== requestVersion.current)
+        return;
+      setErrorMessage(error instanceof Error
+        ? error.message
+        : "Business performance could not be loaded.");
+    }).finally(() => {
+      if (version === requestVersion.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    });
+  }, []);
 
-
-      const next =
-        result as OwnerBusinessDashboard;
-
-
-      setData(
-        next
-      );
-
-
-      const activeMonths =
-        next.monthly.filter(
-          (
-            month
-          ) =>
-            Number(
-              month.revenue_actual
-            ) !==
-              0 ||
-            Number(
-              month.cogs_actual
-            ) !==
-              0 ||
-            Number(
-              month.operating_expenses_actual
-            ) !==
-              0 ||
-            Number(
-              month.net_profit_actual
-            ) !==
-              0
-        );
-
-
-      setSelectedMonth(
-        activeMonths[
-          activeMonths.length -
-            1
-        ] ??
-        next.monthly[
-          next.monthly.length -
-            1
-        ] ??
-        null
-      );
-
-
-      window.setTimeout(
-        () =>
-          setReady(
-            true
-          ),
-        100
-      );
-
-    } catch (
-      error
+  async function loadData(silent = false) {
+    if (
+      silent
     ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Business performance could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(
-        false
-      );
-
       setRefreshing(
-        false
+        true
+      );
+    } else {
+      setLoading(
+        true
       );
     }
+    setReady(
+      false
+    );
+    setErrorMessage(
+      ""
+    );
+    await fetchData();
   }
 
 
-  useEffect(
-    () => {
-      void loadData();
-    },
-    []
-  );
+  useEffect(() => {
+    void fetchData();
+    return () => {
+      requestVersion.current += 1;
+      if (animationTimer.current !== null) window.clearTimeout(animationTimer.current);
+    };
+  }, [fetchData]);
 
 
   async function printReport() {

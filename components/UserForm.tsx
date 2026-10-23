@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import AppCard from "@/components/ui/AppCard";
 import AppInput from "@/components/ui/AppInput";
@@ -30,23 +30,21 @@ const availableRoles: UserRole[] = [
   "viewer",
 ];
 
-export default function UserForm({
+export default function UserForm(props: UserFormProps) {
+  return <UserFormFields key={props.user.id} {...props} />;
+}
+
+function UserFormFields({
   user,
   onSave,
   onCancel,
 }: UserFormProps) {
-  const [fullName, setFullName] = useState("");
+  const [fullName, setFullName] = useState(user.full_name);
   const [role, setRole] =
-    useState<UserRole>("employee");
+    useState<UserRole>(user.role);
 
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    setFullName(user.full_name);
-    setRole(user.role);
-    setErrorMessage("");
-  }, [user]);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>

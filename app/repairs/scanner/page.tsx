@@ -32,6 +32,7 @@ import {
   autoIssueRepairInvoice,
   closeRepairJob,
   completeRepairTechnical,
+  correctRepairJobLine,
   confirmRepairCollection,
   createRepairJob,
   getRepairScannerDevices,
@@ -253,6 +254,8 @@ export default function RepairScannerPage() {
   const [lineQuantity, setLineQuantity] = useState("1");
   const [lineUnitPrice, setLineUnitPrice] = useState("");
   const [lineInventoryItemId, setLineInventoryItemId] = useState("");
+  const [editingLineId, setEditingLineId] = useState<string | null>(null);
+  const [lineCorrectionReason, setLineCorrectionReason] = useState("");
 
   const [collectionMethod, setCollectionMethod] = useState("customer_signature");
   const [collectionReference, setCollectionReference] = useState("");
@@ -803,8 +806,10 @@ export default function RepairScannerPage() {
     try {
       await action();
       await refreshCurrentJob(successMessage);
+      return true;
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Action failed.");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -919,49 +924,235 @@ export default function RepairScannerPage() {
     );
   }
 
+  function beginLineCorrection(line: JobLine) {
+    setEditingLineId(line.id);
+
+    setLineType(
+      line.line_type as LineType
+    );
+
+    setLineDescription(
+      line.description
+    );
+
+    setLineQuantity(
+      String(
+        line.quantity
+      )
+    );
+
+    setLineUnitPrice(
+      String(
+        line.unit_price
+      )
+    );
+
+    setLineInventoryItemId(
+      line.inventory_item_id ??
+      ""
+    );
+
+    setLineCorrectionReason(
+      ""
+    );
+
+    setErrorMessage(
+      ""
+    );
+
+    setMessage(
+      "Owner correction mode: update this recorded work or part and provide a reason."
+    );
+  }
+
+
+  function cancelLineCorrection() {
+    setEditingLineId(
+      null
+    );
+
+    setLineCorrectionReason(
+      ""
+    );
+
+    setLineType(
+      "service"
+    );
+
+    setLineDescription(
+      ""
+    );
+
+    setLineQuantity(
+      "1"
+    );
+
+    setLineUnitPrice(
+      ""
+    );
+
+    setLineInventoryItemId(
+      ""
+    );
+  }
+
+
   async function addLine() {
     if (!selectedJob) return;
 
-    const quantity = Number(lineQuantity);
-    const unitPrice = Number(lineUnitPrice);
+    const quantity =
+      Number(
+        lineQuantity
+      );
 
-    if (!lineDescription.trim()) {
-      setErrorMessage("Repair/service line description is required.");
+    const unitPrice =
+      Number(
+        lineUnitPrice
+      );
+
+
+    if (
+      !lineDescription.trim()
+    ) {
+      setErrorMessage(
+        "Repair/service line description is required."
+      );
+
       return;
     }
 
-    if (!Number.isFinite(quantity) || quantity <= 0) {
-      setErrorMessage("Quantity must be greater than zero.");
+
+    if (
+      !Number.isFinite(
+        quantity
+      ) ||
+      quantity <= 0
+    ) {
+      setErrorMessage(
+        "Quantity must be greater than zero."
+      );
+
       return;
     }
 
-    if (!Number.isFinite(unitPrice) || unitPrice < 0) {
-      setErrorMessage("Enter a valid unit price.");
+
+    if (
+      !Number.isFinite(
+        unitPrice
+      ) ||
+      unitPrice < 0
+    ) {
+      setErrorMessage(
+        "Enter a valid unit price."
+      );
+
       return;
     }
 
-    if (lineType === "part" && !lineInventoryItemId) {
-      setErrorMessage("Select the inventory item used for this part line.");
+
+    if (
+      lineType ===
+        "part" &&
+      !lineInventoryItemId
+    ) {
+      setErrorMessage(
+        "Select the inventory item used for this part line."
+      );
+
       return;
     }
+
+
+    if (
+      editingLineId &&
+      lineCorrectionReason
+        .trim()
+        .length < 5
+    ) {
+      setErrorMessage(
+        "Enter a clear reason for the owner correction."
+      );
+
+      return;
+    }
+
+
+    if (
+      editingLineId
+    ) {
+      const saved = await runAction(
+        () =>
+          correctRepairJobLine({
+            lineId:
+              editingLineId,
+
+            lineType,
+
+            description:
+              lineDescription,
+
+            quantity,
+
+            unitPrice,
+
+            inventoryItemId:
+              lineType ===
+              "part"
+                ? lineInventoryItemId
+                : null,
+
+            reason:
+              lineCorrectionReason,
+          }),
+        "Owner work/part correction saved and audited."
+      );
+
+      if (saved) cancelLineCorrection();
+
+      return;
+    }
+
 
     await runAction(
       () =>
         addRepairJobLine({
-          jobId: selectedJob.id,
+          jobId:
+            selectedJob.id,
+
           lineType,
-          description: lineDescription,
+
+          description:
+            lineDescription,
+
           quantity,
+
           unitPrice,
-          inventoryItemId: lineType === "part" ? lineInventoryItemId : null,
+
+          inventoryItemId:
+            lineType ===
+            "part"
+              ? lineInventoryItemId
+              : null,
         }),
       "Repair/service line added."
     );
 
-    setLineDescription("");
-    setLineQuantity("1");
-    setLineUnitPrice("");
-    setLineInventoryItemId("");
+
+    setLineDescription(
+      ""
+    );
+
+    setLineQuantity(
+      "1"
+    );
+
+    setLineUnitPrice(
+      ""
+    );
+
+    setLineInventoryItemId(
+      ""
+    );
   }
 
   async function collectJob() {
@@ -1852,7 +2043,7 @@ export default function RepairScannerPage() {
                       {jobLines.map((line) => (
                         <div
                           key={line.id}
-                          className="grid gap-2 rounded-xl border p-3 text-sm sm:grid-cols-[110px_1fr_auto] sm:items-center"
+                          className="grid gap-2 rounded-xl border p-3 text-sm sm:grid-cols-[110px_1fr_auto_auto] sm:items-center"
                         >
                           <span className="font-semibold capitalize">{line.line_type}</span>
                           <div>
@@ -1862,6 +2053,30 @@ export default function RepairScannerPage() {
                             </p>
                           </div>
                           <span className="font-bold">{money(line.line_total)}</span>
+
+                          {isOwner &&
+                            !selectedJob.invoice_number &&
+                            ![
+                              "closed",
+                              "collected",
+                              "cancelled",
+                            ].includes(
+                              selectedJob.status
+                            ) && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              disabled={busy}
+                              onClick={() =>
+                                beginLineCorrection(
+                                  line
+                                )
+                              }
+                            >
+                              Correct
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1871,7 +2086,16 @@ export default function RepairScannerPage() {
                     </p>
                   )}
 
-                  {selectedJob.status === "in_progress" && can("repair.update") && (
+                  {(
+                    (
+                      selectedJob.status === "in_progress" &&
+                      can("repair.update")
+                    ) ||
+                    (
+                      isOwner &&
+                      editingLineId !== null
+                    )
+                  ) && (
                     <div className="mt-5 border-t pt-5">
                       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                         <label className="space-y-1.5 text-sm">
@@ -1942,6 +2166,26 @@ export default function RepairScannerPage() {
                         </div>
                       )}
 
+                      {editingLineId && (
+                        <label className="mt-4 block space-y-1.5 text-sm">
+                          <span className="font-medium">
+                            Owner correction reason *
+                          </span>
+
+                          <textarea
+                            className={fieldClass()}
+                            rows={3}
+                            value={lineCorrectionReason}
+                            onChange={(event) =>
+                              setLineCorrectionReason(
+                                event.target.value
+                              )
+                            }
+                            placeholder="Explain what was recorded incorrectly and why it is being corrected."
+                          />
+                        </label>
+                      )}
+
                       <div className="mt-4 flex flex-wrap justify-end gap-2">
                         <Button
                           type="button"
@@ -1950,13 +2194,31 @@ export default function RepairScannerPage() {
                           onClick={() => void addLine()}
                         >
                           <Plus className="mr-2 h-4 w-4" />
-                          Add Work Line
+                          {editingLineId
+                            ? "Save Owner Correction"
+                            : "Add Work Line"}
                         </Button>
+
+                        {editingLineId && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={busy}
+                            onClick={
+                              cancelLineCorrection
+                            }
+                          >
+                            Cancel correction
+                          </Button>
+                        )}
 
                         {can("repair.complete") && (
                           <Button
                             type="button"
-                            disabled={busy}
+                            disabled={
+                              busy ||
+                              editingLineId !== null
+                            }
                             className="bg-blue-600 text-white hover:bg-blue-700"
                             onClick={() =>
                               void runAction(

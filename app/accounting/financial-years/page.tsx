@@ -255,125 +255,121 @@ export default function FinancialYearsPage() {
     useState("");
 
 
-  async function loadData() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
+  function loadData() {
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        setLoading(true);
+        setErrorMessage("");
 
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
 
-      if (!user) {
-        router.replace(
-          "/login"
-        );
+        if (!user) {
+          router.replace(
+            "/login"
+          );
 
-        return;
-      }
+          return;
+        }
 
-      const {
-        data: profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-      const currentCompanyId =
-        profile.company_id;
-
-      setCompanyId(
-        currentCompanyId
-      );
-
-      /*
-       * This also ensures the financial year
-       * containing today's date becomes current/open.
-       */
-      await getAccountingOverview();
-
-      const [
-        companyResult,
-        yearResult,
-        periodResult,
-      ] =
-        await Promise.all([
-          supabase
+        const {
+          data: profile,
+          error:
+            profileError,
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              currentCompanyId
+              "user_id",
+              user.id
             )
-            .single(),
+            .single();
 
-          getAccountingFinancialYears(
-            currentCompanyId
-          ),
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
-          getAccountingPeriods(
-            currentCompanyId
-          ),
-        ]);
+        const currentCompanyId =
+          profile.company_id;
 
-      if (
-        companyResult.error
-      ) {
-        throw new Error(
-          companyResult
-            .error.message
+        setCompanyId(
+          currentCompanyId
         );
-      }
 
-      setCompanyName(
-        companyResult
-          .data.company_name
-      );
+        /*
+         * This also ensures the financial year
+         * containing today's date becomes current/open.
+         */
+        await getAccountingOverview();
 
-      setYears(
-        yearResult
-      );
+        const [
+          companyResult,
+          yearResult,
+          periodResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                currentCompanyId
+              )
+              .single(),
 
-      setPeriods(
-        periodResult
-      );
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Financial years could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
+            getAccountingFinancialYears(
+              currentCompanyId
+            ),
+
+            getAccountingPeriods(
+              currentCompanyId
+            ),
+          ]);
+
+        if (
+          companyResult.error
+        ) {
+          throw new Error(
+            companyResult
+              .error.message
+          );
+        }
+
+        setCompanyName(
+          companyResult
+            .data.company_name
+        );
+
+        setYears(
+          yearResult
+        );
+
+        setPeriods(
+          periodResult
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Financial years could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
 
@@ -385,7 +381,6 @@ export default function FinancialYearsPage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
@@ -616,7 +611,7 @@ export default function FinancialYearsPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>
@@ -812,7 +807,7 @@ export default function FinancialYearsPage() {
 
             <p className="mt-2 text-sm text-muted-foreground">
               Nexus could not identify a financial
-              year containing today's date.
+              year containing today&apos;s date.
             </p>
           </div>
         )}

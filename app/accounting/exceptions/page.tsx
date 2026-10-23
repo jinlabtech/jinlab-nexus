@@ -147,109 +147,107 @@ export default function AccountingExceptionsPage() {
   ] = useState("");
 
 
-  async function loadData(
+  function loadData(
     silent = false
   ) {
-    try {
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (silent) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
 
-      setErrorMessage("");
+        setErrorMessage("");
 
-      const {
-        data: { user },
-      } =
-        await supabase.auth
-          .getUser();
 
-      if (!user) {
-        router.replace(
-          "/login"
-        );
-        return;
-      }
+        if (!user) {
+          router.replace(
+            "/login"
+          );
+          return;
+        }
 
-      const {
-        data: profile,
-        error: profileError,
-      } =
-        await supabase
-          .from("user_profile")
-          .select("company_id")
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-      const currentCompanyId =
-        profile.company_id;
-
-      setCompanyId(
-        currentCompanyId
-      );
-
-      const [
-        companyResult,
-        exceptionResult,
-      ] =
-        await Promise.all([
-          supabase
-            .from("company")
-            .select(
-              "company_name"
-            )
+        const {
+          data: profile,
+          error: profileError,
+        } =
+          await supabase
+            .from("user_profile")
+            .select("company_id")
             .eq(
-              "id",
-              currentCompanyId
+              "user_id",
+              user.id
             )
-            .single(),
+            .single();
 
-          getAccountingPostingExceptions(
-            currentCompanyId,
-            statusFilter
-          ),
-        ]);
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
-      if (
-        companyResult.error
-      ) {
-        throw new Error(
-          companyResult
-            .error.message
+        const currentCompanyId =
+          profile.company_id;
+
+        setCompanyId(
+          currentCompanyId
         );
-      }
 
-      setCompanyName(
-        companyResult.data
-          .company_name
-      );
+        const [
+          companyResult,
+          exceptionResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from("company")
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                currentCompanyId
+              )
+              .single(),
 
-      setExceptions(
-        exceptionResult
-      );
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Accounting exceptions could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+            getAccountingPostingExceptions(
+              currentCompanyId,
+              statusFilter
+            ),
+          ]);
+
+        if (
+          companyResult.error
+        ) {
+          throw new Error(
+            companyResult
+              .error.message
+          );
+        }
+
+        setCompanyName(
+          companyResult.data
+            .company_name
+        );
+
+        setExceptions(
+          exceptionResult
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Accounting exceptions could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   }
 
 
@@ -261,7 +259,6 @@ export default function AccountingExceptionsPage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
@@ -398,7 +395,7 @@ export default function AccountingExceptionsPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>

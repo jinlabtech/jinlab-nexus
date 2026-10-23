@@ -41,19 +41,14 @@ create table if not exists public.invoice_payment_link (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-
 create index if not exists invoice_payment_link_company_idx
   on public.invoice_payment_link(company_id);
-
 create index if not exists invoice_payment_link_invoice_idx
   on public.invoice_payment_link(invoice_id);
-
 create index if not exists invoice_payment_link_plan_idx
   on public.invoice_payment_link(payment_plan_id);
-
 create index if not exists invoice_payment_link_status_idx
   on public.invoice_payment_link(status);
-
 create table if not exists public.payment_gateway_transaction (
   id uuid primary key default gen_random_uuid(),
 
@@ -103,43 +98,32 @@ create table if not exists public.payment_gateway_transaction (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-
 create unique index if not exists payment_gateway_provider_transaction_idx
   on public.payment_gateway_transaction(
     provider,
     provider_transaction_id
   )
   where provider_transaction_id is not null;
-
 create index if not exists payment_gateway_company_idx
   on public.payment_gateway_transaction(company_id);
-
 create index if not exists payment_gateway_invoice_idx
   on public.payment_gateway_transaction(invoice_id);
-
 create index if not exists payment_gateway_link_idx
   on public.payment_gateway_transaction(payment_link_id);
-
 create index if not exists payment_gateway_status_idx
   on public.payment_gateway_transaction(status);
-
 alter table public.invoice_payment
   add column if not exists gateway_transaction_id uuid null
   references public.payment_gateway_transaction(id)
   on delete set null;
-
 alter table public.invoice_payment
   add column if not exists gateway_provider text null;
-
 create index if not exists invoice_payment_gateway_transaction_idx
   on public.invoice_payment(gateway_transaction_id);
-
 alter table public.invoice_payment_link enable row level security;
 alter table public.payment_gateway_transaction enable row level security;
-
 drop policy if exists "invoice_payment_link_select_company"
 on public.invoice_payment_link;
-
 create policy "invoice_payment_link_select_company"
 on public.invoice_payment_link
 for select
@@ -150,10 +134,8 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
 drop policy if exists "invoice_payment_link_insert_company"
 on public.invoice_payment_link;
-
 create policy "invoice_payment_link_insert_company"
 on public.invoice_payment_link
 for insert
@@ -164,10 +146,8 @@ with check (
     where up.user_id = auth.uid()
   )
 );
-
 drop policy if exists "invoice_payment_link_update_company"
 on public.invoice_payment_link;
-
 create policy "invoice_payment_link_update_company"
 on public.invoice_payment_link
 for update
@@ -185,10 +165,8 @@ with check (
     where up.user_id = auth.uid()
   )
 );
-
 drop policy if exists "payment_gateway_transaction_select_company"
 on public.payment_gateway_transaction;
-
 create policy "payment_gateway_transaction_select_company"
 on public.payment_gateway_transaction
 for select

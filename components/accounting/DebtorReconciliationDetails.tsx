@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -70,7 +72,11 @@ function statusLabel(
 }
 
 
-export default function DebtorReconciliationDetails({
+export default function DebtorReconciliationDetails(props: Props) {
+  return <DebtorReconciliationDetailsContent key={props.asOfDate} {...props} />;
+}
+
+function DebtorReconciliationDetailsContent({
   asOfDate,
   currency = "ZAR",
 }: Props) {
@@ -113,43 +119,45 @@ export default function DebtorReconciliationDetails({
     >(null);
 
 
-  async function load(
-    silent = false
-  ) {
-    try {
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
+  const requestVersion = useRef(0);
 
-      setErrorMessage("");
-
-      const data =
-        await getDebtorReconciliationDiagnostics(
-          asOfDate
-        );
-
+  const fetchData = useCallback(() => {
+    const version = ++requestVersion.current;
+    return getDebtorReconciliationDiagnostics(asOfDate).then((data) => {
+      if (version !== requestVersion.current)
+        return;
       setResult(data);
+    }).catch((error) => {
+      if (version !== requestVersion.current)
+        return;
+      setErrorMessage(error instanceof Error
+        ? error.message
+        : "Debtor reconciliation diagnostics could not be loaded.");
+    }).finally(() => {
+      if (version === requestVersion.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    });
+  }, [asOfDate]);
 
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Debtor reconciliation diagnostics could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+  async function load(silent = false) {
+    if (silent) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
     }
+    setErrorMessage("");
+    await fetchData();
   }
 
 
   useEffect(() => {
-    void load();
-  }, [
-    asOfDate,
-  ]);
+    void fetchData();
+    return () => {
+      requestVersion.current += 1;
+    };
+  }, [fetchData]);
 
 
   if (loading) {

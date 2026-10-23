@@ -185,114 +185,109 @@ export default function DebtorsPage() {
     useState("");
 
 
-  async function loadData(
+  function loadData(
     silent = false
   ) {
-    try {
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (silent) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
 
-      setErrorMessage("");
-
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
-
-      if (!user) {
-        router.replace(
-          "/login"
-        );
-        return;
-      }
+        setErrorMessage("");
 
 
-      const {
-        data: profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
+        if (!user) {
+          router.replace(
+            "/login"
+          );
+          return;
+        }
 
 
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        ageingResult,
-      ] =
-        await Promise.all([
-          supabase
-            .from("company")
+        const {
+          data: profile,
+          error:
+            profileError,
+        } =
+          await supabase
+            .from(
+              "user_profile"
+            )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
-
-          getDebtorAgeing(
-            asOfDate
-          ),
-        ]);
+            .single();
 
 
-      if (
-        companyResult.error
-      ) {
-        throw new Error(
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
+
+
+        const [
+          companyResult,
+          ageingResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from("company")
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
+
+            getDebtorAgeing(
+              asOfDate
+            ),
+          ]);
+
+
+        if (
+          companyResult.error
+        ) {
+          throw new Error(
+            companyResult
+              .error.message
+          );
+        }
+
+
+        setCompanyName(
           companyResult
-            .error.message
+            .data.company_name
         );
-      }
 
-
-      setCompanyName(
-        companyResult
-          .data.company_name
-      );
-
-      setAgeing(
-        ageingResult
-      );
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Debtor ageing could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+        setAgeing(
+          ageingResult
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Debtor ageing could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   }
 
 
@@ -304,7 +299,6 @@ export default function DebtorsPage() {
     }
 
     if (!canView) {
-      setLoading(false);
       return;
     }
 
@@ -402,7 +396,7 @@ export default function DebtorsPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
     return (
       <DashboardLayout>

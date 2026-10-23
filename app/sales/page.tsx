@@ -601,6 +601,9 @@ export default function SalesPage() {
             <div className="hidden md:block">
 
               <DataTable
+                key={searchTerm}
+                pageSize={25}
+                compact
                 headers={[
                   "Sales Order",
                   "Customer",

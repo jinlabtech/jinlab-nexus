@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -335,181 +336,132 @@ export default function AppearanceSettingsPage() {
     setErrorMessage,
   ] =
     useState("");
+  const loadSettings = useCallback(() => {
 
+    return supabase.auth
+      .getUser()
+      .then(async ({
+        data: {
+          user,
+        },
+      }) => {
+        if (!user) {
 
-  useEffect(
-    () => {
+          router.replace(
+            "/login"
+          );
 
-      if (
-        permissionsLoading
-      ) {
-        return;
-      }
+          return;
+        }
 
+        const {
+          data:
+          profile,
+          error:
+          profileError,
+        } =
+          await supabase
+            .from(
+              "user_profile"
+            )
+            .select(
+              "company_id"
+            )
+            .eq(
+              "user_id",
+              user.id
+            )
+            .single();
 
-      if (!canManage) {
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
+
+        const [
+          companyResult,
+          settingsResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
+
+            supabase.rpc(
+              "get_company_ui_settings"
+            ),
+          ]);
+
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
+
+        if (
+          settingsResult.error
+        ) {
+          throw settingsResult.error;
+        }
+
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
+        );
+
+        const settings =
+          settingsResult.data as UiSettings;
+
+        const personalTheme =
+          getNexusThemePreference() ??
+          settings.theme_key;
+
+        setCurrentTheme(
+          personalTheme
+        );
+
+        setSelectedTheme(
+          personalTheme
+        );
+      })
+      .catch((error) => {
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Appearance settings could not be loaded."
+        );
+
+      })
+      .finally(() => {
 
         setLoading(
           false
         );
+      });
 
-        return;
-      }
+  }, [router]);
 
+  useEffect(() => {
+    if (permissionsLoading || !(canManage)) return;
+    void loadSettings();
+  }, [permissionsLoading, canManage, loadSettings]);
 
-      void loadSettings();
-
-    },
-    [
-      permissionsLoading,
-      canManage,
-    ]
-  );
-
-
-  async function loadSettings() {
-
-    try {
-
-      setLoading(
-        true
-      );
-
-      setErrorMessage(
-        ""
-      );
-
-
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
-
-
-      if (!user) {
-
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
-          profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
-
-
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        settingsResult,
-      ] =
-        await Promise.all([
-          supabase
-            .from(
-              "company"
-            )
-            .select(
-              "company_name"
-            )
-            .eq(
-              "id",
-              profile.company_id
-            )
-            .single(),
-
-          supabase.rpc(
-            "get_company_ui_settings"
-          ),
-        ]);
-
-
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
-
-
-      if (
-        settingsResult.error
-      ) {
-        throw settingsResult.error;
-      }
-
-
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
-
-
-      const settings =
-        settingsResult.data as UiSettings;
-
-
-      const personalTheme =
-        getNexusThemePreference() ??
-        settings.theme_key;
-
-
-      setCurrentTheme(
-        personalTheme
-      );
-
-
-      setSelectedTheme(
-        personalTheme
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Appearance settings could not be loaded."
-      );
-
-    } finally {
-
-      setLoading(
-        false
-      );
-    }
-  }
 
 
   async function saveTheme() {
@@ -580,8 +532,7 @@ export default function AppearanceSettingsPage() {
 
 
   if (
-    permissionsLoading ||
-    loading
+    permissionsLoading || ((canManage) && loading)
   ) {
 
     return (

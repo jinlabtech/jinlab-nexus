@@ -733,7 +733,7 @@ export default function JinlabSignatureInvoice({
         </h3>
 
         <p className="mt-2 text-xs leading-5">
-          Goods and services are supplied subject to applicable consumer protection legislation and the seller's warranty terms. Warranty claims must be accompanied by proof of purchase. Physical or liquid damage is excluded unless otherwise stated.
+          Goods and services are supplied subject to applicable consumer protection legislation and the seller&apos;s warranty terms. Warranty claims must be accompanied by proof of purchase. Physical or liquid damage is excluded unless otherwise stated.
         </p>
       </section>
 

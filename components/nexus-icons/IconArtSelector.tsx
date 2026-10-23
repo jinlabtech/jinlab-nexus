@@ -39,9 +39,9 @@ const artStyles: ArtOption[] = [
     name: "Nexus Studio",
     badge: "Signature",
     description:
-      "Clean professional application illustrations with simple silhouettes, balanced proportions and restrained dimensional depth.",
+      "Clear line icons with distinct symbols for each application, sized for phones and desktops.",
     personality:
-      "Premium JINLAB",
+      "Lightweight JINLAB",
   },
 ];
 
@@ -134,9 +134,7 @@ export default function IconArtSelector() {
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Choose how Nexus applications are illustrated.
-            Artwork controls form and dimensional character.
-            Material is selected separately below.
+            Clear symbols make applications easier to recognise on every screen. Choose a colour style below.
           </p>
 
         </div>

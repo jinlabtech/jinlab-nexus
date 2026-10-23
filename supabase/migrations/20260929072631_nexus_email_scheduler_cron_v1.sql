@@ -1,3 +1,4 @@
+
 create or replace function public.nexus_email_scheduler_tick()
 returns bigint
 language plpgsql
@@ -53,3 +54,4 @@ select cron.schedule(
   '*/5 * * * *',
   'select public.nexus_email_scheduler_tick();'
 );
+;

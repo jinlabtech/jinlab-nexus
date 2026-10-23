@@ -1,0 +1,34 @@
+/* One SVG per application, shared by phone and desktop. */
+.nexus-icon.nexus-icon {
+  display: inline-grid; place-items: center; flex: 0 0 auto;
+  position: relative; overflow: hidden; vertical-align: middle;
+  border: 1px solid transparent; border-radius: .6rem;
+  background: #1769aa !important; color: #fff !important;
+  box-shadow: none !important; filter: none !important;
+  transform: none !important; animation: none !important; transition: none !important;
+}
+.nexus-icon.nexus-icon::before, .nexus-icon.nexus-icon::after { content: none !important; }
+.nexus-icon--sm { width: 1.65rem; height: 1.65rem; }
+.nexus-icon--md { width: 2.15rem; height: 2.15rem; }
+.nexus-icon--sidebar { width: 2rem; height: 2rem; }
+.nexus-icon--lg { width: 3.25rem; height: 3.25rem; }
+.nexus-icon > .nexus-icon__glyph {
+  display: block; width: 64%; height: 64%; padding: 0;
+  color: inherit !important; background: none !important;
+  filter: none !important; box-shadow: none !important; transform: none !important;
+}
+.nexus-icon.is-active { border-color: currentColor; outline: 2px solid var(--primary); outline-offset: 2px; }
+:where([data-nexus-icon-style="ceramic"], [data-preview-icon-style="ceramic"]) .nexus-icon.nexus-icon { background: #e6eef8 !important; color: #175388 !important; border-color: #a9bfd6; }
+:where([data-nexus-icon-style="titanium"], [data-preview-icon-style="titanium"]) .nexus-icon.nexus-icon { background: #293849 !important; color: #fff !important; }
+:where([data-nexus-icon-style="aurora"], [data-preview-icon-style="aurora"]) .nexus-icon.nexus-icon { background: #6841b0 !important; color: #fff !important; }
+:where([data-nexus-icon-style="mono"], [data-preview-icon-style="mono"]) .nexus-icon.nexus-icon { background: var(--secondary) !important; color: var(--secondary-foreground) !important; border-color: var(--border); }
+/* Settings stay usable without the retired artwork stylesheets. */
+.nexus-icon-settings { padding: 1.25rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--card); color: var(--card-foreground); }
+.nexus-icon-settings__header, .nexus-icon-style-card__top { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+.nexus-icon-style-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: .75rem; margin-top: 1rem; }
+.nexus-icon-style-card { padding: 1rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--card); color: var(--card-foreground); }
+.nexus-icon-style-card.is-selected { border-color: var(--primary); outline: 1px solid var(--primary); }
+.nexus-icon-style-card:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.nexus-icon-style-card__badge { font-size: .75rem; color: var(--muted-foreground); }
+.nexus-icon-style-card__check { color: var(--primary); }
+.nexus-icon-preview { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }

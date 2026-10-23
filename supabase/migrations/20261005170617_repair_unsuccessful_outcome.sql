@@ -187,3 +187,4 @@ begin
   return jsonb_build_object('ok',true,'id',p_job_id,'status','closed','auto_closed',true);
 end;
 $function$;
+;

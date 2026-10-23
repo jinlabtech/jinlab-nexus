@@ -217,7 +217,6 @@ begin
   );
 end;
 $$;
-
 revoke all
 on function public.create_public_gateway_transaction(
   text,
@@ -227,7 +226,6 @@ on function public.create_public_gateway_transaction(
   text
 )
 from public;
-
 grant execute
 on function public.create_public_gateway_transaction(
   text,

@@ -23,23 +23,17 @@ create table if not exists public.audit_log (
 
   created_at timestamptz not null default now()
 );
-
 -- Improve common audit-log searches.
 create index if not exists audit_log_company_id_idx
   on public.audit_log(company_id);
-
 create index if not exists audit_log_user_id_idx
   on public.audit_log(user_id);
-
 create index if not exists audit_log_module_idx
   on public.audit_log(module);
-
 create index if not exists audit_log_created_at_idx
   on public.audit_log(created_at desc);
-
 -- Enable Row Level Security.
 alter table public.audit_log enable row level security;
-
 -- Users may view audit records belonging to their own company.
 create policy "Users can view their company audit logs"
 on public.audit_log
@@ -52,7 +46,6 @@ using (
     where user_profile.user_id = auth.uid()
   )
 );
-
 -- Users may create audit records only for their own company.
 create policy "Users can create their company audit logs"
 on public.audit_log
@@ -66,6 +59,5 @@ with check (
     where user_profile.user_id = auth.uid()
   )
 );
-
 -- Audit records are intentionally not editable or deletable
--- through the application.
+-- through the application.;

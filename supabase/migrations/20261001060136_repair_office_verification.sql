@@ -22,3 +22,4 @@ begin
 end $$;
 revoke all on function public.repair_verify_handover_in_person(uuid,text,boolean) from public,anon;
 grant execute on function public.repair_verify_handover_in_person(uuid,text,boolean) to authenticated;
+;

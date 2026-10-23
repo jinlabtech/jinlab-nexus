@@ -326,17 +326,12 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.get_public_payment_link(text)
 from public;
-
 grant execute
 on function public.get_public_payment_link(text)
 to anon, authenticated;
-
-
 -- ============================================================
 -- Payment-plan aware gateway transaction initiation
 -- ============================================================
@@ -742,8 +737,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.create_public_gateway_transaction(
   text,
@@ -753,7 +746,6 @@ on function public.create_public_gateway_transaction(
   text
 )
 from public;
-
 grant execute
 on function public.create_public_gateway_transaction(
   text,

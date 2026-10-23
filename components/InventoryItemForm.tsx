@@ -3,7 +3,6 @@
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
-  useEffect,
   useState,
 } from "react";
 
@@ -40,7 +39,11 @@ type InventoryItemFormProps = {
   onCancel: () => void;
 };
 
-export default function InventoryItemForm({
+export default function InventoryItemForm(props: InventoryItemFormProps) {
+  return <InventoryItemFormFields key={props.item?.id ?? "new"} {...props} />;
+}
+
+function InventoryItemFormFields({
   item,
   categories,
   suppliers,
@@ -51,31 +54,31 @@ export default function InventoryItemForm({
   const isEditing = Boolean(item);
 
   const [itemName, setItemName] =
-    useState("");
+    useState(item?.item_name ?? "");
 
   const [sku, setSku] =
-    useState("");
+    useState(item?.sku ?? "");
 
   const [barcode, setBarcode] =
-    useState("");
+    useState(item?.barcode ?? "");
 
   const [categoryId, setCategoryId] =
-    useState("");
+    useState(item?.category_id ?? "");
 
   const [supplierId, setSupplierId] =
-    useState("");
+    useState(item?.supplier_id ?? "");
 
   const [description, setDescription] =
-    useState("");
+    useState(item?.description ?? "");
 
   const [costPrice, setCostPrice] =
-    useState("0");
+    useState(item ? String(item.cost_price) : "0");
 
   const [sellingPrice, setSellingPrice] =
-    useState("0");
+    useState(item ? String(item.selling_price) : "0");
 
   const [minimumStock, setMinimumStock] =
-    useState("0");
+    useState(item ? String(item.minimum_stock) : "0");
 
   const [branchId, setBranchId] =
     useState("");
@@ -88,54 +91,6 @@ export default function InventoryItemForm({
 
   const [errorMessage, setErrorMessage] =
     useState("");
-
-  useEffect(() => {
-    setItemName(
-      item?.item_name ?? ""
-    );
-
-    setSku(
-      item?.sku ?? ""
-    );
-
-    setBarcode(
-      item?.barcode ?? ""
-    );
-
-    setCategoryId(
-      item?.category_id ?? ""
-    );
-
-    setSupplierId(
-      item?.supplier_id ?? ""
-    );
-
-    setDescription(
-      item?.description ?? ""
-    );
-
-    setCostPrice(
-      item
-        ? String(item.cost_price)
-        : "0"
-    );
-
-    setSellingPrice(
-      item
-        ? String(item.selling_price)
-        : "0"
-    );
-
-    setMinimumStock(
-      item
-        ? String(item.minimum_stock)
-        : "0"
-    );
-
-    setBranchId("");
-    setInitialStock("0");
-    setErrorMessage("");
-  }, [item]);
 
   function generateSku() {
     const cleanedName =

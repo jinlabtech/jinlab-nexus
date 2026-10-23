@@ -37,8 +37,6 @@ create table if not exists public.company_profile_settings (
   updated_by uuid references auth.users(id),
   updated_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 2. DOCUMENT / BRANDING SETTINGS
 -- This is DIFFERENT from company profile.
@@ -74,8 +72,6 @@ create table if not exists public.company_document_settings (
   updated_by uuid references auth.users(id),
   updated_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 3. FINANCE SETTINGS
 -- Company-wide financial behaviour.
@@ -148,8 +144,6 @@ create table if not exists public.company_finance_settings (
   updated_by uuid references auth.users(id),
   updated_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 4. ACCOUNTING AUTOMATION SETTINGS
 -- Foundation for Nexus Accountant.
@@ -221,8 +215,6 @@ create table if not exists public.company_accounting_settings (
   updated_by uuid references auth.users(id),
   updated_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 5. BRANCH POLICY SETTINGS
 -- Company-wide rules governing branch behaviour.
@@ -271,8 +263,6 @@ create table if not exists public.company_branch_settings (
   updated_by uuid references auth.users(id),
   updated_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 6. SECURITY / GOVERNANCE SETTINGS
 -- ============================================================
@@ -308,8 +298,6 @@ create table if not exists public.company_security_settings (
   updated_by uuid references auth.users(id),
   updated_at timestamptz not null default now()
 );
-
-
 -- ============================================================
 -- 7. BANK ACCOUNTS
 -- Multiple real bank accounts per company.
@@ -347,13 +335,9 @@ create table if not exists public.company_bank_account (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-
-
 create index if not exists
 company_bank_account_company_id_idx
 on public.company_bank_account(company_id);
-
-
 -- ============================================================
 -- 8. SETTINGS CHANGE LOG
 -- Administrative configuration audit history.
@@ -375,16 +359,12 @@ create table if not exists public.settings_change_log (
 
   details jsonb not null default '{}'::jsonb
 );
-
-
 create index if not exists
 settings_change_log_company_id_idx
 on public.settings_change_log(
   company_id,
   changed_at desc
 );
-
-
 -- ============================================================
 -- 9. AUTOMATIC updated_at
 -- ============================================================
@@ -399,68 +379,48 @@ begin
   return new;
 end;
 $$;
-
-
 drop trigger if exists
 company_profile_settings_touch
 on public.company_profile_settings;
-
 create trigger company_profile_settings_touch
 before update on public.company_profile_settings
 for each row
 execute function public.touch_company_setting();
-
-
 drop trigger if exists
 company_document_settings_touch
 on public.company_document_settings;
-
 create trigger company_document_settings_touch
 before update on public.company_document_settings
 for each row
 execute function public.touch_company_setting();
-
-
 drop trigger if exists
 company_finance_settings_touch
 on public.company_finance_settings;
-
 create trigger company_finance_settings_touch
 before update on public.company_finance_settings
 for each row
 execute function public.touch_company_setting();
-
-
 drop trigger if exists
 company_accounting_settings_touch
 on public.company_accounting_settings;
-
 create trigger company_accounting_settings_touch
 before update on public.company_accounting_settings
 for each row
 execute function public.touch_company_setting();
-
-
 drop trigger if exists
 company_branch_settings_touch
 on public.company_branch_settings;
-
 create trigger company_branch_settings_touch
 before update on public.company_branch_settings
 for each row
 execute function public.touch_company_setting();
-
-
 drop trigger if exists
 company_security_settings_touch
 on public.company_security_settings;
-
 create trigger company_security_settings_touch
 before update on public.company_security_settings
 for each row
 execute function public.touch_company_setting();
-
-
 -- ============================================================
 -- 10. DEFAULT SETTINGS FOR EXISTING COMPANIES
 -- ============================================================
@@ -474,8 +434,6 @@ select
   company_name
 from public.company
 on conflict (company_id) do nothing;
-
-
 insert into public.company_document_settings (
   company_id,
   logo_path,
@@ -489,8 +447,6 @@ select
   document_footer
 from public.company
 on conflict (company_id) do nothing;
-
-
 insert into public.company_finance_settings (
   company_id,
   vat_registered,
@@ -502,32 +458,24 @@ select
   vat_number
 from public.company
 on conflict (company_id) do nothing;
-
-
 insert into public.company_accounting_settings (
   company_id
 )
 select id
 from public.company
 on conflict (company_id) do nothing;
-
-
 insert into public.company_branch_settings (
   company_id
 )
 select id
 from public.company
 on conflict (company_id) do nothing;
-
-
 insert into public.company_security_settings (
   company_id
 )
 select id
 from public.company
 on conflict (company_id) do nothing;
-
-
 -- ============================================================
 -- 11. ROW LEVEL SECURITY
 -- READ: settings.view
@@ -538,29 +486,20 @@ on conflict (company_id) do nothing;
 
 alter table public.company_profile_settings
 enable row level security;
-
 alter table public.company_document_settings
 enable row level security;
-
 alter table public.company_finance_settings
 enable row level security;
-
 alter table public.company_accounting_settings
 enable row level security;
-
 alter table public.company_branch_settings
 enable row level security;
-
 alter table public.company_security_settings
 enable row level security;
-
 alter table public.company_bank_account
 enable row level security;
-
 alter table public.settings_change_log
 enable row level security;
-
-
 -- ============================================================
 -- COMPANY MEMBERSHIP READ POLICIES
 -- ============================================================
@@ -575,8 +514,6 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
-
 create policy "company members read document settings"
 on public.company_document_settings
 for select
@@ -587,8 +524,6 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
-
 create policy "company members read finance settings"
 on public.company_finance_settings
 for select
@@ -599,8 +534,6 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
-
 create policy "company members read accounting settings"
 on public.company_accounting_settings
 for select
@@ -611,8 +544,6 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
-
 create policy "company members read branch settings"
 on public.company_branch_settings
 for select
@@ -623,8 +554,6 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
-
 create policy "company members read security settings"
 on public.company_security_settings
 for select
@@ -635,8 +564,6 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
-
 create policy "company members read bank accounts"
 on public.company_bank_account
 for select
@@ -647,8 +574,6 @@ using (
     where up.user_id = auth.uid()
   )
 );
-
-
 create policy "company members read settings history"
 on public.settings_change_log
 for select
@@ -659,4 +584,3 @@ using (
     where up.user_id = auth.uid()
   )
 );
-

@@ -27,8 +27,6 @@ on conflict (
   permission_name
 )
 do nothing;
-
-
 insert into public.role_permissions (
   role_id,
   permission_id
@@ -50,8 +48,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- 2. SALES ORDER PAYMENT
 -- ============================================================
@@ -104,8 +100,6 @@ public.sales_order_payment (
   created_at timestamptz not null
     default now()
 );
-
-
 create index if not exists
 sales_order_payment_order_idx
 on public.sales_order_payment (
@@ -114,8 +108,6 @@ on public.sales_order_payment (
   payment_date,
   created_at
 );
-
-
 create index if not exists
 sales_order_payment_customer_idx
 on public.sales_order_payment (
@@ -123,8 +115,6 @@ on public.sales_order_payment (
   customer_id,
   payment_date
 );
-
-
 -- ============================================================
 -- 3. RLS
 -- ============================================================
@@ -132,13 +122,9 @@ on public.sales_order_payment (
 alter table
 public.sales_order_payment
 enable row level security;
-
-
 drop policy if exists
 "company users view sales order payments"
 on public.sales_order_payment;
-
-
 create policy
 "company users view sales order payments"
 on public.sales_order_payment
@@ -148,18 +134,12 @@ using (
   company_id =
     public.current_company_id()
 );
-
-
 grant select
 on public.sales_order_payment
 to authenticated;
-
-
 revoke insert, update, delete
 on public.sales_order_payment
 from authenticated;
-
-
 -- ============================================================
 -- 4. RECORD ACTUAL PAYMENT
 --
@@ -381,8 +361,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.record_sales_order_payment(
@@ -394,8 +372,6 @@ public.record_sales_order_payment(
   text
 )
 from public;
-
-
 grant execute
 on function
 public.record_sales_order_payment(
@@ -407,8 +383,6 @@ public.record_sales_order_payment(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- 5. PAYMENT SUMMARY
 -- ============================================================
@@ -570,20 +544,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_sales_order_payment_summary(uuid)
 from public;
-
-
 grant execute
 on function
 public.get_sales_order_payment_summary(uuid)
 to authenticated;
-
-
 -- ============================================================
 -- 6. PROTECT PAYMENT EVIDENCE
 --
@@ -617,13 +585,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 protect_sales_order_payment_trigger
 on public.sales_order_payment;
-
-
 create trigger
 protect_sales_order_payment_trigger
 before update or delete
@@ -631,8 +595,6 @@ on public.sales_order_payment
 for each row
 execute function
 public.protect_sales_order_payment();
-
-
 -- ============================================================
 -- 7. LOCK COMMERCIAL DETAILS AFTER PAYMENT BEGINS
 --
@@ -696,13 +658,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 protect_paid_sales_order_header_trigger
 on public.sales_order;
-
-
 create trigger
 protect_paid_sales_order_header_trigger
 before update
@@ -710,8 +668,6 @@ on public.sales_order
 for each row
 execute function
 public.protect_paid_sales_order_header();
-
-
 -- ============================================================
 -- 8. LOCK ITEMS AFTER PAYMENT BEGINS
 --
@@ -773,13 +729,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 protect_paid_sales_order_items_trigger
 on public.sales_order_item;
-
-
 create trigger
 protect_paid_sales_order_items_trigger
 before insert or update or delete
@@ -787,8 +739,6 @@ on public.sales_order_item
 for each row
 execute function
 public.protect_paid_sales_order_items();
-
-
 -- ============================================================
 -- 9. PREVENT PAY-NOW / PREPAID INVOICE CONVERSION
 --    UNTIL FULL PAYMENT EVIDENCE EXISTS
@@ -895,13 +845,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 enforce_sales_order_payment_before_invoice_trigger
 on public.invoice;
-
-
 create trigger
 enforce_sales_order_payment_before_invoice_trigger
 before insert
@@ -909,8 +855,6 @@ on public.invoice
 for each row
 execute function
 public.enforce_sales_order_payment_before_invoice();
-
-
 -- ============================================================
 -- 10. UPDATE PAYMENT BASIS SETTER
 --
@@ -1013,8 +957,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.set_sales_order_payment_basis(
@@ -1022,8 +964,6 @@ public.set_sales_order_payment_basis(
   text
 )
 from public;
-
-
 grant execute
 on function
 public.set_sales_order_payment_basis(
@@ -1031,8 +971,6 @@ public.set_sales_order_payment_basis(
   text
 )
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

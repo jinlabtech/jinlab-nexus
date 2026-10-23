@@ -1,5 +1,4 @@
-import NexusIllustration from "@/components/nexus-icons/NexusIllustration";
-
+import { BadgeCheck, Banknote, Barcode, Boxes, Building2, Calculator, CalendarCheck, ChartColumn, ChartNoAxesCombined, ClipboardCheck, ClipboardList, Clock, ContactRound, FileCheck2, FileText, HandCoins, History, LayoutDashboard, Mail, MapPin, MessageCircle, Network, Orbit, Package, PackagePlus, Plug, Receipt, ScanLine, Send, Settings, ShieldCheck, ShoppingBag, ShoppingCart, SlidersHorizontal, Sparkles, Tags, Trash2, Truck, Undo2, UserRoundCog, UsersRound, Wallet, Wrench, type LucideIcon } from "lucide-react";
 
 const names = new Set([
   "dashboard",
@@ -139,30 +138,53 @@ export function canonicalNexusIconName(
 }
 
 
-export default function NexusGlyph({
-  name,
-  className = "",
-}: {
-  name: string;
-  className?: string;
-}) {
-  const resolved =
-    canonicalNexusIconName(
-      name
-    );
+const glyphs: Record<string, LucideIcon> = {
+  "dashboard": LayoutDashboard,
+  "email": Mail,
+  "email-sent": Send,
+  "whatsapp": MessageCircle,
+  "timebook": Clock,
+  "shipping": Truck,
+  "shipping-shipments": Package,
+  "shipping-history": History,
+  "shipping-new": PackagePlus,
+  "shipping-tracking": MapPin,
+  "shipping-connections": Plug,
+  "sales": ChartNoAxesCombined,
+  "customers": ContactRound,
+  "quotations": FileText,
+  "sales-orders": ClipboardList,
+  "invoices": FileCheck2,
+  "pos": ShoppingCart,
+  "pos-approvals": BadgeCheck,
+  "pos-receipts": Receipt,
+  "pos-cash-up": Banknote,
+  "pos-pricing": Tags,
+  "pos-returns": Undo2,
+  "repairs": Wrench,
+  "inventory": Boxes,
+  "inventory-scanner": ScanLine,
+  "inventory-barcodes": Barcode,
+  "purchasing": ShoppingBag,
+  "finance": Wallet,
+  "accounting": Calculator,
+  "payroll": HandCoins,
+  "payroll-runs": CalendarCheck,
+  "payroll-compliance": ClipboardCheck,
+  "hr": UsersRound,
+  "users": UserRoundCog,
+  "companies": Building2,
+  "branches": Network,
+  "reports": ChartColumn,
+  "administration": SlidersHorizontal,
+  "security": ShieldCheck,
+  "settings": Settings,
+  "recycle": Trash2,
+  "ai": Sparkles,
+  "core": Orbit,
+};
 
-
-  return (
-    <span
-      className={[
-        "nexus-illustration",
-        className,
-      ].join(" ")}
-      aria-hidden="true"
-    >
-      <NexusIllustration
-        name={resolved}
-      />
-    </span>
-  );
+export default function NexusGlyph({ name, className = "" }: { name: string; className?: string }) {
+  const Glyph = glyphs[canonicalNexusIconName(name)] ?? Orbit;
+  return <Glyph className={`nexus-icon__glyph ${className}`} aria-hidden="true" strokeWidth={1.8} />;
 }

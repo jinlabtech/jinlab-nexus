@@ -1,0 +1,14 @@
+/* Desktop dashboard only; the phone home and document layouts are unchanged. */
+@media screen and (min-width: 768px) {
+  .nexus-desktop-dashboard-identity > header { padding-top: 12px !important; padding-bottom: 12px !important; min-height: 84px; }
+  .nexus-desktop-dashboard-identity [data-nexus-company-logo-frame="true"] { width: 110px !important; height: 48px !important; padding: 0 !important; }
+  .nexus-desktop-dashboard-identity [data-nexus-company-logo="true"] { max-width: 110px !important; max-height: 48px !important; object-fit: contain; }
+  .nexus-desktop-dashboard { min-width: 0; }
+  html[data-nexus-theme] .nexus-desktop-dashboard [data-slot="button"][data-variant="default"],
+  html[data-nexus-theme] .nexus-desktop-dashboard button[aria-pressed="true"] { background: var(--primary) !important; color: var(--primary-foreground) !important; border-color: var(--primary) !important; }
+  .nexus-desktop-dashboard [data-slot="button"] { min-height: 36px; }
+
+  .nexus-desktop-dashboard :is(section, article, button, a) { animation: none; text-shadow: none; }
+  .nexus-desktop-dashboard .nexus-dashboard-notifications { background: var(--popover) !important; color: var(--popover-foreground) !important; box-shadow: 0 8px 24px rgb(0 0 0 / .12) !important; }
+  .nexus-desktop-dashboard button:focus-visible, .nexus-desktop-dashboard a:focus-visible, .nexus-desktop-dashboard summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+}

@@ -12,7 +12,6 @@ check (
         'vat'
     )
 );
-
 alter table public.quotation_item
 add column if not exists discount_mode text
 not null default 'percentage'
@@ -22,14 +21,12 @@ check (
         'fixed'
     )
 );
-
 alter table public.quotation_item
 add column if not exists discount_value numeric(14,2)
 not null default 0
 check (
     discount_value >= 0
 );
-
 -- Keep old discount_rate temporarily for compatibility.
 -- New calculations will use discount_mode + discount_value.
 

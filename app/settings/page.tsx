@@ -12,7 +12,6 @@ import {
   CircleDollarSign,
   Layers3,
   Plug,
-  Palette,
   ShieldCheck,
   ShoppingCart,
   Users,

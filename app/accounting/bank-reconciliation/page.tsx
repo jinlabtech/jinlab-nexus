@@ -287,143 +287,130 @@ export default function BankReconciliationPage() {
     useState("");
 
 
-  async function loadWorkspace(
+  function loadWorkspace(
     silent = false
   ) {
-
-    try {
-
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-
-      setErrorMessage("");
+    return supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (silent) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
 
 
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth
-          .getUser();
+        setErrorMessage("");
 
 
-      if (!user) {
-        router.replace(
-          "/login"
-        );
 
-        return;
-      }
+        if (!user) {
+          router.replace(
+            "/login"
+          );
 
-
-      const {
-        data:
-          profile,
-        error:
-          profileError,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .single();
+          return;
+        }
 
 
-      if (
-        profileError ||
-        !profile?.company_id
-      ) {
-        throw new Error(
-          "Company profile could not be loaded."
-        );
-      }
-
-
-      const [
-        companyResult,
-        workspaceResult,
-      ] =
-        await Promise.all([
-          supabase
+        const {
+          data:
+            profile,
+          error:
+            profileError,
+        } =
+          await supabase
             .from(
-              "company"
+              "user_profile"
             )
             .select(
-              "company_name"
+              "company_id"
             )
             .eq(
-              "id",
-              profile.company_id
+              "user_id",
+              user.id
             )
-            .single(),
-
-          supabase.rpc(
-            "get_payment_clearing_workspace",
-            {
-              p_as_of_date:
-                today(),
-            }
-          ),
-        ]);
+            .single();
 
 
-      if (
-        companyResult.error
-      ) {
-        throw companyResult.error;
-      }
+        if (
+          profileError ||
+          !profile?.company_id
+        ) {
+          throw new Error(
+            "Company profile could not be loaded."
+          );
+        }
 
 
-      if (
-        workspaceResult.error
-      ) {
-        throw workspaceResult.error;
-      }
+        const [
+          companyResult,
+          workspaceResult,
+        ] =
+          await Promise.all([
+            supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .single(),
+
+            supabase.rpc(
+              "get_payment_clearing_workspace",
+              {
+                p_as_of_date:
+                  today(),
+              }
+            ),
+          ]);
 
 
-      setCompanyName(
-        companyResult.data
-          ?.company_name ??
-        "JINLAB Nexus"
-      );
+        if (
+          companyResult.error
+        ) {
+          throw companyResult.error;
+        }
 
 
-      setWorkspace(
-        workspaceResult.data as ClearingWorkspace
-      );
+        if (
+          workspaceResult.error
+        ) {
+          throw workspaceResult.error;
+        }
 
 
-      setSelectedIds(
-        []
-      );
+        setCompanyName(
+          companyResult.data
+            ?.company_name ??
+          "JINLAB Nexus"
+        );
 
-    } catch (
-      error
-    ) {
 
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Payment Clearing could not be loaded."
-      );
+        setWorkspace(
+          workspaceResult.data as ClearingWorkspace
+        );
 
-    } finally {
 
-      setLoading(false);
-      setRefreshing(false);
-    }
+        setSelectedIds(
+          []
+        );
+      })
+      .catch((error: unknown) => {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Payment Clearing could not be loaded."
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   }
 
 
@@ -438,7 +425,6 @@ export default function BankReconciliationPage() {
 
 
       if (!canView) {
-        setLoading(false);
         return;
       }
 
@@ -749,7 +735,7 @@ export default function BankReconciliationPage() {
 
   if (
     permissionsLoading ||
-    loading
+    (canView && loading)
   ) {
 
     return (

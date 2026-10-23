@@ -87,13 +87,10 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_accounting_exception_summary()
 from public;
-
 grant execute
 on function
 public.get_accounting_exception_summary()

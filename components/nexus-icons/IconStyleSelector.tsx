@@ -40,7 +40,7 @@ const styles: IconStyleOption[] = [
     id: "lumina",
     name: "Lumina",
     description:
-      "Polished luminous tiles with soft glass reflections and dimensional colour.",
+      "Clear blue tiles with high-contrast white symbols.",
     personality:
       "Signature JINLAB",
     badge:
@@ -50,7 +50,7 @@ const styles: IconStyleOption[] = [
     id: "ceramic",
     name: "Ceramic",
     description:
-      "Pearl-like sculpted surfaces with calm shadows and precision glyphs.",
+      "Quiet pale tiles with crisp blue symbols.",
     personality:
       "Soft luxury",
     badge:
@@ -60,7 +60,7 @@ const styles: IconStyleOption[] = [
     id: "titanium",
     name: "Titanium",
     description:
-      "Machined dark metal with restrained highlights and professional depth.",
+      "Solid dark tiles with bright symbols.",
     personality:
       "Industrial",
     badge:
@@ -70,7 +70,7 @@ const styles: IconStyleOption[] = [
     id: "aurora",
     name: "Aurora",
     description:
-      "Rich spectral light, layered colour and an expressive futuristic finish.",
+      "Violet tiles with clear white symbols.",
     personality:
       "Creative",
     badge:
@@ -80,7 +80,7 @@ const styles: IconStyleOption[] = [
     id: "mono",
     name: "Minimal",
     description:
-      "Clean adaptive material designed to preserve every application artwork in light and dark environments.",
+      "Theme-matched symbols on a simple neutral surface.",
     personality:
       "Focused",
     badge:
@@ -159,14 +159,11 @@ export default function IconStyleSelector() {
           </div>
 
           <h2 className="text-2xl font-bold tracking-tight">
-            Icon Material
+            Icon Colour
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Choose the physical surface used
-            around Nexus artwork. Application
-            illustrations remain unique while
-            material, reflection and finish change.
+            Choose a colour palette for the application icons. All styles use lightweight shapes without blur or animation.
           </p>
         </div>
 

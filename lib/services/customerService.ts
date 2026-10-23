@@ -1,3 +1,4 @@
+import { clientRequest } from "@/lib/clientRequest";
 import { supabase } from "@/lib/supabase";
 
 import type {
@@ -25,8 +26,18 @@ export async function getCustomers(
     );
   }
 
+  const customerLoadStart = performance.now();
+
   const { data, error } =
-    await query;
+    await clientRequest(query.abortSignal(AbortSignal.timeout(15_000)), "Customer loading timed out. Check your connection and retry.");
+
+  if (process.env.NODE_ENV === "development") {
+    console.info(
+      `[Nexus timing] Customers query: ${Math.round(
+        performance.now() - customerLoadStart
+      )}ms`
+    );
+  }
 
   if (error) {
     throw new Error(error.message);

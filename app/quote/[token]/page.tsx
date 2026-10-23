@@ -121,26 +121,25 @@ export default function PublicQuotationPage() {
 
   const loadQuotation =
     useCallback(
-      async () => {
-        try {
-          setLoading(true);
-          setError(null);
+      () => {
+        return getPublicQuotation(
+          token
+        )
+          .then(async (result) => {
+            setError(null);
 
-          const result =
-            await getPublicQuotation(
-              token
+            setData(result);
+          })
+          .catch((err) => {
+            setError(
+              err instanceof Error
+                ? err.message
+                : "Unable to load quotation."
             );
-
-          setData(result);
-        } catch (err) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Unable to load quotation."
-          );
-        } finally {
-          setLoading(false);
-        }
+          })
+          .finally(() => {
+            setLoading(false);
+          });
       },
       [token]
     );

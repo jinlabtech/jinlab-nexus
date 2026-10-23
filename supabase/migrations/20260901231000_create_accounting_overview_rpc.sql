@@ -316,19 +316,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_accounting_overview()
 from public;
-
 grant execute
 on function
 public.get_accounting_overview()
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

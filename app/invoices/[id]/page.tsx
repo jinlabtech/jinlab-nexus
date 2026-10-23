@@ -1,5 +1,7 @@
 "use client";
 
+import { useBrowserClock } from "@/lib/nexus/browser-storage";
+
 import ArrangeShippingLink from "@/components/ArrangeShippingLink";
 
 import {
@@ -27,7 +29,6 @@ import {
   getInvoice,
   updateInvoiceDetails,
   updateInvoiceItemFinancials,
-  getInvoiceChangeLog,
   updateInvoiceStatus,
   type UpdateInvoiceDetailsInput,
   type UpdateInvoiceItemFinancialsInput,
@@ -109,6 +110,7 @@ function formatStatus(
 }
 
 export default function InvoiceDetailPage() {
+  const currentTime = useBrowserClock();
   const params = useParams();
   const router = useRouter();
 
@@ -300,7 +302,7 @@ export default function InvoiceDetailPage() {
     }
   }
 
-  async function savePaymentLink() {
+  async function savePaymentLink(createdAt: number) {
     if (!invoice || !companyId) {
       return;
     }
@@ -351,7 +353,7 @@ export default function InvoiceDetailPage() {
         expiryDays === null
           ? null
           : new Date(
-              Date.now() +
+              createdAt +
                 expiryDays *
                   24 *
                   60 *
@@ -577,7 +579,6 @@ export default function InvoiceDetailPage() {
 
   const [
     invoiceChangeLog,
-    setInvoiceChangeLog,
   ] = useState<
     InvoiceChangeLog[]
   >([]);
@@ -625,7 +626,7 @@ export default function InvoiceDetailPage() {
           throw new Error(
             profileError
               ?.message ??
-              "Company could not be identified."
+            "Company could not be identified."
           );
         }
 
@@ -1900,7 +1901,7 @@ export default function InvoiceDetailPage() {
                 const expired =
                   Boolean(link.expires_at) &&
                   new Date(link.expires_at as string).getTime() <
-                    Date.now();
+                    (currentTime ?? Number.NEGATIVE_INFINITY);
 
                 const displayStatus =
                   link.status === "active" && expired
@@ -2194,7 +2195,7 @@ export default function InvoiceDetailPage() {
               <Button
                 type="button"
                 onClick={
-                  savePaymentLink
+                  () => void savePaymentLink(Date.now())
                 }
                 disabled={
                   actionLoading

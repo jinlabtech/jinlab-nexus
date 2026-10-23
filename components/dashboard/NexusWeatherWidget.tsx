@@ -63,6 +63,20 @@ type Position = {
     number;
 };
 
+function locateDevice(): Promise<Position> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Location is not available on this device."));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      result => resolve({ latitude: result.coords.latitude, longitude: result.coords.longitude }),
+      () => reject(new Error("Allow location access to show local weather.")),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 10 * 60 * 1000 },
+    );
+  });
+}
+
 export default function NexusWeatherWidget() {
   const [
     weather,
@@ -84,7 +98,7 @@ export default function NexusWeatherWidget() {
     loading,
     setLoading,
   ] =
-    useState(false);
+    useState(true);
 
   const [
     error,
@@ -150,71 +164,31 @@ export default function NexusWeatherWidget() {
       []
     );
 
-  const requestLocation =
-    useCallback(() => {
-      if (
-        typeof navigator ===
-          "undefined" ||
-        !navigator.geolocation
-      ) {
-        setError(
-          "Location is not available on this device."
-        );
-
-        return;
-      }
-
-      setLoading(true);
-      setError("");
-
-      navigator.geolocation
-        .getCurrentPosition(
-          (result) => {
-            const next = {
-              latitude:
-                result.coords
-                  .latitude,
-
-              longitude:
-                result.coords
-                  .longitude,
-            };
-
-            setPosition(
-              next
-            );
-
-            void loadWeather(
-              next
-            );
-          },
-
-          () => {
-            setLoading(
-              false
-            );
-
-            setError(
-              "Allow location access to show local weather."
-            );
-          },
-
-          {
-            enableHighAccuracy:
-              false,
-
-            timeout:
-              8000,
-
-            maximumAge:
-              10 * 60 * 1000,
-          }
-        );
-    }, [loadWeather]);
+  const requestLocation = useCallback(() => {
+    setLoading(true);
+    setError("");
+    void locateDevice().then(next => {
+      setPosition(next);
+      return loadWeather(next);
+    }).catch((failure: unknown) => {
+      setLoading(false);
+      setError(failure instanceof Error ? failure.message : "Location is unavailable.");
+    });
+  }, [loadWeather]);
 
   useEffect(() => {
-    requestLocation();
-  }, [requestLocation]);
+    let active = true;
+    void locateDevice().then(next => {
+      if (!active) return;
+      setPosition(next);
+      return loadWeather(next);
+    }).catch((failure: unknown) => {
+      if (!active) return;
+      setLoading(false);
+      setError(failure instanceof Error ? failure.message : "Location is unavailable.");
+    });
+    return () => { active = false; };
+  }, [loadWeather]);
 
   return (
     <article className="nexus-weather-widget rounded-2xl border bg-card p-4 text-card-foreground shadow-sm sm:p-5">

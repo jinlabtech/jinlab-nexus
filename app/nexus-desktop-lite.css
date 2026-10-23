@@ -1,0 +1,24 @@
+/* Desktop defaults favour low paint/compositing cost. Keep focus rings,
+   loading indicators, document styling and mobile interaction rules intact. */
+@media screen and (min-width: 768px) {
+  html[data-nexus-theme] body { background: var(--background) !important; }
+  html[data-nexus-theme] body::before,
+  html[data-nexus-theme] body::after { content: none !important; }
+  html[data-nexus-theme] :not(:where(.nexus-document, .nexus-document *)) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  html[data-nexus-theme] :is(aside, header, [data-slot="card"], .nexus-live-theme-bar, .nexus-module-hub-card):not(:where(.nexus-document, .nexus-document *)) {
+    background: var(--card) !important;
+    color: var(--card-foreground);
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  html[data-nexus-theme] :is([data-slot="card"], .nexus-module-hub-card):hover:not(:where(.nexus-document, .nexus-document *)) { transform: none !important; }
+  html[data-nexus-theme] :is([data-slot="dialog-content"], [data-slot="popover-content"], [data-slot="dropdown-menu-content"], [data-slot="sheet-content"]):not(:where(.nexus-document, .nexus-document *)) {
+    background: var(--popover) !important; color: var(--popover-foreground);
+    box-shadow: 0 2px 8px rgb(0 0 0 / .15) !important;
+  }
+}

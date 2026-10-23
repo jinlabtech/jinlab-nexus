@@ -878,19 +878,14 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function
 public.get_debtor_ageing(date)
 from public;
-
 grant execute
 on function
 public.get_debtor_ageing(date)
 to authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

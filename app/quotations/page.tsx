@@ -1,5 +1,7 @@
 "use client";
 
+import "./quotation-popup.css";
+
 import {
 	useEffect,
 	useMemo,
@@ -487,20 +489,7 @@ export default function QuotationsPage() {
 					onLogout={logout}
 				/>
 
-				<ActionModal
-				open={showForm}
-				title="New Quotation"
-				subtitle="Create a customer quotation."
-				onClose={() => setShowForm(false)}
-				maxWidth="max-w-3xl"
-			>
-				<QuotationForm
-					customers={customers}
-					branches={branches}
-					onSave={createNewQuotation}
-					onCancel={() => setShowForm(false)}
-				/>
-			</ActionModal>
+
 
 			<main className="nexus-quotations-page p-4 sm:p-6 lg:p-8">
 					<div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6">
@@ -530,6 +519,23 @@ export default function QuotationsPage() {
 				onLogout={logout}
 			/>
 
+				<ActionModal
+				open={showForm && !permissionsLoading && can("quotation.create")}
+				title="New Quotation"
+				subtitle="Create a customer quotation."
+				onClose={() => setShowForm(false)}
+				maxWidth="max-w-3xl"
+                className="nexus-quotation-popup"
+                dismissOnBackdrop={false}
+			>
+				<QuotationForm
+					customers={customers}
+					branches={branches}
+					onSave={createNewQuotation}
+					onCancel={() => setShowForm(false)}
+				/>
+			</ActionModal>
+
 			<main className="p-4 sm:p-6 lg:p-8">
 				<section className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 					<div>
@@ -549,8 +555,7 @@ export default function QuotationsPage() {
 
 					{can(
 						"quotation.create"
-					) &&
-						!showForm && (
+					) && (
 							<Button
 								type="button"
 								onClick={() => {
@@ -680,19 +685,7 @@ export default function QuotationsPage() {
 						emptyMessage="No quotations yet."
 					/>
 				)}
-				{can("quotation.create") && !showForm && (
-					<Button
-						type="button"
-						onClick={() => {
-							setMessage("");
-							setPageError("");
-							setShowForm(true);
-						}}
-						className="nexus-quotation-add-fab fixed z-[75] md:hidden"
-					>
-						+ Quote
-					</Button>
-				)}
+
 
 			</main>
 		</DashboardLayout>

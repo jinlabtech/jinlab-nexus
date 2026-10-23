@@ -73,8 +73,6 @@ create table if not exists public.accounting_account (
     code
   )
 );
-
-
 create unique index if not exists
 accounting_account_system_key_unique_idx
 on public.accounting_account (
@@ -82,43 +80,32 @@ on public.accounting_account (
   system_key
 )
 where system_key is not null;
-
-
 create index if not exists
 accounting_account_company_idx
 on public.accounting_account (
   company_id
 );
-
-
 create index if not exists
 accounting_account_type_idx
 on public.accounting_account (
   company_id,
   account_type
 );
-
-
 create index if not exists
 accounting_account_active_idx
 on public.accounting_account (
   company_id,
   is_active
 );
-
-
 drop trigger if exists
 accounting_account_set_updated_at
 on public.accounting_account;
-
 create trigger
 accounting_account_set_updated_at
 before update
 on public.accounting_account
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 2. ACCOUNTING PERIODS
 -- ============================================================
@@ -170,15 +157,11 @@ create table if not exists public.accounting_period (
     end_date
   )
 );
-
-
 create index if not exists
 accounting_period_company_idx
 on public.accounting_period (
   company_id
 );
-
-
 create index if not exists
 accounting_period_dates_idx
 on public.accounting_period (
@@ -186,28 +169,21 @@ on public.accounting_period (
   start_date,
   end_date
 );
-
-
 create index if not exists
 accounting_period_status_idx
 on public.accounting_period (
   company_id,
   status
 );
-
-
 drop trigger if exists
 accounting_period_set_updated_at
 on public.accounting_period;
-
 create trigger
 accounting_period_set_updated_at
 before update
 on public.accounting_period
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 3. JOURNAL ENTRY
 -- One business transaction.
@@ -308,8 +284,6 @@ create table if not exists public.journal_entry (
     entry_number
   )
 );
-
-
 create unique index if not exists
 journal_entry_source_event_unique_idx
 on public.journal_entry (
@@ -321,31 +295,23 @@ on public.journal_entry (
 where
   source_id is not null
   and source_event is not null;
-
-
 create index if not exists
 journal_entry_company_idx
 on public.journal_entry (
   company_id
 );
-
-
 create index if not exists
 journal_entry_date_idx
 on public.journal_entry (
   company_id,
   entry_date desc
 );
-
-
 create index if not exists
 journal_entry_status_idx
 on public.journal_entry (
   company_id,
   status
 );
-
-
 create index if not exists
 journal_entry_source_idx
 on public.journal_entry (
@@ -353,20 +319,15 @@ on public.journal_entry (
   source_type,
   source_id
 );
-
-
 drop trigger if exists
 journal_entry_set_updated_at
 on public.journal_entry;
-
 create trigger
 journal_entry_set_updated_at
 before update
 on public.journal_entry
 for each row
 execute function public.set_updated_at();
-
-
 -- ============================================================
 -- 4. JOURNAL LINES
 -- Every posted journal must balance:
@@ -434,30 +395,22 @@ create table if not exists public.journal_line (
     line_number
   )
 );
-
-
 create index if not exists
 journal_line_entry_idx
 on public.journal_line (
   journal_entry_id
 );
-
-
 create index if not exists
 journal_line_company_idx
 on public.journal_line (
   company_id
 );
-
-
 create index if not exists
 journal_line_account_idx
 on public.journal_line (
   company_id,
   account_id
 );
-
-
 -- ============================================================
 -- 5. VALIDATE JOURNAL LINE OWNERSHIP
 -- Prevent cross-company account / journal mixing.
@@ -513,12 +466,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 journal_line_validate_company
 on public.journal_line;
-
 create trigger
 journal_line_validate_company
 before insert or update
@@ -526,8 +476,6 @@ on public.journal_line
 for each row
 execute function
 public.validate_journal_line_company();
-
-
 -- ============================================================
 -- 6. JOURNAL TOTALS
 -- Database is authoritative.
@@ -574,8 +522,6 @@ begin
 
 end;
 $$;
-
-
 create or replace function
 public.journal_line_refresh_parent()
 returns trigger
@@ -616,12 +562,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 journal_line_refresh_parent
 on public.journal_line;
-
 create trigger
 journal_line_refresh_parent
 after insert or update or delete
@@ -629,8 +572,6 @@ on public.journal_line
 for each row
 execute function
 public.journal_line_refresh_parent();
-
-
 -- ============================================================
 -- 7. IMMUTABILITY
 -- Posted financial history cannot be edited or deleted.
@@ -655,12 +596,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 journal_entry_prevent_posted_update
 on public.journal_entry;
-
 create trigger
 journal_entry_prevent_posted_update
 before update
@@ -668,12 +606,9 @@ on public.journal_entry
 for each row
 execute function
 public.prevent_posted_journal_entry_mutation();
-
-
 drop trigger if exists
 journal_entry_prevent_posted_delete
 on public.journal_entry;
-
 create trigger
 journal_entry_prevent_posted_delete
 before delete
@@ -681,8 +616,6 @@ on public.journal_entry
 for each row
 execute function
 public.prevent_posted_journal_entry_mutation();
-
-
 create or replace function
 public.prevent_posted_journal_line_mutation()
 returns trigger
@@ -721,12 +654,9 @@ begin
 
 end;
 $$;
-
-
 drop trigger if exists
 journal_line_prevent_posted_insert
 on public.journal_line;
-
 create trigger
 journal_line_prevent_posted_insert
 before insert
@@ -734,12 +664,9 @@ on public.journal_line
 for each row
 execute function
 public.prevent_posted_journal_line_mutation();
-
-
 drop trigger if exists
 journal_line_prevent_posted_update
 on public.journal_line;
-
 create trigger
 journal_line_prevent_posted_update
 before update
@@ -747,12 +674,9 @@ on public.journal_line
 for each row
 execute function
 public.prevent_posted_journal_line_mutation();
-
-
 drop trigger if exists
 journal_line_prevent_posted_delete
 on public.journal_line;
-
 create trigger
 journal_line_prevent_posted_delete
 before delete
@@ -760,8 +684,6 @@ on public.journal_line
 for each row
 execute function
 public.prevent_posted_journal_line_mutation();
-
-
 -- ============================================================
 -- 8. ROW LEVEL SECURITY
 -- Financial writes will go through controlled RPCs.
@@ -770,20 +692,15 @@ public.prevent_posted_journal_line_mutation();
 alter table
 public.accounting_account
 enable row level security;
-
 alter table
 public.accounting_period
 enable row level security;
-
 alter table
 public.journal_entry
 enable row level security;
-
 alter table
 public.journal_line
 enable row level security;
-
-
 create policy
 "company members read accounting accounts"
 on public.accounting_account
@@ -797,8 +714,6 @@ using (
       auth.uid()
   )
 );
-
-
 create policy
 "company members read accounting periods"
 on public.accounting_period
@@ -812,8 +727,6 @@ using (
       auth.uid()
   )
 );
-
-
 create policy
 "company members read journal entries"
 on public.journal_entry
@@ -827,8 +740,6 @@ using (
       auth.uid()
   )
 );
-
-
 create policy
 "company members read journal lines"
 on public.journal_line
@@ -842,42 +753,30 @@ using (
       auth.uid()
   )
 );
-
-
 revoke insert, update, delete
 on public.accounting_account
 from authenticated;
-
 revoke insert, update, delete
 on public.accounting_period
 from authenticated;
-
 revoke insert, update, delete
 on public.journal_entry
 from authenticated;
-
 revoke insert, update, delete
 on public.journal_line
 from authenticated;
-
-
 grant select
 on public.accounting_account
 to authenticated;
-
 grant select
 on public.accounting_period
 to authenticated;
-
 grant select
 on public.journal_entry
 to authenticated;
-
 grant select
 on public.journal_line
 to authenticated;
-
-
 -- ============================================================
 -- 9. ACCOUNTING RBAC
 -- ============================================================
@@ -895,8 +794,6 @@ on conflict (
   permission_name
 )
 do nothing;
-
-
 -- OWNER / ADMIN
 insert into public.role_permissions (
   role_id,
@@ -919,8 +816,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- MANAGER
 -- Can inspect accounting and prepare journals,
 -- but posting / period control is not automatic.
@@ -944,8 +839,6 @@ on conflict (
   permission_id
 )
 do nothing;
-
-
 -- ============================================================
 -- END ACCOUNTING LEDGER FOUNDATION
--- ============================================================
+-- ============================================================;

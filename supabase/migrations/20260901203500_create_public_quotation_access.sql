@@ -251,17 +251,12 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.get_public_quotation(text)
 from public;
-
 grant execute
 on function public.get_public_quotation(text)
 to anon, authenticated;
-
-
 -- ============================================================
 -- 2. CUSTOMER RESPONSE
 -- ============================================================
@@ -456,8 +451,6 @@ begin
 
 end;
 $$;
-
-
 revoke all
 on function public.respond_to_public_quotation(
   text,
@@ -465,7 +458,6 @@ on function public.respond_to_public_quotation(
   text
 )
 from public;
-
 grant execute
 on function public.respond_to_public_quotation(
   text,
@@ -473,8 +465,6 @@ on function public.respond_to_public_quotation(
   text
 )
 to anon, authenticated;
-
-
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================;

@@ -63,6 +63,19 @@ export function coreRecordHref(href: string) {
 export function downloadCoreReport(analysis: CoreAnalysis) {
   const lines = ["NEXUS INTELLIGENCE", analysis.companyName, `Business date: ${analysis.asOf}`, `Checked: ${analysis.checkedAt}`, "", analysis.headline, "", "BUSINESS MEASURES"];
   for (const metric of analysis.metrics) lines.push(`${metric.label}: ${metric.value}`, metric.detail, "");
+  if (analysis.salesReport) {
+    const sales = analysis.salesReport;
+    lines.push("SALES REPORT", sales.detail);
+    if (sales.state === "ready") for (const [label, value] of [["Revenue month to date", sales.revenueMonth], ["Cash collected month to date", sales.cashMonth], ["Gross profit month to date", sales.grossProfitMonth], ["Net profit month to date", sales.netProfitMonth], ["Revenue financial year to date", sales.revenueYear]]) lines.push(`${label}: ${value} ${analysis.currency || "currency unverified"}`);
+    if (sales.postingExceptions) lines.push(`Open posting exceptions: ${sales.postingExceptions}`);
+    lines.push("");
+  }
+  if (analysis.repairReport) {
+    lines.push("OUTSTANDING REPAIRS", `Total: ${analysis.repairReport.total}`);
+    if (analysis.repairReport.truncated) lines.push("Only the oldest 100 open jobs are listed.");
+    for (const job of analysis.repairReport.jobs) lines.push(`${job.number}: ${job.status}; ${job.assigned ? "assigned" : "unassigned"}; updated ${job.updatedAt}`);
+    lines.push("");
+  }
   lines.push("PRIORITIES");
   if (!analysis.findings.length) lines.push("No priorities identified within the available data and current checks.");
   for (const finding of analysis.findings) lines.push(`[${finding.severity.toUpperCase()}] ${finding.title}`, finding.summary, ...finding.evidence.map((item) => `- ${item}`), `Check applied: ${finding.rule}`, `${finding.actionLabel}: ${coreRecordHref(finding.href) ? window.location.origin + finding.href : "Open the relevant Nexus module"}`, "");

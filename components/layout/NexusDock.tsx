@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import Link from "next/link";
+import { useBrowserStorage, decodeStringList } from "@/lib/nexus/browser-storage";
 
 import {
   usePathname,
@@ -86,6 +87,11 @@ const MODE_KEY = "nexus-dock-mode-v3";
 const RECENT_KEY = "nexus-dock-recent-v3";
 
 const MAX_PINS = 9;
+const emptyRecent: string[] = [];
+function decodeMode(raw: string): DockMode {
+  const value = raw.startsWith('"') ? JSON.parse(raw) : raw;
+  return value === "collapsed" || value === "expanded" ? value : "normal";
+}
 
 function activeRoute(
   pathname: string,
@@ -121,14 +127,9 @@ export default function NexusDock() {
     loading,
   } = usePermissions();
 
-  const [mode, setMode] =
-    useState<DockMode>("normal");
-
-  const [pins, setPins] =
-    useState<string[]>(defaultPins);
-
-  const [recent, setRecent] =
-    useState<string[]>([]);
+  const [mode, setMode] = useBrowserStorage<DockMode>(MODE_KEY, "normal", decodeMode);
+  const [pins, setPins] = useBrowserStorage(PINS_KEY, defaultPins, decodeStringList);
+  const [recent, setRecent] = useBrowserStorage(RECENT_KEY, emptyRecent, decodeStringList);
 
   const [dragging, setDragging] =
     useState<string | null>(null);
@@ -145,97 +146,6 @@ export default function NexusDock() {
 
   const searchRef =
     useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    try {
-      const savedPins =
-        window.localStorage.getItem(PINS_KEY);
-
-      const savedMode =
-        window.localStorage.getItem(MODE_KEY);
-
-      const savedRecent =
-        window.localStorage.getItem(RECENT_KEY);
-
-      if (savedPins) {
-        const parsed = JSON.parse(savedPins);
-
-        if (Array.isArray(parsed)) {
-          setPins(
-            parsed.filter(
-              (item) =>
-                typeof item === "string"
-            )
-          );
-        }
-      }
-
-      if (
-        savedMode === "collapsed" ||
-        savedMode === "normal" ||
-        savedMode === "expanded"
-      ) {
-        setMode(savedMode);
-      }
-
-      if (savedRecent) {
-        const parsed =
-          JSON.parse(savedRecent);
-
-        if (Array.isArray(parsed)) {
-          setRecent(
-            parsed.filter(
-              (item) =>
-                typeof item === "string"
-            )
-          );
-        }
-      }
-    } catch {
-      // Keep defaults.
-    }
-  }, []);
-
-  useEffect(() => {
-    function syncPinsFromStorage() {
-      try {
-        const raw =
-          window.localStorage.getItem(
-            PINS_KEY
-          );
-
-        if (!raw) {
-          return;
-        }
-
-        const parsed =
-          JSON.parse(raw);
-
-        if (Array.isArray(parsed)) {
-          setPins(
-            parsed.filter(
-              (item) =>
-                typeof item === "string"
-            )
-          );
-        }
-      } catch {
-        // Keep current dock state.
-      }
-    }
-
-    window.addEventListener(
-      "nexus:dock-pins-changed",
-      syncPinsFromStorage
-    );
-
-    return () => {
-      window.removeEventListener(
-        "nexus:dock-pins-changed",
-        syncPinsFromStorage
-      );
-    };
-  }, []);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -327,25 +237,8 @@ export default function NexusDock() {
 
     if (!current) return;
 
-    setRecent((existing) => {
-      const next = [
-        current.id,
-        ...existing.filter(
-          (id) =>
-            id !== current.id
-        ),
-      ].slice(0, 6);
-
-      try {
-        window.localStorage.setItem(
-          RECENT_KEY,
-          JSON.stringify(next)
-        );
-      } catch {}
-
-      return next;
-    });
-  }, [pathname]);
+    setRecent((existing) => [current.id, ...existing.filter(id => id !== current.id)].slice(0, 6));
+  }, [pathname, setRecent]);
 
   const launcherApps =
     useMemo(() => {
@@ -430,29 +323,12 @@ export default function NexusDock() {
   ) {
     setMode(next);
 
-    try {
-      window.localStorage.setItem(
-        MODE_KEY,
-        next
-      );
-    } catch {}
   }
 
-  function savePins(
-    next: string[]
-  ) {
-    const limited =
-      next.slice(0, MAX_PINS);
-
-    setPins(limited);
-
-    try {
-      window.localStorage.setItem(
-        PINS_KEY,
-        JSON.stringify(limited)
-      );
-    } catch {}
+  function savePins(next: string[]) {
+    setPins(next.slice(0, MAX_PINS));
   }
+
 
   function togglePin(
     id: string

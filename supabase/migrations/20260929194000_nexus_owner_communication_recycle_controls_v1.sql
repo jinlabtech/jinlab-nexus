@@ -127,8 +127,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- MARKETING CAMPAIGN: RESTORE
 -- =========================================================
@@ -237,8 +235,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- MARKETING CAMPAIGN: PERMANENT DELETE
 -- =========================================================
@@ -332,8 +328,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- RECURRING SCHEDULE: TRASH
 -- =========================================================
@@ -432,8 +426,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- RECURRING SCHEDULE: RESTORE
 -- =========================================================
@@ -547,8 +539,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- RECURRING SCHEDULE: PERMANENT DELETE
 -- =========================================================
@@ -653,8 +643,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- BULK EMAIL: TRASH
 -- =========================================================
@@ -777,8 +765,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- BULK EMAIL: RESTORE
 -- =========================================================
@@ -884,8 +870,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- BULK EMAIL: PERMANENT DELETE
 -- =========================================================
@@ -969,8 +953,6 @@ begin
   );
 end;
 $$;
-
-
 -- =========================================================
 -- GENERIC RECYCLE BIN RESTORE
 -- =========================================================
@@ -1019,8 +1001,6 @@ begin
   end case;
 end;
 $$;
-
-
 -- =========================================================
 -- GENERIC RECYCLE BIN PERMANENT DELETE
 -- =========================================================
@@ -1069,8 +1049,6 @@ begin
   end case;
 end;
 $$;
-
-
 -- =========================================================
 -- PRIVILEGES
 -- =========================================================
@@ -1078,88 +1056,66 @@ $$;
 revoke all on function
   public.marketing_owner_trash_campaign(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.marketing_owner_restore_campaign(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.marketing_owner_delete_campaign(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.marketing_owner_trash_recurring_series(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.marketing_owner_restore_recurring_series(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.marketing_owner_delete_recurring_series(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.email_owner_trash_bulk_batch(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.email_owner_restore_bulk_batch(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.email_owner_delete_bulk_batch(uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.owner_recycle_bin_restore(text, uuid)
 from public, anon, authenticated;
-
 revoke all on function
   public.owner_recycle_bin_permanent_delete(text, uuid)
 from public, anon, authenticated;
-
-
 grant execute on function
   public.marketing_owner_trash_campaign(uuid)
 to authenticated;
-
 grant execute on function
   public.marketing_owner_restore_campaign(uuid)
 to authenticated;
-
 grant execute on function
   public.marketing_owner_delete_campaign(uuid)
 to authenticated;
-
 grant execute on function
   public.marketing_owner_trash_recurring_series(uuid)
 to authenticated;
-
 grant execute on function
   public.marketing_owner_restore_recurring_series(uuid)
 to authenticated;
-
 grant execute on function
   public.marketing_owner_delete_recurring_series(uuid)
 to authenticated;
-
 grant execute on function
   public.email_owner_trash_bulk_batch(uuid)
 to authenticated;
-
 grant execute on function
   public.email_owner_restore_bulk_batch(uuid)
 to authenticated;
-
 grant execute on function
   public.email_owner_delete_bulk_batch(uuid)
 to authenticated;
-
 grant execute on function
   public.owner_recycle_bin_restore(text, uuid)
 to authenticated;
-
 grant execute on function
   public.owner_recycle_bin_permanent_delete(text, uuid)
 to authenticated;

@@ -196,10 +196,8 @@ begin
 
 end;
 $$;
-
 revoke all on function public.get_public_payment_link(text) from public;
 grant execute on function public.get_public_payment_link(text) to anon, authenticated;
-
 -- ============================================================
 -- Adaptive gateway transaction initiation
 -- ============================================================
@@ -469,17 +467,12 @@ begin
 
 end;
 $$;
-
 revoke all on function public.create_public_gateway_transaction(
   text, text, text, numeric, text
 ) from public;
-
 grant execute on function public.create_public_gateway_transaction(
   text, text, text, numeric, text
 ) to anon, authenticated;
-
-
-
 -- ============================================================
 -- Adaptive verified gateway payment posting
 -- ============================================================
@@ -895,8 +888,6 @@ begin
 
 end;
 $$;
-
-
 -- This function represents confirmed money.
 -- Browser users must NEVER be allowed to call it directly.
 
@@ -910,7 +901,6 @@ on function public.post_verified_gateway_payment(
   jsonb
 )
 from public;
-
 revoke all
 on function public.post_verified_gateway_payment(
   uuid,
@@ -921,7 +911,6 @@ on function public.post_verified_gateway_payment(
   jsonb
 )
 from anon;
-
 revoke all
 on function public.post_verified_gateway_payment(
   uuid,
@@ -932,7 +921,6 @@ on function public.post_verified_gateway_payment(
   jsonb
 )
 from authenticated;
-
 grant execute
 on function public.post_verified_gateway_payment(
   uuid,

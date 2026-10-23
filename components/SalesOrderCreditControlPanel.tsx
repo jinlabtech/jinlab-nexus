@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -91,7 +93,11 @@ function formatCurrency(
 }
 
 
-export default function SalesOrderCreditControlPanel({
+export default function SalesOrderCreditControlPanel(props: Props) {
+  return <SalesOrderCreditControlPanelContent key={props.salesOrderId} {...props} />;
+}
+
+function SalesOrderCreditControlPanelContent({
   salesOrderId,
 }: Props) {
 
@@ -170,40 +176,42 @@ export default function SalesOrderCreditControlPanel({
     useState("");
 
 
-  async function loadControl() {
-    try {
-      setLoading(true);
-      setErrorMessage("");
+  const requestVersion = useRef(0);
 
-      const result =
-        await getSalesOrderCreditControl(
-          salesOrderId
-        );
-
+  const fetchData = useCallback(() => {
+    const version = ++requestVersion.current;
+    return getSalesOrderCreditControl(salesOrderId).then((result) => {
+      if (version !== requestVersion.current)
+        return;
       setControl(result);
+      setPaymentBasis(result.payment_basis ??
+        "");
+    }).catch((error) => {
+      if (version !== requestVersion.current)
+        return;
+      setErrorMessage(error instanceof Error
+        ? error.message
+        : "Credit control could not be loaded.");
+    }).finally(() => {
+      if (version === requestVersion.current) {
+        setLoading(false);
+      }
+    });
+  }, [salesOrderId]);
 
-      setPaymentBasis(
-        result.payment_basis ??
-        ""
-      );
-
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Credit control could not be loaded."
-      );
-    } finally {
-      setLoading(false);
-    }
+  async function loadControl() {
+    setLoading(true);
+    setErrorMessage("");
+    await fetchData();
   }
 
 
   useEffect(() => {
-    void loadControl();
-  }, [
-    salesOrderId,
-  ]);
+    void fetchData();
+    return () => {
+      requestVersion.current += 1;
+    };
+  }, [fetchData]);
 
 
   async function savePaymentBasis() {

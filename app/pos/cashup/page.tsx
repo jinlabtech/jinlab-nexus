@@ -3,6 +3,7 @@
 import SearchableSelect from "@/components/ui/SearchableSelect";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -198,158 +199,137 @@ export default function PosCashupPage() {
     useState(
       ""
     );
+  const fetchWorkspace = useCallback((selectedBranchId: string) => {
+
+    return supabase.auth.getUser()
+      .then(async ({
+        data: {
+          user,
+        },
+      }) => {
+        if (!user) {
+
+          router.replace(
+            "/login"
+          );
+
+          return;
+        }
+
+        const {
+          data:
+          profile,
+        } =
+          await supabase
+            .from(
+              "user_profile"
+            )
+            .select(
+              "full_name, company_id"
+            )
+            .eq(
+              "user_id",
+              user.id
+            )
+            .maybeSingle();
+
+        if (
+          profile?.full_name
+        ) {
+
+          setUserName(
+            profile.full_name
+          );
+        }
+
+        if (
+          profile?.company_id
+        ) {
+
+          const {
+            data:
+            company,
+          } =
+            await supabase
+              .from(
+                "company"
+              )
+              .select(
+                "company_name"
+              )
+              .eq(
+                "id",
+                profile.company_id
+              )
+              .maybeSingle();
 
 
-  async function loadWorkspace(
-    selectedBranchId =
-      branchId
-  ) {
+          if (
+            company?.company_name
+          ) {
+
+            setCompanyName(
+              company.company_name
+            );
+          }
+
+        }
+
+        const {
+          data,
+          error,
+        } =
+          await supabase.rpc(
+            "get_pos_cashup_workspace",
+            {
+              p_branch_id:
+                selectedBranchId ||
+                null,
+            }
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        setWorkspace(
+          data as CashupWorkspace
+        );
+      })
+      .catch((error) => {
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to load POS cash-up."
+        );
+
+      })
+      .finally(() => {
+
+        setLoading(
+          false
+        );
+
+      });
+  }, [router]);
+
+  function loadWorkspace(selectedBranchId =
+    branchId) {
 
     setLoading(
       true
     );
-
     setErrorMessage(
       ""
     );
-
-
-    try {
-
-      const {
-        data: {
-          user,
-        },
-      } =
-        await supabase.auth.getUser();
-
-
-      if (!user) {
-
-        router.replace(
-          "/login"
-        );
-
-        return;
-      }
-
-
-      const {
-        data:
-          profile,
-      } =
-        await supabase
-          .from(
-            "user_profile"
-          )
-          .select(
-            "full_name, company_id"
-          )
-          .eq(
-            "user_id",
-            user.id
-          )
-          .maybeSingle();
-
-
-      if (
-        profile?.full_name
-      ) {
-
-        setUserName(
-          profile.full_name
-        );
-      }
-
-
-      if (
-        profile?.company_id
-      ) {
-
-        const {
-          data:
-            company,
-        } =
-          await supabase
-            .from(
-              "company"
-            )
-            .select(
-              "company_name"
-            )
-            .eq(
-              "id",
-              profile.company_id
-            )
-            .maybeSingle();
-
-
-        if (
-          company?.company_name
-        ) {
-
-          setCompanyName(
-            company.company_name
-          );
-        }
-
-      }
-
-
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "get_pos_cashup_workspace",
-          {
-            p_branch_id:
-              selectedBranchId ||
-              null,
-          }
-        );
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      setWorkspace(
-        data as CashupWorkspace
-      );
-
-    } catch (
-      error
-    ) {
-
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to load POS cash-up."
-      );
-
-    } finally {
-
-      setLoading(
-        false
-      );
-
-    }
-
+    return fetchWorkspace(selectedBranchId);
   }
 
+  useEffect(() => {
+    void fetchWorkspace("");
+  }, [fetchWorkspace]);
 
-  useEffect(
-    () => {
-
-      void loadWorkspace(
-        ""
-      );
-
-    },
-    []
-  );
 
 
   const summary =

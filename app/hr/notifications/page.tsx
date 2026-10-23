@@ -422,89 +422,80 @@ export default function HrNotificationsPage() {
 
   const load =
     useCallback(
-      async (
+      (
         quiet =
           false
       ) => {
-        if (
-          !quiet
-        ) {
-          setBusy(
-            "refresh"
-          );
-        }
+        return supabase.auth.getUser()
+          .then(async ({ data: { user } }) => {
+            if (
+              !quiet
+            ) {
+              setBusy(
+                "refresh"
+              );
+            }
 
 
-        setError(
-          ""
-        );
-
-
-        try {
-          const {
-            data: {
-              user,
-            },
-          } =
-            await supabase.auth.getUser();
-
-
-          if (!user) {
-            window.location.href =
-              "/login";
-
-            return;
-          }
-
-
-          const {
-            data,
-            error:
-              rpcError,
-          } =
-            await supabase.rpc(
-              "get_hr_notifications_workspace",
-              {
-                p_include_resolved:
-                  includeResolved,
-              }
-            );
-
-
-          if (
-            rpcError
-          ) {
-            throw rpcError;
-          }
-
-
-          setWorkspace(
-            data as Workspace
-          );
-
-        } catch (
-          caught
-        ) {
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : "Unable to load HR notifications."
-          );
-
-        } finally {
-          setLoading(
-            false
-          );
-
-
-          if (
-            !quiet
-          ) {
-            setBusy(
+            setError(
               ""
             );
-          }
-        }
+
+
+            if (!user) {
+              window.location.href =
+                "/login";
+
+              return;
+            }
+
+
+            const {
+              data,
+              error:
+                rpcError,
+            } =
+              await supabase.rpc(
+                "get_hr_notifications_workspace",
+                {
+                  p_include_resolved:
+                    includeResolved,
+                }
+              );
+
+
+            if (
+              rpcError
+            ) {
+              throw rpcError;
+            }
+
+
+            setWorkspace(
+              data as Workspace
+            );
+          })
+          .catch((caught: unknown) => {
+            setError(
+              caught instanceof Error
+                ? caught.message
+                : "Unable to load HR notifications."
+            );
+          })
+          .finally(() => {
+            setLoading(
+              false
+            );
+
+
+            if (
+              !quiet
+            ) {
+              setBusy(
+                ""
+              );
+            }
+          });
       },
       [
         includeResolved,

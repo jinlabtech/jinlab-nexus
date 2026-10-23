@@ -74,7 +74,7 @@ export default function A4Preview({
        */
       const availableWidth =
         Math.max(
-          containerEl.clientWidth - 8,
+          containerEl.clientWidth - parseFloat(getComputedStyle(containerEl).paddingLeft) - parseFloat(getComputedStyle(containerEl).paddingRight),
           1
         );
 
@@ -136,8 +136,7 @@ export default function A4Preview({
         </button>
 
         <span>
-          Preview is a real A4 page.
-          Printing remains 210 × 297 mm.
+          {fitToScreen ? "Whole page preview. Choose 100% A4 for larger text." : "Swipe sideways to read the full-size page."} Printing stays A4.
         </span>
       </div>
 
@@ -157,6 +156,8 @@ export default function A4Preview({
               ? {
                   height:
                     `${scaledHeight}px`,
+                  width: `${(210 / 25.4) * 96 * scale}px`,
+                  margin: "0 auto",
                 }
               : undefined
           }
@@ -170,7 +171,7 @@ export default function A4Preview({
                     transform:
                       `scale(${scale})`,
                     transformOrigin:
-                      "top center",
+                      "top left",
                   }
                 : undefined
             }
