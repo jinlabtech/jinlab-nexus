@@ -35,6 +35,25 @@ export interface SecondHandItem {
   disposed_at: string | null;
   buyer_id: string | null;
   screening_result: "clear" | "flagged" | "unknown";
+  acquisition_type: "purchase" | "trade_in";
+  trade_in_reference: string | null;
+  trade_in?: SecondHandTradeIn | null;
+}
+export interface SecondHandTradeIn {
+  customer_id: string;
+  customer_name: string;
+  replacement_inventory_item_id: string;
+  replacement_item_name: string;
+  replacement_price: number;
+  allowance_amount: number;
+  balance_due: number;
+  excess_allowance: number;
+}
+export interface SecondHandIntegrationChoices {
+  customers: { id: string; name: string; number: string }[];
+  replacement_items: { id: string; name: string; sku: string; selling_price: number; quantity: number }[];
+  repair_jobs: { id: string; job_number: string; status: string }[];
+  staff: { id: string; name: string; email: string }[];
 }
 export interface SecondHandAudit {
   id: string;
@@ -67,7 +86,7 @@ export interface SecondHandWorkspace {
   access: { user_id: string; role: SecondHandRole }[];
   costs: SecondHandCost[];
 }
-export type SecondHandAction = "party_create" | "acquire" | "approve" | "release" | "flag" | "report_saps" | "add_cost" | "link_inventory" | "dispose" | "policy_update" | "grant_access" | "revoke_access";
+export type SecondHandAction = "party_create" | "acquire" | "approve" | "release" | "flag" | "report_saps" | "add_cost" | "link_repair" | "link_inventory" | "dispose" | "policy_update" | "grant_access" | "revoke_access";
 
 // Spreadsheet programs interpret these leading characters as executable formulas.
 export function safeCsvCell(value: unknown): string {
@@ -98,6 +117,9 @@ const safeDatabaseMessages = new Set<string>([
   "Acquisition time must be actual, in the past, and within five years.",
   "Auditor access is read-only.",
   "Choose an existing authenticated staff account.",
+  "Choose an active customer in this company.",
+  "Choose an available replacement product in this branch.",
+  "Choose both a customer and replacement product for a trade-in estimate.",
   "Communications equipment requires its applicable IMEI.",
   "Confirm registered premises/goods scope and a holding period of 7–365 days.",
   "Grant clerk or auditor access.",
@@ -106,6 +128,7 @@ const safeDatabaseMessages = new Set<string>([
   "Invalid sale amount.",
   "Invalid selling price.",
   "Only a released item can be disposed.",
+  "Only approved, unsold devices can be linked to repairs.",
   "Only an approved item can be released.",
   "Only clear, held items can receive owner approval.",
   "Only quarantined items accept a SAPS report reference.",
@@ -127,6 +150,8 @@ const safeDatabaseMessages = new Set<string>([
   "Sold item investigations require a manual incident process; the register remains unchanged.",
   "Statutory/conservative holding period has not elapsed; no delivery or refurbishment is allowed.",
   "The item is not available in this branch.",
+  "This device already has a linked repair job.",
+  "Search must contain no more than 100 characters.",
   "This device is controlled by Second-hand Trading. Use its verified-buyer disposal register; ordinary stock, POS and invoice paths are blocked.",
   "This serial/IMEI is already in the register. Owner review is required; repeat intake is blocked.",
   "Unknown second-hand operation."
